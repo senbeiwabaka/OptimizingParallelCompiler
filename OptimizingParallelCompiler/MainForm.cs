@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using System.IO;
 
 namespace OptimizingParallelCompiler
 {
@@ -14,6 +15,9 @@ namespace OptimizingParallelCompiler
     {
         private List<string> _reserveWords;
         private Thread _wordColoringThread;
+
+        const string _errorFile = "error.txt";
+        const string _resultsFile = "results.txt";
 
         public MainForm()
         {
@@ -128,6 +132,91 @@ namespace OptimizingParallelCompiler
             
 
             Console.WriteLine("help");
+        }
+
+
+        /// <summary>
+        /// Menu item to run code
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void runToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void runCode()
+        {
+
+        }
+
+        private void writeResultsToFile(string results)
+        {
+            //Code to capture Results
+            try
+            {
+                //Check if file already exists
+                if (File.Exists(_resultsFile))
+                {
+                    //File Exists - delete file
+                    File.Delete(_resultsFile);
+                }
+                
+                //Code to write results
+                StreamWriter resultsWriter = new StreamWriter(_resultsFile);
+
+                resultsWriter.Write(results);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("An error has occured trying to write results file!");
+                if (File.Exists(_errorFile))
+                {
+                    File.AppendAllText(_errorFile, ex.Message);
+                }
+                else
+                {
+                    File.WriteAllText(_errorFile, ex.Message);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Read execution results from a file.
+        /// </summary>
+        private void readResultsFromFile()
+        {
+            //Try to read file
+            try
+            {
+                //Check if file exists
+                if (File.Exists(_resultsFile))
+                {
+                    {
+                        //Code to read results
+                        StreamReader resultsReader = new StreamReader(_resultsFile);
+                        
+                        //Write Results to Screen?
+                        //txtResults.Text = resultsReader.ReadToEnd();
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("The results file does not exist!");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("An error has occured trying to read results file!");
+                if (File.Exists(_errorFile))
+                {
+                    File.AppendAllText(_errorFile, ex.Message);
+                }
+                else
+                {
+                    File.WriteAllText(_errorFile, ex.Message);
+                }
+            }
         }
     }
 }
