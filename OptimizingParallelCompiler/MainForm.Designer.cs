@@ -33,8 +33,8 @@
             this.convertToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.runToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
-            this.richTextBox2 = new System.Windows.Forms.RichTextBox();
+            this.txtOneilCode = new System.Windows.Forms.RichTextBox();
+            this.txtCSharpCode = new System.Windows.Forms.RichTextBox();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -78,30 +78,30 @@
             this.exitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             // 
-            // richTextBox1
+            // txtOneilCode
             // 
-            this.richTextBox1.Location = new System.Drawing.Point(13, 28);
-            this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(435, 554);
-            this.richTextBox1.TabIndex = 1;
-            this.richTextBox1.Text = "";
-            this.richTextBox1.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.richTextBox1_KeyPress);
+            this.txtOneilCode.Location = new System.Drawing.Point(13, 28);
+            this.txtOneilCode.Name = "txtOneilCode";
+            this.txtOneilCode.Size = new System.Drawing.Size(435, 554);
+            this.txtOneilCode.TabIndex = 1;
+            this.txtOneilCode.Text = "";
+            this.txtOneilCode.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.richTextBox1_KeyPress);
             // 
-            // richTextBox2
+            // txtCSharpCode
             // 
-            this.richTextBox2.Location = new System.Drawing.Point(454, 27);
-            this.richTextBox2.Name = "richTextBox2";
-            this.richTextBox2.Size = new System.Drawing.Size(451, 554);
-            this.richTextBox2.TabIndex = 2;
-            this.richTextBox2.Text = "";
+            this.txtCSharpCode.Location = new System.Drawing.Point(454, 27);
+            this.txtCSharpCode.Name = "txtCSharpCode";
+            this.txtCSharpCode.Size = new System.Drawing.Size(451, 554);
+            this.txtCSharpCode.TabIndex = 2;
+            this.txtCSharpCode.Text = "";
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(917, 573);
-            this.Controls.Add(this.richTextBox2);
-            this.Controls.Add(this.richTextBox1);
+            this.Controls.Add(this.txtCSharpCode);
+            this.Controls.Add(this.txtOneilCode);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "MainForm";
@@ -120,8 +120,8 @@
         private System.Windows.Forms.ToolStripMenuItem convertToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem runToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
-        private System.Windows.Forms.RichTextBox richTextBox1;
-        private System.Windows.Forms.RichTextBox richTextBox2;
+        private System.Windows.Forms.RichTextBox txtOneilCode;
+        private System.Windows.Forms.RichTextBox txtCSharpCode;
     }
 }
 

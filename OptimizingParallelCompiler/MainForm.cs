@@ -61,22 +61,22 @@ namespace OptimizingParallelCompiler
 
         private void RtbColor()
         {
-            int index = richTextBox1.Text.IndexOf("if");
+            int index = txtOneilCode.Text.IndexOf("if");
 
             Console.WriteLine(index);
 
-            for (int i = 0; i < richTextBox1.Lines.Length; i++)
+            for (int i = 0; i < txtOneilCode.Lines.Length; i++)
             {
-                var words = richTextBox1.Lines[i];
+                var words = txtOneilCode.Lines[i];
 
                 for (int k = 0; k < _reserveWords.Count; k++)
                 {
-                    var start = richTextBox1.Lines[i].IndexOf(_reserveWords[k]);
+                    var start = txtOneilCode.Lines[i].IndexOf(_reserveWords[k]);
                     if (start > -1)
                     {
-                        richTextBox1.Select(start, _reserveWords[k].Length);
-                        richTextBox1.SelectionColor = Color.DodgerBlue;
-                        richTextBox1.Select(0, 0);
+                        txtOneilCode.Select(start, _reserveWords[k].Length);
+                        txtOneilCode.SelectionColor = Color.DodgerBlue;
+                        txtOneilCode.Select(0, 0);
                     }
                 }
             }
@@ -120,11 +120,11 @@ namespace OptimizingParallelCompiler
 
         private void convertToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var words = richTextBox1.Text.ToArray();
+            var words = txtOneilCode.Text.ToArray();
 
             var test = new List<string>();
 
-            foreach (var line in richTextBox1.Lines)
+            foreach (var line in txtOneilCode.Lines)
             {
                 test.Add(line);
             }
@@ -142,7 +142,16 @@ namespace OptimizingParallelCompiler
         /// <param name="e"></param>
         private void runToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            //Run .created exe and get results.
+            try
+            {
 
+            }
+            catch (Exception)
+            {
+                
+                throw;
+            }
         }
 
         private void runCode()
