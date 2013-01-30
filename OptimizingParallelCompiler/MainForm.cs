@@ -13,6 +13,7 @@ namespace OptimizingParallelCompiler
         private readonly List<string> _reserveWords;
         private string _output = "Out.exe";
         private CompilerResults _results;
+        private int _labelCounter = 0;
 
         const string ErrorFile = "error.txt";
         const string ResultsFile = "results.txt";
@@ -39,6 +40,7 @@ namespace OptimizingParallelCompiler
                     "print",
                     "prompt",
                     "end",
+                    "for",
                 };
         }
 
@@ -103,11 +105,38 @@ namespace OptimizingParallelCompiler
                         }
                         else if (reserveWord.Equals("while"))
                         {
-                            
+
+                            ++_labelCounter;
                         }
                         else if (reserveWord.Equals("for"))
                         {
-                            
+                            test[i] = test[i].Replace("\t", string.Empty);
+                            var index = test[i].IndexOf("for") + reserveWord.Count() + 1;
+                            txtError.AppendText(index.ToString());
+                            var end = test[i].IndexOf("to") - 1;
+                            txtError.AppendText(end.ToString());
+                            var value = "\t\t" + test[i].Substring(index, end - index) + ";\n";
+                            txtError.AppendText(value.ToString());
+                            var value1 = "\t" + value.Substring(2, value.IndexOf("=") - 2) + "=" +
+                                         value.Substring(2, value.IndexOf("=") - 2) + " + 1;";
+                            var label = "Label" + _labelCounter.ToString();
+                            var sentence = value + "\t" + label + ":";
+                            var number = test[i].IndexOf("to") + 2;
+                            var number1 = test[i].IndexOf("\r\n");
+                            txtError.AppendText(number.ToString());
+                            txtError.AppendText((number1 - number).ToString());
+                            txtError.AppendText(
+                                test[i].Substring(test[i].IndexOf("to") + 2, test[i].IndexOf("\n") - 3));
+
+                            var last = "\tif( " + value.Substring(2, value.IndexOf("=") - 2) + " <= " +
+                                       test[i].Substring(test[i].IndexOf("to") + 3, test[i].IndexOf("\n") - 3) +
+                                       " ) then goto " + label + ";";
+
+                            test[i] = sentence;
+                            test.Insert(i + 2, value1);
+                            test.Insert(i + 3, last);
+
+                            ++_labelCounter; 
                         }
                         else if(reserveWord.Equals("var"))
                         {
@@ -158,6 +187,13 @@ namespace OptimizingParallelCompiler
                         else if (reserveWord.Equals("input"))
                         {
                             
+                        }
+                        else if (reserveWord.Equals("int"))
+                        {
+                            var sentence = test[i];
+                            sentence = sentence.Replace("\t", string.Empty);
+                            sentence = "\t" + sentence + ";";
+                            test[i] = sentence;
                         }
                     }
                     else if (test[i].Contains("begin"))
