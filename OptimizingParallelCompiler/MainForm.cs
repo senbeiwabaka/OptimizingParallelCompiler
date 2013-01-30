@@ -1,11 +1,8 @@
 ﻿using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Windows.Forms;
 using System.IO;
 
@@ -14,6 +11,8 @@ namespace OptimizingParallelCompiler
     public partial class MainForm : Form
     {
         private readonly List<string> _reserveWords;
+        private string output = "Out.exe";
+        private CompilerResults _results;
 
         const string ErrorFile = "error.txt";
         const string ResultsFile = "results.txt";
@@ -112,7 +111,7 @@ namespace OptimizingParallelCompiler
                             Console.WriteLine(test[i]);
                             if (i == 0)
                             {
-                                const string usingstatements = "System;\n"  + "class Program\n" + "{";
+                                const string usingstatements = "using System;\n"  + "class Program\n" + "{";
                                 test.Insert(1, usingstatements);
                             }
                         }
@@ -130,7 +129,11 @@ namespace OptimizingParallelCompiler
                         }
                         else if (reserveWord.Equals("end") && test[i].Equals(reserveWord))
                         {
-                            test[i] = "}";
+                            test[i] = "} \n }";
+                        }
+                        else if (reserveWord.Equals("prompt"))
+                        {
+                            
                         }
                     }
                 }  
@@ -153,6 +156,50 @@ namespace OptimizingParallelCompiler
         /// <param name="e"></param>
         private void compileToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            var codeProvider = CodeDomProvider.CreateProvider("CSharp");
+
+            txtError.Text = "";
+
+            //generate exe not dll
+            var par = new CompilerParameters
+                {
+                    GenerateExecutable = true,
+                    OutputAssembly = output,
+                    CompilerOptions = "/platform:x86"
+                };
+
+            //Assembly a;
+            //par.ReferencedAssemblies.Add("C:/Program Files (x86)/Microsoft XNA/XNA Game Studio/v4.0/References/Windows/x86/Microsoft.Xna.Framework.dll");
+            //par.ReferencedAssemblies.Add("C:/Program Files (x86)/Microsoft XNA/XNA Game Studio/v4.0/References/Windows/x86/Microsoft.Xna.Framework.Game.dll");
+            //par.ReferencedAssemblies.Add("C:/Program Files (x86)/Microsoft XNA/XNA Game Studio/v4.0/References/Windows/x86/Microsoft.Xna.Framework.Graphics.dll");
+
+
+            txtError.Text = par.LinkedResources.ToString();
+
+            _results = codeProvider.CompileAssemblyFromSource(par, txtCSharpCode.Text);
+
+
+            if (_results.Errors.Count > 0)
+            {
+                txtError.ForeColor = Color.Red;
+
+                foreach (CompilerError item in _results.Errors)
+                {
+                    txtError.Text = "line number " + item.Line + ", error num" + item.ErrorNumber +
+                                    " , " + item.ErrorText + ";" +
+                                    Environment.NewLine + Environment.NewLine;
+                }
+            }
+            else
+            {
+                //Successful Compile
+                txtError.ForeColor = Color.Blue;
+                txtError.Text = "Success!";
+                foreach (string text in par.ReferencedAssemblies)
+                {
+                    txtError.Text += text;
+                }
+            }
 
         }
 
