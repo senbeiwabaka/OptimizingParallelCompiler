@@ -43,7 +43,8 @@
             this.taxToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.triviaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.convertToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.runToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.compileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.txtOneilCode = new System.Windows.Forms.RichTextBox();
             this.txtCSharpCode = new System.Windows.Forms.RichTextBox();
@@ -65,7 +66,8 @@
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.loadOneilCodeToolStripMenuItem,
             this.convertToolStripMenuItem,
-            this.runToolStripMenuItem,
+            this.compileToolStripMenuItem,
+            this.toolStripMenuItem1,
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
@@ -173,12 +175,18 @@
             this.convertToolStripMenuItem.Text = "Convert";
             this.convertToolStripMenuItem.Click += new System.EventHandler(this.convertToolStripMenuItem_Click);
             // 
-            // runToolStripMenuItem
+            // compileToolStripMenuItem
             // 
-            this.runToolStripMenuItem.Name = "runToolStripMenuItem";
-            this.runToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
-            this.runToolStripMenuItem.Text = "Run";
-            this.runToolStripMenuItem.Click += new System.EventHandler(this.runToolStripMenuItem_Click);
+            this.compileToolStripMenuItem.Name = "compileToolStripMenuItem";
+            this.compileToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
+            this.compileToolStripMenuItem.Text = "Compile";
+            this.compileToolStripMenuItem.Click += new System.EventHandler(this.compileToolStripMenuItem_Click);
+            // 
+            // toolStripMenuItem1
+            // 
+            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(162, 22);
+            this.toolStripMenuItem1.Text = "Run";
             // 
             // exitToolStripMenuItem
             // 
@@ -227,7 +235,7 @@
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem convertToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem runToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem compileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
         private System.Windows.Forms.RichTextBox txtOneilCode;
         private System.Windows.Forms.RichTextBox txtCSharpCode;
@@ -243,6 +251,7 @@
         private System.Windows.Forms.ToolStripMenuItem sortinsertionToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem taxToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem triviaToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
     }
 }
 

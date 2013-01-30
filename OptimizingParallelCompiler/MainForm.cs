@@ -22,7 +22,7 @@ namespace OptimizingParallelCompiler
         {
             InitializeComponent();
 
-            _reserveWords = new List<string>()
+            _reserveWords = new List<string>(31)
                 {
                     "let",
                     "title",
@@ -32,13 +32,11 @@ namespace OptimizingParallelCompiler
                     "rem",
                     "label",
                     "if",
-                    "(",
-                    ")",
+                    "endfor",
+                    "endwhile",
                     "then",
                     "goto",
                     "input",
-                    "[",
-                    "]",
                     "print",
                     "prompt",
                     "<",
@@ -51,7 +49,8 @@ namespace OptimizingParallelCompiler
                     "!=",
                     "*",
                     "/",
-                    "%"
+                    "%",
+                    "end",
                 };
         }
 
@@ -70,7 +69,7 @@ namespace OptimizingParallelCompiler
                                 reserveWord.Length);
                             txtOneilCode.SelectionColor = Color.DodgerBlue;
                         }
-                        else
+                        else if (i == 0)
                         {
                             txtOneilCode.Select(
                                 txtOneilCode.Lines[i].IndexOf(reserveWord),
@@ -107,10 +106,15 @@ namespace OptimizingParallelCompiler
                             var sentence = test[i];
                             sentence = sentence.Substring(reserveWord.Count(), sentence.Length - reserveWord.Count());
                             Console.WriteLine(sentence);
-                            sentence = "//" + sentence + "\n";
+                            sentence = "//" + sentence;
                             Console.WriteLine(sentence);
                             test[i] = sentence;
                             Console.WriteLine(test[i]);
+                            if (i == 0)
+                            {
+                                const string usingstatements = "System;\n"  + "class Program\n" + "{";
+                                test.Insert(1, usingstatements);
+                            }
                         }
                         else if (reserveWord.Equals("while"))
                         {
@@ -120,6 +124,14 @@ namespace OptimizingParallelCompiler
                         {
                             
                         }
+                        else if(reserveWord.Equals("var"))
+                        {
+                            test[i] = "static void Main()\n{";
+                        }
+                        else if (reserveWord.Equals("end") && test[i].Equals(reserveWord))
+                        {
+                            test[i] = "}";
+                        }
                     }
                 }  
             }
@@ -128,33 +140,18 @@ namespace OptimizingParallelCompiler
 
             foreach (var lines in test)
             {
-                txtCSharpCode.Text += lines;
+                txtCSharpCode.Text += lines + "\n";
             }
 
             Console.WriteLine("help");
         }
-
 
         /// <summary>
         /// Menu item to run code
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void runToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            //Run .created exe and get results.
-            try
-            {
-
-            }
-            catch (Exception)
-            {
-                
-                throw;
-            }
-        }
-
-        private void runCode()
+        private void compileToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
         }
@@ -228,6 +225,8 @@ namespace OptimizingParallelCompiler
             }
         }
 
+        #region Sample program loading
+
         private void automatonToolStripMenuItem_Click(object sender, EventArgs e)
         {
             LoadOneilCode("automaton");
@@ -282,6 +281,7 @@ namespace OptimizingParallelCompiler
         {
             LoadOneilCode("trivia");
         }
+
         private void LoadOneilCode(string fileName)
         {
             //Try to read file
@@ -290,13 +290,16 @@ namespace OptimizingParallelCompiler
                 //Check if file exists
                 if (File.Exists(Environment.CurrentDirectory + "\\oneilcode\\" + fileName + ".txt"))
                 {
-                    {
-                        //Code to read results
-                        var resultsReader = new StreamReader(Environment.CurrentDirectory + "\\oneilcode\\" + fileName + ".txt");
+                    //Code to read results
+                    var resultsReader =
+                        new StreamReader(Environment.CurrentDirectory + "\\oneilcode\\" + fileName + ".txt");
 
-                        //Write O'Neil code to to Screen?
-                        txtOneilCode.Text = resultsReader.ReadToEnd();
-                    }
+                    //Write O'Neil code to to Screen?
+                    txtOneilCode.Text = resultsReader.ReadToEnd();
+
+                    resultsReader.Close();
+
+                    RtbColor();
                 }
                 else
                 {
@@ -316,6 +319,8 @@ namespace OptimizingParallelCompiler
                 }
             }
         }
+
+        #endregion
 
         private void txtOneilCode_TextChanged(object sender, EventArgs e)
         {
