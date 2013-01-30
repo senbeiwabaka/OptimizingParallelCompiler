@@ -11,7 +11,7 @@ namespace OptimizingParallelCompiler
     public partial class MainForm : Form
     {
         private readonly List<string> _reserveWords;
-        private string output = "Out.exe";
+        private string _output = "Out.exe";
         private CompilerResults _results;
 
         const string ErrorFile = "error.txt";
@@ -38,17 +38,6 @@ namespace OptimizingParallelCompiler
                     "input",
                     "print",
                     "prompt",
-                    "<",
-                    "|",
-                    "==",
-                    "+",
-                    "-",
-                    "<=",
-                    ">=",
-                    "!=",
-                    "*",
-                    "/",
-                    "%",
                     "end",
                 };
         }
@@ -104,11 +93,8 @@ namespace OptimizingParallelCompiler
                         {
                             var sentence = test[i];
                             sentence = sentence.Substring(reserveWord.Count(), sentence.Length - reserveWord.Count());
-                            Console.WriteLine(sentence);
                             sentence = "//" + sentence;
-                            Console.WriteLine(sentence);
                             test[i] = sentence;
-                            Console.WriteLine(test[i]);
                             if (i == 0)
                             {
                                 const string usingstatements = "using System;\n"  + "class Program\n" + "{";
@@ -125,16 +111,59 @@ namespace OptimizingParallelCompiler
                         }
                         else if(reserveWord.Equals("var"))
                         {
-                            test[i] = "static void Main()\n{";
+                            test[i] = "\tstatic void Main()\n\t{";
                         }
                         else if (reserveWord.Equals("end") && test[i].Equals(reserveWord))
                         {
-                            test[i] = "} \n }";
+                            test[i] = test[i].Replace("\t", "");
+                            test[i] = "\t}\n}";
                         }
-                        else if (reserveWord.Equals("prompt"))
+                        else if (reserveWord.Equals("prompt") || reserveWord.Equals("print"))
+                        {
+                            var sentence = test[i];
+                            sentence = sentence.Replace("\t", string.Empty);
+                            sentence = sentence.Substring(reserveWord.Count(), sentence.Length - reserveWord.Count());
+                            sentence = "\tConsole.WriteLine(" + sentence + ");";
+                            test[i] = sentence;
+                        }
+                        else if (reserveWord.Equals("rem"))
+                        {
+                            var sentence = test[i];
+                            sentence = sentence.Replace("\t", string.Empty);
+                            sentence = sentence.Substring(reserveWord.Count(), sentence.Length - reserveWord.Count());
+                            sentence = "\t//" + sentence;
+                            test[i] = sentence;
+                        }
+                        else if (reserveWord.Equals("list"))
+                        {
+                            var sentence = test[i];
+                            sentence = sentence.Replace("\t", string.Empty);
+                            sentence = sentence.Substring(reserveWord.Count(), sentence.Length - reserveWord.Count());
+                            sentence = "\tint" + sentence + ";";
+                            test[i] = sentence;
+                        }
+                        else if (reserveWord.Equals("let"))
+                        {
+                            var sentence = test[i];
+                            sentence = sentence.Replace("\t", string.Empty);
+                            sentence = sentence.Substring(reserveWord.Count(), sentence.Length - reserveWord.Count());
+                            sentence = "\t" + sentence + ";";
+                            test[i] = sentence;
+                        }
+                        else if (reserveWord.Equals("endfor") || reserveWord.Equals("endwhile"))
+                        {
+                            test[i] = test[i].Replace("\t", string.Empty);
+                            test[i] = "\t}";
+                        }
+                        else if (reserveWord.Equals("input"))
                         {
                             
                         }
+                    }
+                    else if (test[i].Contains("begin"))
+                    {
+                        test[i] = test[i].Replace("\t", "");
+                        test[i] = "\t";
                     }
                 }  
             }
@@ -145,12 +174,10 @@ namespace OptimizingParallelCompiler
             {
                 txtCSharpCode.Text += lines + "\n";
             }
-
-            Console.WriteLine("help");
         }
 
         /// <summary>
-        /// Menu item to run code
+        /// Menu item to compile the code to an executable
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -164,7 +191,7 @@ namespace OptimizingParallelCompiler
             var par = new CompilerParameters
                 {
                     GenerateExecutable = true,
-                    OutputAssembly = output,
+                    OutputAssembly = _output,
                     CompilerOptions = "/platform:x86"
                 };
 
@@ -174,20 +201,19 @@ namespace OptimizingParallelCompiler
             //par.ReferencedAssemblies.Add("C:/Program Files (x86)/Microsoft XNA/XNA Game Studio/v4.0/References/Windows/x86/Microsoft.Xna.Framework.Graphics.dll");
 
 
-            txtError.Text = par.LinkedResources.ToString();
+            txtError.Text = par.LinkedResources + Environment.NewLine;
 
             _results = codeProvider.CompileAssemblyFromSource(par, txtCSharpCode.Text);
 
 
             if (_results.Errors.Count > 0)
             {
-                txtError.ForeColor = Color.Red;
+                txtError.ForeColor = Color.FromArgb(122, 77, 198);
 
                 foreach (CompilerError item in _results.Errors)
                 {
-                    txtError.Text = "line number " + item.Line + ", error num" + item.ErrorNumber +
-                                    " , " + item.ErrorText + ";" +
-                                    Environment.NewLine + Environment.NewLine;
+                    txtError.Text += "line number " + item.Line + ", error num" + item.ErrorNumber +
+                                    " , " + item.ErrorText + Environment.NewLine + Environment.NewLine;
                 }
             }
             else
@@ -195,6 +221,7 @@ namespace OptimizingParallelCompiler
                 //Successful Compile
                 txtError.ForeColor = Color.Blue;
                 txtError.Text = "Success!";
+
                 foreach (string text in par.ReferencedAssemblies)
                 {
                     txtError.Text += text;
@@ -341,12 +368,16 @@ namespace OptimizingParallelCompiler
                     var resultsReader =
                         new StreamReader(Environment.CurrentDirectory + "\\oneilcode\\" + fileName + ".txt");
 
+                    txtOneilCode.Clear();
+
                     //Write O'Neil code to to Screen?
                     txtOneilCode.Text = resultsReader.ReadToEnd();
 
                     resultsReader.Close();
 
                     RtbColor();
+
+                    _output = fileName;
                 }
                 else
                 {
