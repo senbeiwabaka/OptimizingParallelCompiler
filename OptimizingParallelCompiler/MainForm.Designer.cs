@@ -220,6 +220,7 @@
             this.txtError.Multiline = true;
             this.txtError.Name = "txtError";
             this.txtError.ReadOnly = true;
+            this.txtError.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.txtError.Size = new System.Drawing.Size(892, 105);
             this.txtError.TabIndex = 3;
             // 
