@@ -227,5 +227,94 @@ namespace OptimizingParallelCompiler
                 }
             }
         }
+
+        private void automatonToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            loadOneilCode("automaton");
+        }
+
+        private void binrepToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            loadOneilCode("binrep");
+        }
+
+        private void fibonacciToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            loadOneilCode("fibonacci");
+        }
+
+        private void jacobiToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            loadOneilCode("jacobi");
+        }
+
+        private void mandelbrotToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            loadOneilCode("mandelbrot");
+        }
+
+        private void movingedgeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            loadOneilCode("movingedge");
+        }
+
+        private void multiplyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            loadOneilCode("multiply");
+        }
+
+        private void sortToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            loadOneilCode("sort");
+        }
+
+        private void sortinsertionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            loadOneilCode("sortinsertion");
+        }
+
+        private void taxToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            loadOneilCode("tax");
+        }
+
+        private void triviaToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            loadOneilCode("trivia");
+        }
+        private void loadOneilCode(string fileName)
+        {
+            //Try to read file
+            try
+            {
+                //Check if file exists
+                if (File.Exists(Environment.CurrentDirectory + "\\oneilcode\\" + fileName + ".txt"))
+                {
+                    {
+                        //Code to read results
+                        StreamReader resultsReader = new StreamReader(Environment.CurrentDirectory + "\\oneilcode\\" + fileName + ".txt");
+
+                        //Write Oneil code to to Screen?
+                        txtOneilCode.Text = resultsReader.ReadToEnd();
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("The " + fileName + " file does not exist!");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("An error has occured trying to read " + fileName + " file!");
+                if (File.Exists(_errorFile))
+                {
+                    File.AppendAllText(_errorFile, ex.Message);
+                }
+                else
+                {
+                    File.WriteAllText(_errorFile, ex.Message);
+                }
+            }
+        }
     }
 }
