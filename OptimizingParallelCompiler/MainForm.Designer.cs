@@ -48,6 +48,7 @@
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.txtOneilCode = new System.Windows.Forms.RichTextBox();
             this.txtCSharpCode = new System.Windows.Forms.RichTextBox();
+            this.txtError = new System.Windows.Forms.TextBox();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -198,7 +199,7 @@
             // 
             this.txtOneilCode.Location = new System.Drawing.Point(13, 28);
             this.txtOneilCode.Name = "txtOneilCode";
-            this.txtOneilCode.Size = new System.Drawing.Size(435, 554);
+            this.txtOneilCode.Size = new System.Drawing.Size(435, 421);
             this.txtOneilCode.TabIndex = 1;
             this.txtOneilCode.Text = "";
             this.txtOneilCode.TextChanged += new System.EventHandler(this.txtOneilCode_TextChanged);
@@ -208,15 +209,26 @@
             // 
             this.txtCSharpCode.Location = new System.Drawing.Point(454, 27);
             this.txtCSharpCode.Name = "txtCSharpCode";
-            this.txtCSharpCode.Size = new System.Drawing.Size(451, 554);
+            this.txtCSharpCode.ReadOnly = true;
+            this.txtCSharpCode.Size = new System.Drawing.Size(451, 422);
             this.txtCSharpCode.TabIndex = 2;
             this.txtCSharpCode.Text = "";
+            // 
+            // txtError
+            // 
+            this.txtError.Location = new System.Drawing.Point(13, 456);
+            this.txtError.Multiline = true;
+            this.txtError.Name = "txtError";
+            this.txtError.ReadOnly = true;
+            this.txtError.Size = new System.Drawing.Size(892, 105);
+            this.txtError.TabIndex = 3;
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(917, 573);
+            this.Controls.Add(this.txtError);
             this.Controls.Add(this.txtCSharpCode);
             this.Controls.Add(this.txtOneilCode);
             this.Controls.Add(this.menuStrip1);
@@ -252,6 +264,7 @@
         private System.Windows.Forms.ToolStripMenuItem taxToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem triviaToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
+        private System.Windows.Forms.TextBox txtError;
     }
 }
 
