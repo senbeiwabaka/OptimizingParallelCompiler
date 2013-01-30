@@ -13,11 +13,10 @@ namespace OptimizingParallelCompiler
 {
     public partial class MainForm : Form
     {
-        private List<string> _reserveWords;
-        private Thread _wordColoringThread;
+        private readonly List<string> _reserveWords;
 
-        const string _errorFile = "error.txt";
-        const string _resultsFile = "results.txt";
+        const string ErrorFile = "error.txt";
+        const string ResultsFile = "results.txt";
 
         public MainForm()
         {
@@ -54,58 +53,33 @@ namespace OptimizingParallelCompiler
                     "/",
                     "%"
                 };
-
-            //_wordColoringThread = new Thread(RtbColor);
-            //_wordColoringThread.Start();
         }
 
         private void RtbColor()
         {
-            int index = txtOneilCode.Text.IndexOf("if");
-
-            Console.WriteLine(index);
-
-            for (int i = 0; i < txtOneilCode.Lines.Length; i++)
+            for (int i = 0; i < txtOneilCode.Lines.Count(); ++i)
             {
-                var words = txtOneilCode.Lines[i];
-
-                for (int k = 0; k < _reserveWords.Count; k++)
+                foreach (var reserveWord in _reserveWords)
                 {
-                    var start = txtOneilCode.Lines[i].IndexOf(_reserveWords[k]);
-                    if (start > -1)
+                    if (txtOneilCode.Lines[i].Contains(reserveWord))
                     {
-                        txtOneilCode.Select(start, _reserveWords[k].Length);
-                        txtOneilCode.SelectionColor = Color.DodgerBlue;
-                        txtOneilCode.Select(0, 0);
+                        if (i > 0)
+                        {
+                            txtOneilCode.Select(
+                                txtOneilCode.Lines[i].IndexOf(reserveWord) + txtOneilCode.Lines[i].Count() + 1,
+                                reserveWord.Length);
+                            txtOneilCode.SelectionColor = Color.DodgerBlue;
+                        }
+                        else
+                        {
+                            txtOneilCode.Select(
+                                txtOneilCode.Lines[i].IndexOf(reserveWord),
+                                reserveWord.Length);
+                            txtOneilCode.SelectionColor = Color.DodgerBlue;
+                        }
                     }
                 }
             }
-
-            /*
-            for (int i = 0; i < richTextBox1.Lines.Length; i++)
-            {
-                var text = richTextBox1.Lines.ToList();
-
-                foreach (var variable in text)
-                {
-                    foreach (var word in _reserveWords)
-                    {
-                        richTextBox1.Select(richTextBox1.Lines[i].IndexOf(variable), variable.Length);
-                        richTextBox1.SelectionColor = ColorForWord(variable, word);
-                    }
-                }
-            }
-             * */
-        }
-
-        private Color ColorForWord(string selectedWord, string reservedWord)
-        {
-            if (selectedWord != reservedWord)
-            {
-                return Color.Black;
-            }
-
-            return Color.DodgerBlue;
         }
 
         private void richTextBox1_KeyPress(object sender, KeyPressEventArgs e)
@@ -120,16 +94,42 @@ namespace OptimizingParallelCompiler
 
         private void convertToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var words = txtOneilCode.Text.ToArray();
+            var test = txtOneilCode.Lines.ToList();
 
-            var test = new List<string>();
-
-            foreach (var line in txtOneilCode.Lines)
+            for (int i = 0; i < test.Count; i++)
             {
-                test.Add(line);
+                foreach (var reserveWord in _reserveWords)
+                {
+                    if (test[i].Contains(reserveWord))
+                    {
+                        if (reserveWord.Equals("title"))
+                        {
+                            var sentence = test[i];
+                            sentence = sentence.Substring(reserveWord.Count(), sentence.Length - reserveWord.Count());
+                            Console.WriteLine(sentence);
+                            sentence = "//" + sentence + "\n";
+                            Console.WriteLine(sentence);
+                            test[i] = sentence;
+                            Console.WriteLine(test[i]);
+                        }
+                        else if (reserveWord.Equals("while"))
+                        {
+                            
+                        }
+                        else if (reserveWord.Equals("for"))
+                        {
+                            
+                        }
+                    }
+                }  
             }
 
-            
+            txtCSharpCode.Clear();
+
+            foreach (var lines in test)
+            {
+                txtCSharpCode.Text += lines;
+            }
 
             Console.WriteLine("help");
         }
@@ -159,33 +159,33 @@ namespace OptimizingParallelCompiler
 
         }
 
-        private void writeResultsToFile(string results)
+        private void WriteResultsToFile(string results)
         {
             //Code to capture Results
             try
             {
                 //Check if file already exists
-                if (File.Exists(_resultsFile))
+                if (File.Exists(ResultsFile))
                 {
                     //File Exists - delete file
-                    File.Delete(_resultsFile);
+                    File.Delete(ResultsFile);
                 }
                 
                 //Code to write results
-                StreamWriter resultsWriter = new StreamWriter(_resultsFile);
+                var resultsWriter = new StreamWriter(ResultsFile);
 
                 resultsWriter.Write(results);
             }
             catch (Exception ex)
             {
-                MessageBox.Show("An error has occured trying to write results file!");
-                if (File.Exists(_errorFile))
+                MessageBox.Show("An error has occurred trying to write results file!");
+                if (File.Exists(ErrorFile))
                 {
-                    File.AppendAllText(_errorFile, ex.Message);
+                    File.AppendAllText(ErrorFile, ex.Message);
                 }
                 else
                 {
-                    File.WriteAllText(_errorFile, ex.Message);
+                    File.WriteAllText(ErrorFile, ex.Message);
                 }
             }
         }
@@ -193,17 +193,17 @@ namespace OptimizingParallelCompiler
         /// <summary>
         /// Read execution results from a file.
         /// </summary>
-        private void readResultsFromFile()
+        private void ReadResultsFromFile()
         {
             //Try to read file
             try
             {
                 //Check if file exists
-                if (File.Exists(_resultsFile))
+                if (File.Exists(ResultsFile))
                 {
                     {
                         //Code to read results
-                        StreamReader resultsReader = new StreamReader(_resultsFile);
+                        var resultsReader = new StreamReader(ResultsFile);
                         
                         //Write Results to Screen?
                         //txtResults.Text = resultsReader.ReadToEnd();
@@ -216,73 +216,73 @@ namespace OptimizingParallelCompiler
             }
             catch (Exception ex)
             {
-                MessageBox.Show("An error has occured trying to read results file!");
-                if (File.Exists(_errorFile))
+                MessageBox.Show("An error has occurred trying to read results file!");
+                if (File.Exists(ErrorFile))
                 {
-                    File.AppendAllText(_errorFile, ex.Message);
+                    File.AppendAllText(ErrorFile, ex.Message);
                 }
                 else
                 {
-                    File.WriteAllText(_errorFile, ex.Message);
+                    File.WriteAllText(ErrorFile, ex.Message);
                 }
             }
         }
 
         private void automatonToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            loadOneilCode("automaton");
+            LoadOneilCode("automaton");
         }
 
         private void binrepToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            loadOneilCode("binrep");
+            LoadOneilCode("binrep");
         }
 
         private void fibonacciToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            loadOneilCode("fibonacci");
+            LoadOneilCode("fibonacci");
         }
 
         private void jacobiToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            loadOneilCode("jacobi");
+            LoadOneilCode("jacobi");
         }
 
         private void mandelbrotToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            loadOneilCode("mandelbrot");
+            LoadOneilCode("mandelbrot");
         }
 
         private void movingedgeToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            loadOneilCode("movingedge");
+            LoadOneilCode("movingedge");
         }
 
         private void multiplyToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            loadOneilCode("multiply");
+            LoadOneilCode("multiply");
         }
 
         private void sortToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            loadOneilCode("sort");
+            LoadOneilCode("sort");
         }
 
         private void sortinsertionToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            loadOneilCode("sortinsertion");
+            LoadOneilCode("sortinsertion");
         }
 
         private void taxToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            loadOneilCode("tax");
+            LoadOneilCode("tax");
         }
 
         private void triviaToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            loadOneilCode("trivia");
+            LoadOneilCode("trivia");
         }
-        private void loadOneilCode(string fileName)
+        private void LoadOneilCode(string fileName)
         {
             //Try to read file
             try
@@ -292,9 +292,9 @@ namespace OptimizingParallelCompiler
                 {
                     {
                         //Code to read results
-                        StreamReader resultsReader = new StreamReader(Environment.CurrentDirectory + "\\oneilcode\\" + fileName + ".txt");
+                        var resultsReader = new StreamReader(Environment.CurrentDirectory + "\\oneilcode\\" + fileName + ".txt");
 
-                        //Write Oneil code to to Screen?
+                        //Write O'Neil code to to Screen?
                         txtOneilCode.Text = resultsReader.ReadToEnd();
                     }
                 }
@@ -305,16 +305,28 @@ namespace OptimizingParallelCompiler
             }
             catch (Exception ex)
             {
-                MessageBox.Show("An error has occured trying to read " + fileName + " file!");
-                if (File.Exists(_errorFile))
+                MessageBox.Show("An error has occurred trying to read " + fileName + " file!");
+                if (File.Exists(ErrorFile))
                 {
-                    File.AppendAllText(_errorFile, ex.Message);
+                    File.AppendAllText(ErrorFile, ex.Message);
                 }
                 else
                 {
-                    File.WriteAllText(_errorFile, ex.Message);
+                    File.WriteAllText(ErrorFile, ex.Message);
                 }
             }
+        }
+
+        private void txtOneilCode_TextChanged(object sender, EventArgs e)
+        {
+            /*
+            if (txtOneilCode.Text.Contains("hi"))
+            {
+                txtOneilCode.Select(txtOneilCode.Text.IndexOf("hi"), "hi".Length);
+                txtOneilCode.SelectionColor = Color.Aqua;
+                txtOneilCode.Select("hi".Length, 0);
+            }
+             * */
         }
     }
 }
