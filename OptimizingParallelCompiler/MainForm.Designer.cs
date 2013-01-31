@@ -202,7 +202,6 @@
             this.txtOneilCode.Size = new System.Drawing.Size(435, 421);
             this.txtOneilCode.TabIndex = 1;
             this.txtOneilCode.Text = "";
-            this.txtOneilCode.TextChanged += new System.EventHandler(this.txtOneilCode_TextChanged);
             this.txtOneilCode.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.richTextBox1_KeyPress);
             // 
             // txtCSharpCode
