@@ -22,7 +22,7 @@ namespace OptimizingParallelCompiler
         {
             InitializeComponent();
 
-            _reserveWords = new List<string>(31)
+            _reserveWords = new List<string>(25)
                 {
                     "let",
                     "title",
@@ -33,7 +33,6 @@ namespace OptimizingParallelCompiler
                     "label",
                     "if",
                     "endfor",
-                    "endwhile",
                     "then",
                     "goto",
                     "input",
@@ -41,6 +40,7 @@ namespace OptimizingParallelCompiler
                     "prompt",
                     "end",
                     "for",
+                    "while",
                 };
         }
 
@@ -103,8 +103,31 @@ namespace OptimizingParallelCompiler
                                 test.Insert(1, usingstatements);
                             }
                         }
-                        else if (reserveWord.Equals("while"))
+                        else if (reserveWord.Equals("while",StringComparison.Ordinal) && !test[i].Contains("end"))
                         {
+                            txtError.AppendText(Environment.NewLine.ToString() + reserveWord + " : " +
+                                                test[i].ToString() + " : " + string.Equals(reserveWord, "while"));
+                            var statement = test[i];
+                            var label = "label" + _labelCounter;
+                            ++_labelCounter;
+                            var label1 = "label" + _labelCounter;
+                            var sentence = "goto " + label + ";\n";
+                            sentence += label1 + ":";
+                            test[i] = sentence;
+                            var other = new List<string>(test.GetRange(0,test.Count));
+                            for (int x =0;x<other.Count;++x)
+                            {
+                                other[x] = other[x].Trim('\t', ' ');
+                            }
+                            var endWhile = other.IndexOf("endwhile");
+
+                            test[endWhile] = label + ":";
+                            statement = statement.Replace("while", "if");
+                            statement = statement.TrimEnd(' ');
+                            statement = statement + " goto " + label1 + ";";
+
+                            test[endWhile] += "\n" + statement;
+                            txtError.AppendText(Environment.NewLine + statement.ToString());
 
                             ++_labelCounter;
                         }
@@ -112,25 +135,19 @@ namespace OptimizingParallelCompiler
                         {
                             test[i] = test[i].Replace("\t", string.Empty);
                             var index = test[i].IndexOf("for") + reserveWord.Count() + 1;
-                            txtError.AppendText(index.ToString());
                             var end = test[i].IndexOf("to") - 1;
-                            txtError.AppendText(end.ToString());
                             var value = "\t\t" + test[i].Substring(index, end - index) + ";\n";
-                            txtError.AppendText(value.ToString());
                             var value1 = "\t" + value.Substring(2, value.IndexOf("=") - 2) + "=" +
                                          value.Substring(2, value.IndexOf("=") - 2) + " + 1;";
                             var label = "Label" + _labelCounter.ToString();
                             var sentence = value + "\t" + label + ":";
                             var number = test[i].IndexOf("to") + 2;
-                            var number1 = test[i].IndexOf("\r\n");
-                            txtError.AppendText(number.ToString());
-                            txtError.AppendText((number1 - number).ToString());
-                            txtError.AppendText(
-                                test[i].Substring(test[i].IndexOf("to") + 2, test[i].IndexOf("\n") - 3));
-
+                            test[i] = test[i].TrimEnd(' ');
+                            var lastvalue = test[i].Last();
+                            var number1 = test[i].IndexOf(lastvalue);
                             var last = "\tif( " + value.Substring(2, value.IndexOf("=") - 2) + " <= " +
-                                       test[i].Substring(test[i].IndexOf("to") + 3, test[i].IndexOf("\n") - 3) +
-                                       " ) then goto " + label + ";";
+                                       test[i].Substring(number, number1 - number + 1) +
+                                       " ) goto " + label + ";";
 
                             test[i] = sentence;
                             test.Insert(i + 2, value1);
@@ -151,6 +168,8 @@ namespace OptimizingParallelCompiler
                         {
                             var sentence = test[i];
                             sentence = sentence.Replace("\t", string.Empty);
+                            sentence = sentence.Replace(";", "");
+                            sentence = sentence.TrimEnd(' ');
                             sentence = sentence.Substring(reserveWord.Count(), sentence.Length - reserveWord.Count());
                             sentence = "\tConsole.WriteLine(" + sentence + ");";
                             test[i] = sentence;
@@ -167,8 +186,12 @@ namespace OptimizingParallelCompiler
                         {
                             var sentence = test[i];
                             sentence = sentence.Replace("\t", string.Empty);
-                            sentence = sentence.Substring(reserveWord.Count(), sentence.Length - reserveWord.Count());
-                            sentence = "\tint" + sentence + ";";
+                            var arrayBegin = sentence.IndexOf("[") + 1;
+                            var arrayEnd = sentence.IndexOf("]");
+                            var value = sentence.Substring(arrayBegin, arrayEnd - arrayBegin);
+                            var number = sentence.IndexOf(" ");
+                            sentence = sentence.Substring(number, sentence.Length - number);
+                            sentence = "\tint[]" + sentence + " = new int[" + value + "];";
                             test[i] = sentence;
                         }
                         else if (reserveWord.Equals("let"))
@@ -179,14 +202,13 @@ namespace OptimizingParallelCompiler
                             sentence = "\t" + sentence + ";";
                             test[i] = sentence;
                         }
-                        else if (reserveWord.Equals("endfor") || reserveWord.Equals("endwhile"))
+                        else if (reserveWord.Equals("endfor"))
                         {
-                            test[i] = test[i].Replace("\t", string.Empty);
-                            test[i] = "\t}";
+                            test[i] = "";
                         }
                         else if (reserveWord.Equals("input"))
                         {
-                            
+
                         }
                         else if (reserveWord.Equals("int"))
                         {
@@ -194,6 +216,18 @@ namespace OptimizingParallelCompiler
                             sentence = sentence.Replace("\t", string.Empty);
                             sentence = "\t" + sentence + ";";
                             test[i] = sentence;
+                        }
+                        else if (reserveWord.Equals("if") && !test[i].Contains("goto"))
+                        {
+                            var label = "label" + _labelCounter;
+                            test[i] = test[i].Trim(' ', '\t');
+                            var sentence = test[i].Substring(0, test[i].Count() - "then".Length);
+                            sentence += "goto " + label + ";";
+
+                            test[i] = sentence;
+                            test.Insert(i + 2, label + ":");
+
+                            ++_labelCounter;
                         }
                     }
                     else if (test[i].Contains("begin"))
@@ -227,7 +261,7 @@ namespace OptimizingParallelCompiler
             var par = new CompilerParameters
                 {
                     GenerateExecutable = true,
-                    OutputAssembly = _output,
+                    OutputAssembly = _output + ".exe",
                     CompilerOptions = "/platform:x86"
                 };
 
