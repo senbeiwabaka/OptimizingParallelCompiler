@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace OptimizingParallelCompiler
@@ -43,6 +44,11 @@ namespace OptimizingParallelCompiler
                     "while",
                     "begin",
                 };
+        }
+        
+        private int IdentifierCount(string identifier)
+        {
+            return Regex.Matches(txtOneilCode.Text, "\\s" + identifier + "\\s").Count;
         }
 
         private void RtbColor()
