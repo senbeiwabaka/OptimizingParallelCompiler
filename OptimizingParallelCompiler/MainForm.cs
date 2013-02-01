@@ -43,6 +43,7 @@ namespace OptimizingParallelCompiler
                     "for",
                     "while",
                     "begin",
+                    "==",
                 };
         }
         
@@ -226,6 +227,10 @@ namespace OptimizingParallelCompiler
                             test.Insert(i + 2, label + ":");
 
                             ++_labelCounter;
+                        }
+                        else if (reserveWord.Equals("=="))
+                        {
+                            test[i] = test[i].Replace("==", "!=");
                         }
                     }
                     else if (test[i].Contains("begin"))
