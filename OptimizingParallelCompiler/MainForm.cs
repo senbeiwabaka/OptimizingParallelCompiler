@@ -18,6 +18,7 @@ namespace OptimizingParallelCompiler
 
         private const string ErrorFile = "error.txt";
         private const string ResultsFile = "results.txt";
+        private const string BatFile = "batfile.bat";
 
         public MainForm()
         {
@@ -333,6 +334,42 @@ namespace OptimizingParallelCompiler
             }
         }
 
+        private void WriteBatFile(string exePath, string exeName)
+        {
+            //Code to capture Results
+            try
+            {
+                //Check if file already exists
+                if (File.Exists(BatFile))
+                {
+                    //File Exists - delete file
+                    File.Delete(BatFile);
+                }
+
+                //Code to write results
+                var resultsWriter = new StreamWriter(BatFile);
+
+                resultsWriter.Write("start " + exePath + " %1" + Environment.NewLine  +
+                    "ECHO Press any key to exit" + Environment.NewLine  +
+   "PAUSE >NUL" + Environment.NewLine +
+   "EXIT /B" + Environment.NewLine);
+
+                resultsWriter.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("An error has occurred trying to write results file!");
+                if (File.Exists(ErrorFile))
+                {
+                    File.AppendAllText(ErrorFile, ex.Message);
+                }
+                else
+                {
+                    File.WriteAllText(ErrorFile, ex.Message);
+                }
+            }
+        }
+
         /// <summary>
         ///     Read execution results from a file.
         /// </summary>
@@ -471,5 +508,20 @@ namespace OptimizingParallelCompiler
         }
 
         #endregion
+
+        private void toolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            //Create bat file
+            WriteBatFile(_output + ".exe", _output);
+
+            //Call bat file
+            string BatPath = Environment.CurrentDirectory + "\\" + BatFile;
+            System.Diagnostics.Process.Start(BatPath, _output);
+            //System.Diagnostics.Process p = new System.Diagnostics.Process();
+            //p.StartInfo.WorkingDirectory = firebirdInstallationPath;
+            //p.StartInfo.FileName = _output + ".exe";
+            //p.Start();
+            //p.WaitForExit();
+        }
     }
 }
