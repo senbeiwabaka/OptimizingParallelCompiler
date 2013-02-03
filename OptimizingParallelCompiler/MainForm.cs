@@ -27,9 +27,9 @@ namespace OptimizingParallelCompiler
 
             _reserveWords = new List<string>(25)
                 {
-                    "let",
                     "title",
                     "var",
+                    "let",
                     "int",
                     "list",
                     "rem",
@@ -86,28 +86,22 @@ namespace OptimizingParallelCompiler
 
         private void convertToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var test = txtOneilCode.Lines.ToList();
+            var test = new List<string>(txtOneilCode.Lines);
 
+            test[0] = test[0].Replace("title", "//");
+            const string usingstatements = "using System;\n" + "class Program\n" + "{";
+            test.Insert(1, usingstatements);
             
-            for (var i = 0; i < test.Count; i++)
+            for (var i = 2; i < test.Count; i++)
             {
+                test[i] = test[i].TrimStart(' ', '\t');
+                test[i] = test[i].TrimEnd(' ', '\t');
+
                 foreach (var reserveWord in _reserveWords)
                 {
                     if (test[i].Contains(reserveWord))
                     {
-                        if (reserveWord.Equals("title"))
-                        {
-                            var sentence = test[i];
-                            sentence = sentence.Substring(reserveWord.Count(), sentence.Length - reserveWord.Count());
-                            sentence = "//" + sentence;
-                            test[i] = sentence;
-                            if (i == 0)
-                            {
-                                const string usingstatements = "using System;\n" + "class Program\n" + "{";
-                                test.Insert(1, usingstatements);
-                            }
-                        }
-                        else if (reserveWord.Equals("while", StringComparison.Ordinal) && !test[i].Contains("end"))
+                        if (reserveWord.Equals("while", StringComparison.Ordinal) && !test[i].Contains("end"))
                         {
                             txtError.AppendText(Environment.NewLine + reserveWord + " : " +
                                                 test[i] + " : " + string.Equals(reserveWord, "while"));

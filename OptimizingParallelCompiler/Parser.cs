@@ -11,16 +11,24 @@ namespace OptimizingParallelCompiler
         public static void Change(ref List<string> rtblines, List<string> keywords, string code)
         {
             var lines = new string(code.ToCharArray());
+
+            rtblines.TrimExcess();
+
+            for (int i = 0; i < rtblines.Count; i++)
+            {
+                rtblines[i] = rtblines[i].TrimStart(' ', '\t');
+                rtblines[i] = rtblines[i].TrimEnd(' ', '\t');
+            }
+
             foreach (var keyword in keywords)
             {
                 MatchCollection match;
-                var count = WordCount(keyword, ref lines, out match);
 
-                Console.WriteLine(count + " : word " + keyword);
+                var count = WordCount(keyword, ref lines, out match);
 
                 foreach (Group m in match)
                 {
-                    Console.WriteLine(m.Index + " : " + keyword);
+                    //Console.WriteLine(m.Index + " : " + keyword);
 
                     if (keyword.Equals("begin") || keyword.Equals("var"))
                     {
@@ -32,6 +40,12 @@ namespace OptimizingParallelCompiler
                         const string usingstatements = "using System;\n" + "class Program\n" + "{\n"
                             + "\tstatic void Main()\n\t{";
                         rtblines.Insert(1, usingstatements);
+                    }
+                    else if (keyword.Equals("let"))
+                    {
+                        Console.WriteLine(m.Index + " : " + m.Value);
+                        
+                        Console.WriteLine(rtblines.FindAll(x => x == "let").ToList());
                     }
                 }
 
