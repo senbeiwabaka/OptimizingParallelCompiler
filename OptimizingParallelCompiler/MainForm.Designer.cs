@@ -243,6 +243,7 @@
             // 
             // txtError
             // 
+            this.txtError.BackColor = System.Drawing.SystemColors.Window;
             this.txtError.Location = new System.Drawing.Point(13, 456);
             this.txtError.Multiline = true;
             this.txtError.Name = "txtError";
