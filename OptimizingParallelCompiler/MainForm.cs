@@ -520,8 +520,8 @@ namespace OptimizingParallelCompiler
             WriteBatFile(_output + ".exe", _output);
 
             //Call bat file
-            string BatPath = Environment.CurrentDirectory + "\\" + BatFile;
-            System.Diagnostics.Process.Start(BatPath, _output);
+            string BatPath = Environment.CurrentDirectory + "\\" + _output;
+            System.Diagnostics.Process.Start("cmd.exe", "/k " + BatPath);
             //System.Diagnostics.Process p = new System.Diagnostics.Process();
             //p.StartInfo.WorkingDirectory = firebirdInstallationPath;
             //p.StartInfo.FileName = _output + ".exe";
