@@ -203,11 +203,11 @@ namespace OptimizingParallelCompiler
                         {
                             test[i] = "";
                         }
-                        else if (reserveWord.Equals("input"))
+                        else if (reserveWord.Equals("input") && test[i].IndexOf("input") == 0)
                         {
                             var sentence = test[i];
                             sentence = sentence.Replace("input", "");
-                            test[i] = sentence + " = Console.Readline();";
+                            test[i] = "\t" + sentence + " = Convert.ToInt32(Console.ReadLine());";
                         }
                         else if (reserveWord.Equals("int"))
                         {
