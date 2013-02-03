@@ -47,6 +47,8 @@ namespace OptimizingParallelCompiler
                     "begin",
                     "==",
                 };
+
+            
         }
         
         private int IdentifierCount(string identifier)
@@ -524,14 +526,6 @@ namespace OptimizingParallelCompiler
             //p.StartInfo.FileName = _output + ".exe";
             //p.Start();
             //p.WaitForExit();
-        }
-
-        private void testToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Database myDb = new Database();
-
-            txtOneilCode.Text = myDb.getStatementsByWord(txtOneilCode.Text.Trim().ToUpper());
-
         }
     }
 }
