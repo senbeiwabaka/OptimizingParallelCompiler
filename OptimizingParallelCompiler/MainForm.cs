@@ -88,7 +88,7 @@ namespace OptimizingParallelCompiler
         {
             var test = txtOneilCode.Lines.ToList();
 
-            /*
+            
             for (var i = 0; i < test.Count; i++)
             {
                 foreach (var reserveWord in _reserveWords)
@@ -243,9 +243,9 @@ namespace OptimizingParallelCompiler
                     }
                 }
             }
-             * */
+             
 
-            Parser.Change(ref test, _reserveWords, txtOneilCode.Text);
+            //Parser.Change(ref test, _reserveWords, txtOneilCode.Text);
 
             txtCSharpCode.Clear();
 
