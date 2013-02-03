@@ -205,6 +205,9 @@ namespace OptimizingParallelCompiler
                         }
                         else if (reserveWord.Equals("input"))
                         {
+                            var sentence = test[i];
+                            sentence = sentence.Replace("input", "");
+                            test[i] = sentence + " = Console.Readline();";
                         }
                         else if (reserveWord.Equals("int"))
                         {
