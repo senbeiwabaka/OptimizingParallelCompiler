@@ -528,5 +528,13 @@ namespace OptimizingParallelCompiler
             //p.Start();
             //p.WaitForExit();
         }
+
+        private void testToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Database myDb = new Database();
+
+            txtOneilCode.Text = myDb.getStatementsByWord(txtOneilCode.Text.Trim().ToUpper());
+
+        }
     }
 }
