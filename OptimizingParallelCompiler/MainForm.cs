@@ -1,11 +1,9 @@
 ﻿using System;
 using System.CodeDom.Compiler;
-using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace OptimizingParallelCompiler
@@ -29,6 +27,8 @@ namespace OptimizingParallelCompiler
                 {
                     "title",
                     "var",
+                    "label",
+                    "goto",
                     "let",
                     "int",
                     "list",
@@ -49,11 +49,6 @@ namespace OptimizingParallelCompiler
                 };
 
             
-        }
-        
-        private int IdentifierCount(string identifier)
-        {
-            return Regex.Matches(txtOneilCode.Text, "\\s" + identifier + "\\s").Count;
         }
 
         private void RtbColor()
@@ -90,9 +85,14 @@ namespace OptimizingParallelCompiler
         {
             var test = new List<string>(txtOneilCode.Lines);
 
+            
+
             test[0] = test[0].Replace("title", "//");
             const string usingstatements = "using System;\n" + "class Program\n" + "{";
             test.Insert(1, usingstatements);
+
+            var works = test.ToList().FindIndex(x => x.Contains("let"));
+            txtError.AppendText(works + "\n");
             
             for (var i = 2; i < test.Count; i++)
             {
@@ -132,7 +132,7 @@ namespace OptimizingParallelCompiler
                         }
                         else if (reserveWord.Equals("for"))
                         {
-                            test[i] = test[i].Replace("\t", string.Empty);
+                            //test[i] = test[i].Replace("\t", string.Empty);
                             var index = test[i].IndexOf("for") + reserveWord.Count() + 1;
                             var end = test[i].IndexOf("to") - 1;
                             var value = "\t\t" + test[i].Substring(index, end - index) + ";\n";
@@ -141,7 +141,7 @@ namespace OptimizingParallelCompiler
                             var label = "Label" + _labelCounter.ToString();
                             var sentence = value + "\t" + label + ":";
                             var number = test[i].IndexOf("to") + 2;
-                            test[i] = test[i].TrimEnd(' ');
+                            //test[i] = test[i].TrimEnd(' ');
                             var lastvalue = test[i].Last();
                             var number1 = test[i].IndexOf(lastvalue);
                             var last = "\tif( " + value.Substring(2, value.IndexOf("=") - 2) + " <= " +
@@ -234,6 +234,16 @@ namespace OptimizingParallelCompiler
                         {
                             test[i] = test[i].Replace("==", "!=");
                         }
+                        else if (reserveWord.Equals("goto"))
+                        {
+                            //var something = test[i].Length - 1;
+                            //test[i] = test[i].Replace(test[i].ElementAt(something), ';');
+                        }
+                        else if (reserveWord.Equals("label"))
+                        {
+                            var something = test[i].Length - 1;
+                            test[i] = test[i].Replace(test[i].ElementAt(something), ':');
+                        }
                     }
                     else if (test[i].Contains("begin"))
                     {
@@ -278,8 +288,7 @@ namespace OptimizingParallelCompiler
             //par.ReferencedAssemblies.Add("C:/Program Files (x86)/Microsoft XNA/XNA Game Studio/v4.0/References/Windows/x86/Microsoft.Xna.Framework.Game.dll");
             //par.ReferencedAssemblies.Add("C:/Program Files (x86)/Microsoft XNA/XNA Game Studio/v4.0/References/Windows/x86/Microsoft.Xna.Framework.Graphics.dll");
 
-
-            txtError.Text = par.LinkedResources + Environment.NewLine;
+            //txtError.Text = par.LinkedResources + Environment.NewLine;
 
             _results = codeProvider.CompileAssemblyFromSource(par, txtCSharpCode.Text);
 
@@ -297,43 +306,13 @@ namespace OptimizingParallelCompiler
             else
             {
                 //Successful Compile
-                txtError.ForeColor = Color.Blue;
+                txtError.BackColor = Color.Blue;
+                txtError.ForeColor = Color.White;
                 txtError.Text = "Success!";
 
                 foreach (var text in par.ReferencedAssemblies)
                 {
                     txtError.Text += text;
-                }
-            }
-        }
-
-        private void WriteResultsToFile(string results)
-        {
-            //Code to capture Results
-            try
-            {
-                //Check if file already exists
-                if (File.Exists(ResultsFile))
-                {
-                    //File Exists - delete file
-                    File.Delete(ResultsFile);
-                }
-
-                //Code to write results
-                var resultsWriter = new StreamWriter(ResultsFile);
-
-                resultsWriter.Write(results);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("An error has occurred trying to write results file!");
-                if (File.Exists(ErrorFile))
-                {
-                    File.AppendAllText(ErrorFile, ex.Message);
-                }
-                else
-                {
-                    File.WriteAllText(ErrorFile, ex.Message);
                 }
             }
         }
@@ -363,44 +342,6 @@ namespace OptimizingParallelCompiler
             catch (Exception ex)
             {
                 MessageBox.Show("An error has occurred trying to write results file!");
-                if (File.Exists(ErrorFile))
-                {
-                    File.AppendAllText(ErrorFile, ex.Message);
-                }
-                else
-                {
-                    File.WriteAllText(ErrorFile, ex.Message);
-                }
-            }
-        }
-
-        /// <summary>
-        ///     Read execution results from a file.
-        /// </summary>
-        private void ReadResultsFromFile()
-        {
-            //Try to read file
-            try
-            {
-                //Check if file exists
-                if (File.Exists(ResultsFile))
-                {
-                    {
-                        //Code to read results
-                        var resultsReader = new StreamReader(ResultsFile);
-
-                        //Write Results to Screen?
-                        //txtResults.Text = resultsReader.ReadToEnd();
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("The results file does not exist!");
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("An error has occurred trying to read results file!");
                 if (File.Exists(ErrorFile))
                 {
                     File.AppendAllText(ErrorFile, ex.Message);
@@ -516,11 +457,11 @@ namespace OptimizingParallelCompiler
         private void toolStripMenuItem1_Click(object sender, EventArgs e)
         {
             //Create bat file
-            WriteBatFile(_output + ".exe", _output);
+            //WriteBatFile(_output + ".exe", _output);
 
             //Call bat file
-            string BatPath = Environment.CurrentDirectory + "\\" + _output;
-            System.Diagnostics.Process.Start("cmd.exe", "/k " + BatPath);
+            var batPath = Environment.CurrentDirectory + "\\" + _output;
+            System.Diagnostics.Process.Start("cmd.exe", "/k " + batPath);
             //System.Diagnostics.Process p = new System.Diagnostics.Process();
             //p.StartInfo.WorkingDirectory = firebirdInstallationPath;
             //p.StartInfo.FileName = _output + ".exe";
