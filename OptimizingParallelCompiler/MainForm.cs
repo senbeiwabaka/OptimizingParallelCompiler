@@ -315,8 +315,8 @@ namespace OptimizingParallelCompiler
                         }
                         else if (reserveWord.Equals("label"))
                         {
-                            var something = test[i].Length - 1;
-                            test[i] = test[i].Replace(test[i].ElementAt(something), ':');
+                            //var something = test[i].Length - 1;
+                            //test[i] = test[i].Replace(test[i].ElementAt(something), ':');
                         }
                     }
                     else if (test[i].Contains("begin"))
