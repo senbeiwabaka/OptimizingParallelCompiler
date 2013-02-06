@@ -14,7 +14,7 @@ namespace OptimizingParallelCompiler
         private string _output = "Out.exe";
         private CompilerResults _results;
         private int _labelCounter;
-
+        private List<string> _ListOfEndFors;
         private const string ErrorFile = "error.txt";
         private const string ResultsFile = "results.txt";
         private const string BatFile = "batfile.bat";
@@ -22,6 +22,9 @@ namespace OptimizingParallelCompiler
         public MainForm()
         {
             InitializeComponent();
+
+            List<string> ListOfEndFors = new List<string>();
+            _ListOfEndFors = ListOfEndFors;
 
             _reserveWords = new List<string>(25)
                 {
@@ -99,6 +102,8 @@ namespace OptimizingParallelCompiler
                 test[i] = test[i].TrimStart(' ', '\t');
                 test[i] = test[i].TrimEnd(' ', '\t');
 
+
+
                 foreach (var reserveWord in _reserveWords)
                 {
                     if (test[i].Contains(reserveWord))
@@ -132,26 +137,92 @@ namespace OptimizingParallelCompiler
                         }
                         else if (reserveWord.Equals("for"))
                         {
+                            string endForStringPart1;
+                            string endForStringPart2;
+
+                            //variable for list of statements
+                            string endForString = "";
+                            //_tempEndFor =;
+
+                            //look ahead until you find the end for
+                            //int tempI = i;
+                            //int endOfFor = 0;
+                            //bool endForFound = false;
+                            //while (endForFound == false)
+                            //{
+                            //    if (test[tempI] == "endfor")
+                            //    {
+                            //        endForFound = true;
+                            //        endOfFor = tempI;
+                            //    }
+                            //    //add statement to list
+                            //    //stmtList += "\n\t" + test[tempI];
+                            //    tempI++;
+                            //}
+
+
+
                             //test[i] = test[i].Replace("\t", string.Empty);
-                            var index = test[i].IndexOf("for") + reserveWord.Count() + 1;
+                            var id = test[i].IndexOf("for") + reserveWord.Count() + 1;
                             var end = test[i].IndexOf("to") - 1;
-                            var value = "\t\t" + test[i].Substring(index, end - index) + ";\n";
+                            var value = "\t\t" + test[i].Substring(id, end - id) + ";\n";
                             var value1 = "\t" + value.Substring(2, value.IndexOf("=") - 2) + "=" +
                                             value.Substring(2, value.IndexOf("=") - 2) + " + 1;";
+                            string bound = "";
+
+                            int a1 = test[i].IndexOf("to") + 2;
+                            int a2 = test[i].Length - 1;
+                            int a3 = test[i].IndexOf("to") + 1;
+                            int a4 = a2 - a3;
+
+                            bound = test[i].Substring(a1, a4);
                             var label = "Label" + _labelCounter.ToString();
+                            endForStringPart1 = value1;
+                            
                             var sentence = value + "\t" + label + ":";
                             var number = test[i].IndexOf("to") + 2;
                             //test[i] = test[i].TrimEnd(' ');
                             var lastvalue = test[i].Last();
                             var number1 = test[i].IndexOf(lastvalue);
-                            var last = "\tif( " + value.Substring(2, value.IndexOf("=") - 2) + " <= " +
-                                          test[i].Substring(number, number1 - number + 1) +
-                                          " ) goto " + label + ";";
+
+//Oneil Code                    //Translation
+//for idx = 0 to bound – 1      let idx = 0
+//                              label L_0
+//let array[idx] = -1           let array[idx] = -1 
+//endfor                        let idx = idx + 1 
+//                              if (idx <= bound – 1) then goto L_0
+                             
+//for i = 1 to size -1          "\t\ti = 1;\n\tLabel3:"
+//statements                    statements
+//endfor                        "\ti =i  + 1;" + "\n"      //this is endForStringPart1
+//                               + "\n"     this is endForStringPart2
+
+                            //idx
+                            string idx = value.Substring(2, value.IndexOf("=") - 2);
+                            
+
+
+
+                            endForStringPart2 = "if (" + idx + " <= " + bound + ") then goto " + label + ";";
+
+                            endForStringPart2 += "\n";
+
+                            //var temp1 = "\tif( " + value.Substring(2, value.IndexOf("=") - 2) + " <= ";
+                            //var temp2 = test[i].Substring(number, number1 - number + 1);
+                            //var temp3 = ") goto " + label + ";";
+
+                            //var last = "\tif( " + value.Substring(2, value.IndexOf("=") - 2) + " <= " +
+                            //              test[i].Substring(number, number1 - number + 1) +
+                            //              " ) goto " + label + ";";
 
                             test[i] = sentence;
-                            test.Insert(i + 2, value1);
-                            test.Insert(i + 3, last);
+                            endForString = endForStringPart1+="\n";
+                            
+                            endForString += "\t" + endForStringPart2;
 
+                            //test.Insert(i + 2, endForStringPart1);
+                            //test.Insert(i + 3, last);
+                            _ListOfEndFors.Add(endForString);
                             ++_labelCounter;
                         }
                         else if (reserveWord.Equals("var"))
@@ -203,7 +274,10 @@ namespace OptimizingParallelCompiler
                         }
                         else if (reserveWord.Equals("endfor"))
                         {
-                            test[i] = "";
+                            //take the last string off the list
+                            test[i] = _ListOfEndFors[_ListOfEndFors.Count - 1];
+                            _ListOfEndFors.RemoveAt(_ListOfEndFors.Count - 1);
+                           
                         }
                         else if (reserveWord.Equals("input") && test[i].IndexOf("input") == 0)
                         {
