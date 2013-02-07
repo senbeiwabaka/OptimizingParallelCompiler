@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace OptimizingParallelCompiler
@@ -36,11 +37,9 @@ namespace OptimizingParallelCompiler
                     "int",
                     "list",
                     "rem",
-                    "label",
                     "if",
                     "endfor",
                     "then",
-                    "goto",
                     "input",
                     "print",
                     "prompt",
@@ -80,7 +79,7 @@ namespace OptimizingParallelCompiler
         {
             if (e.KeyChar.Equals((char) Keys.Enter))
             {
-                RtbColor();
+                //RtbColor();
             }
         }
 
@@ -88,15 +87,203 @@ namespace OptimizingParallelCompiler
         {
             var test = new List<string>(txtOneilCode.Lines);
 
-            
+            //test[0] = test[0].Replace("title", "//");
+            //const string usingstatements = "using System;\n" + "class Program\n" + "{";
+            //test.Insert(1, usingstatements);
 
-            test[0] = test[0].Replace("title", "//");
-            const string usingstatements = "using System;\n" + "class Program\n" + "{";
-            test.Insert(1, usingstatements);
+            //var works = test.ToList().FindIndex(x => x.Contains("let"));
+            //txtError.AppendText(works + "\n");
 
-            var works = test.ToList().FindIndex(x => x.Contains("let"));
-            txtError.AppendText(works + "\n");
+            test.ForEach(delegate(string s)
+                {
+                    var other = s;
+                    s = s.TrimEnd('\t', ' ');
+                    var count = s.Count(x => x.Equals('\t'));
+                    s = s.TrimStart('\t', ' ');
+                    if (s.IndexOf("title") == 0)
+                    {
+                        test[0] = test[0].Replace("title", "//");
+                        const string usingstatements = "using System;\n" + "class Program\n" + "{";
+                        test.Insert(1, usingstatements);
+                    }
+                    else if (s.IndexOf("while") == 0)
+                    {
+                        string tab = null;
+                        for (int i = 0; i < count; i++)
+                        {
+                            tab += "\t";
+                        }
+
+                        var label = "label" + _labelCounter;
+                        var newif = tab + label + ":\n" + s;
+                        ++_labelCounter;
+                        var sentence = "goto " + label + ";\n";
+                        var statement = "label" + _labelCounter + ":";
+                        newif = newif.Replace("while", "if");
+                        newif += " goto label" + _labelCounter + ";";
+                        statement = tab + statement;
+
+                        sentence += statement;
+                        var index = test.IndexOf(other);
+                        test[index] = test[index].Replace(s, sentence);
+                        ++_labelCounter;
+                        
+                        var whilecount = test.Count(s1 => s1.Contains("while") && !s1.Contains("endwhile"));
+                        txtError.AppendText("while : " + whilecount.ToString() + "\n");
+                        var endwhile = test.Count(s1 => s1.Contains("endwhile"));
+                        txtError.AppendText("endwhile : " + endwhile.ToString() + "\n");
+                        var space = index;
+                        while (whilecount > 0)
+                        {
+                            var whileindex = test.FindIndex(space,
+                                                            s1 => s1.Contains("while") && !s1.Contains("endwhile"));
+                            var endwhileindex = test.FindIndex(index, s1 => s1.Contains("endwhile"));
+
+                            if (whilecount > 2)
+                            {
+                                endwhileindex = test.FindIndex(endwhileindex, s1 => s1.Contains("endwhile"));
+                            }
+
+                            if (whileindex > index && whileindex < endwhileindex)
+                            {
+                                var whileif = test[whileindex];
+                                space = whileindex;
+                                txtError.AppendText("true\n");
+                                label = "label" + _labelCounter;
+                                ++_labelCounter;
+                                sentence = "goto " + label + ";\n";
+                                statement = "label" + _labelCounter + ":";
+                                whileif = whileif.Replace("while", "if");
+                                whileif += " goto label" + _labelCounter + ";";
+
+                                var tcount = test[whileindex].Count(x => x.Equals('\t'));
+
+                                for (int i = 0; i < tcount; ++i)
+                                {
+                                    statement = "\t" + statement;
+                                    whileif = "\t" + newif;
+                                }
+
+                                sentence += statement;
+                                test[whileindex] = sentence;
+                                ++_labelCounter;
+
+                                test[endwhileindex] = whileif;
+                            }
+
+                            --whilecount;
+                        }
+
+                        var endindex = test.FindIndex(x => x.Contains("endwhile"));
+                        var tabcount = test[endindex].Count(x => x.Equals('\t'));
+                        txtError.AppendText("tab count : " + tabcount + "\n");
+                        test[endindex] = newif;
+                    }
+                    else if (s.IndexOf("for") == 0)
+                    {
+                    }
+                    else if (s.IndexOf("var") == 0)
+                    {
+                        var index = test.IndexOf(other);
+                        test[index] = "\tstatic void Main()\n\t{";
+                    }
+                    else if (s.IndexOf("end") == 0 && s.Length == 3)
+                    {
+                        var index = test.IndexOf(other);
+                        test[index] = "\t}\n}";
+                    }
+                    else if (s.IndexOf("prompt") == 0 || s.IndexOf("print") == 0)
+                    {
+                        var sentence = s;
+                        int index;
+                        if (s.IndexOf("prompt") == 0)
+                        {
+                            sentence = sentence.Replace("prompt", "Console.WriteLine(");
+                            index = test.IndexOf(other);
+                        }
+                        else
+                        {
+                            sentence = sentence.Replace("print", "Console.WriteLine(");
+                            index = test.IndexOf(other);
+                        }
+                        sentence += ");";
+                        test[index] = test[index].Replace(s, sentence);
+                    }
+                    else if (s.IndexOf("rem") == 0)
+                    {
+                        var sentence = s;
+                        sentence = sentence.Replace("rem", "//");
+                        var index = test.IndexOf(other);
+                        test[index] = test[index].Replace(s, sentence);
+                    }
+                    
+                    else if (s.IndexOf("list") == 0)
+                    {
+                        var sentence = s;
+                        var arrayBegin = sentence.IndexOf("[") + 1;
+                        var arrayEnd = sentence.IndexOf("]");
+                        var value = sentence.Substring(arrayBegin, arrayEnd - arrayBegin);
+                        sentence = sentence.Substring(arrayEnd + 1, sentence.Length - (arrayEnd + 1));
+                        sentence = "int[] " + sentence + " = new int[" + value + "];";
+                        var index = test.IndexOf(other);
+                        test[index] = test[index].Replace(s, sentence);
+                    }
+                    else if (s.IndexOf("let") == 0)
+                    {
+                        var sentence = s;
+                        sentence = sentence.Substring("let".Length, sentence.Length - "let".Length);
+                        sentence = sentence + ";";
+                        var index = test.IndexOf(other);
+                        test[index] = test[index].Replace(s, sentence);
+                    }
+                    else if (s.IndexOf("input") == 0)
+                    {
+                        var sentence = s;
+                        sentence = sentence.Replace("input", "");
+                        var index = test.IndexOf(other);
+                        test[index] = test[index].Replace(s, sentence + " = Convert.ToInt32(Console.ReadLine());");
+
+                    }
+                    else if (s.IndexOf("int") == 0)
+                    {
+                        var index = test.IndexOf(other);
+                        test[index] = test[index].Replace(s, s + ";");
+                    }
+                        /*
+                    else if (reserveWord.Equals("if") && !test[i].Contains("goto"))
+                    {
+                        var label = "label" + _labelCounter;
+                        test[i] = test[i].Trim(' ', '\t');
+                        var sentence = test[i].Substring(0, test[i].Count() - "then".Length);
+                        sentence += "goto " + label + ";";
+
+                        test[i] = sentence;
+                        test.Insert(i + 2, label + ":");
+
+                        ++_labelCounter;
+                        break;
+
+                    }
+                    else if (reserveWord.Equals("=="))
+                    {
+                        test[i] = test[i].Replace("==", "!=");
+                        break;
+                    }
+                    else if (reserveWord.Equals("goto"))
+                    {
+                        //var something = test[i].Length - 1;
+                        //test[i] = test[i].Replace(test[i].ElementAt(something), ';');
+                    }
+                    else if (reserveWord.Equals("label"))
+                    {
+                        var something = test[i].Length - 1;
+                        test[i] = test[i].Replace(test[i].ElementAt(something), ':');
+                        break;
+                    }
+                         * */
+                });
             
+            /*
             for (var i = 2; i < test.Count; i++)
             {
                 test[i] = test[i].TrimStart(' ', '\t');
@@ -203,7 +390,7 @@ namespace OptimizingParallelCompiler
 
 
 
-                            endForStringPart2 = "if (" + idx + " <= " + bound + ") then goto " + label + ";";
+                            endForStringPart2 = "if (" + idx + " <= " + bound + ") goto " + label + ";";
 
                             endForStringPart2 += "\n";
 
@@ -277,13 +464,15 @@ namespace OptimizingParallelCompiler
                             //take the last string off the list
                             test[i] = _ListOfEndFors[_ListOfEndFors.Count - 1];
                             _ListOfEndFors.RemoveAt(_ListOfEndFors.Count - 1);
-                           
+                            break;
                         }
                         else if (reserveWord.Equals("input") && test[i].IndexOf("input") == 0)
                         {
                             var sentence = test[i];
                             sentence = sentence.Replace("input", "");
                             test[i] = "\t" + sentence + " = Convert.ToInt32(Console.ReadLine());";
+                            break;
+
                         }
                         else if (reserveWord.Equals("int"))
                         {
@@ -291,6 +480,7 @@ namespace OptimizingParallelCompiler
                             sentence = sentence.Replace("\t", string.Empty);
                             sentence = "\t" + sentence + ";";
                             test[i] = sentence;
+                            break;
                         }
                         else if (reserveWord.Equals("if") && !test[i].Contains("goto"))
                         {
@@ -303,10 +493,13 @@ namespace OptimizingParallelCompiler
                             test.Insert(i + 2, label + ":");
 
                             ++_labelCounter;
+                            break;
+
                         }
                         else if (reserveWord.Equals("=="))
                         {
                             test[i] = test[i].Replace("==", "!=");
+                            break;
                         }
                         else if (reserveWord.Equals("goto"))
                         {
@@ -315,20 +508,24 @@ namespace OptimizingParallelCompiler
                         }
                         else if (reserveWord.Equals("label"))
                         {
-                            //var something = test[i].Length - 1;
-                            //test[i] = test[i].Replace(test[i].ElementAt(something), ':');
+                            var something = test[i].Length - 1;
+                            test[i] = test[i].Replace(test[i].ElementAt(something), ':');
+                            break;
                         }
                     }
                     else if (test[i].Contains("begin"))
                     {
                         test[i] = test[i].Replace("\t", "");
                         test[i] = "\t";
+                        
                     }
                 }
             }
              
 
             //Parser.Change(ref test, _reserveWords, txtOneilCode.Text);
+                         * */
+            _labelCounter = 0;
 
             txtCSharpCode.Clear();
 
@@ -387,42 +584,6 @@ namespace OptimizingParallelCompiler
                 foreach (var text in par.ReferencedAssemblies)
                 {
                     txtError.Text += text;
-                }
-            }
-        }
-
-        private void WriteBatFile(string exePath, string exeName)
-        {
-            //Code to capture Results
-            try
-            {
-                //Check if file already exists
-                if (File.Exists(BatFile))
-                {
-                    //File Exists - delete file
-                    File.Delete(BatFile);
-                }
-
-                //Code to write results
-                var resultsWriter = new StreamWriter(BatFile);
-
-                resultsWriter.Write("start " + exePath + " %1" + Environment.NewLine  +
-                    "ECHO Press any key to exit" + Environment.NewLine  +
-   "PAUSE >NUL" + Environment.NewLine +
-   "EXIT /B" + Environment.NewLine);
-
-                resultsWriter.Close();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("An error has occurred trying to write results file!");
-                if (File.Exists(ErrorFile))
-                {
-                    File.AppendAllText(ErrorFile, ex.Message);
-                }
-                else
-                {
-                    File.WriteAllText(ErrorFile, ex.Message);
                 }
             }
         }
