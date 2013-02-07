@@ -109,7 +109,7 @@ namespace OptimizingParallelCompiler
                     else if (s.IndexOf("while") == 0)
                     {
                         string tab = null;
-                        for (int i = 0; i < count; i++)
+                        for (var i = 0; i < count; i++)
                         {
                             tab += "\t";
                         }
@@ -139,32 +139,32 @@ namespace OptimizingParallelCompiler
                                                             s1 => s1.Contains("while") && !s1.Contains("endwhile"));
                             var endwhileindex = test.FindIndex(index, s1 => s1.Contains("endwhile"));
 
-                            if (whilecount > 2)
+                            if (whilecount > 1)
                             {
-                                endwhileindex = test.FindIndex(endwhileindex, s1 => s1.Contains("endwhile"));
+                                endwhileindex = test.FindIndex(endwhileindex + 1, s1 => s1.Contains("endwhile"));
                             }
 
                             if (whileindex > index && whileindex < endwhileindex)
                             {
-                                var whileif = test[whileindex];
                                 space = whileindex;
+
+                                var tcount = test[whileindex].Count(x => x.Equals('\t'));
+                                string nestedTabCount = null;
+                                for (var i = 0; i < tcount; ++i)
+                                {
+                                    nestedTabCount += "\t";
+                                }
+
                                 txtError.AppendText("true\n");
                                 label = "label" + _labelCounter;
+                                var whileif = nestedTabCount + label + ":\n" + test[whileindex];
                                 ++_labelCounter;
                                 sentence = "goto " + label + ";\n";
                                 statement = "label" + _labelCounter + ":";
                                 whileif = whileif.Replace("while", "if");
                                 whileif += " goto label" + _labelCounter + ";";
+                                sentence = nestedTabCount + sentence + statement;
 
-                                var tcount = test[whileindex].Count(x => x.Equals('\t'));
-
-                                for (int i = 0; i < tcount; ++i)
-                                {
-                                    statement = "\t" + statement;
-                                    whileif = "\t" + newif;
-                                }
-
-                                sentence += statement;
                                 test[whileindex] = sentence;
                                 ++_labelCounter;
 
