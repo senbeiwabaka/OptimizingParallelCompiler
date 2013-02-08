@@ -46,7 +46,6 @@
             this.compileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.dBTestToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.txtOneilCode = new System.Windows.Forms.RichTextBox();
             this.txtCSharpCode = new System.Windows.Forms.RichTextBox();
             this.txtError = new System.Windows.Forms.TextBox();
@@ -59,8 +58,7 @@
             // menuStrip1
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileToolStripMenuItem,
-            this.dBTestToolStripMenuItem});
+            this.fileToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(962, 24);
@@ -218,11 +216,6 @@
             this.exitToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             // 
-            // dBTestToolStripMenuItem
-            // 
-            this.dBTestToolStripMenuItem.Name = "dBTestToolStripMenuItem";
-            this.dBTestToolStripMenuItem.Size = new System.Drawing.Size(12, 20);
-            // 
             // txtOneilCode
             // 
             this.txtOneilCode.Location = new System.Drawing.Point(24, 29);
@@ -375,7 +368,6 @@
         private System.Windows.Forms.ToolStripMenuItem triviaToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
         private System.Windows.Forms.TextBox txtError;
-        private System.Windows.Forms.ToolStripMenuItem dBTestToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem testToolStripMenuItem;
         private LineNumbersControlForRichTextBox.LineNumbersForRichText lineNumbersForRichText1;
         private LineNumbersControlForRichTextBox.LineNumbersForRichText lineNumbersForRichText2;
