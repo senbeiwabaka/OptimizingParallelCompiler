@@ -218,7 +218,7 @@ namespace OptimizingParallelCompiler
                                         value.Substring(2, value.IndexOf("=") - 2) + " + 1;";
                         string bound = "";
 
-                        int a1 = s.IndexOf("to") + 2;
+                        var a1 = s.IndexOf("to") + 2;
                         int a2 = s.Length - 1;
                         int a3 = s.IndexOf("to") + 1;
                         int a4 = a2 - a3;
@@ -377,23 +377,35 @@ namespace OptimizingParallelCompiler
                         else if (statement.Contains("print"))
                         {
                             statement = statement.Replace("print", "Console.WriteLine(");
+                            var label = "label" + _labelCounter;
+                            statement = " goto " + label + "; " + statement;
                             statement += ");";
                             equator += statement;
                             test[index] = test[index].Replace(s, equator);
+                            test.Insert(index + 2, label + ":");
+                            ++_labelCounter;
                         }
                         else if (statement.Contains("prompt"))
                         {
                             statement = statement.Replace("prompt", "Console.WriteLine(");
+                            var label = "label" + _labelCounter;
+                            statement = " goto " + label + "; " + statement;
                             statement += ");";
                             equator += statement;
                             test[index] = test[index].Replace(s, equator);
+                            test.Insert(index + 2, label + ":");
+                            ++_labelCounter;
                         }
                         else if (statement.Contains("let"))
                         {
                             statement = statement.Replace("let", "");
+                            var label = "label" + _labelCounter;
+                            statement = " goto " + label + "; " + statement;
                             statement += ";";
                             equator += statement;
                             test[index] = test[index].Replace(s, equator);
+                            test.Insert(index + 2, label + ":");
+                            ++_labelCounter;
                         }
                         else
                         {
