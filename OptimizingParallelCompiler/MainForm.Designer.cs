@@ -63,7 +63,7 @@
             this.dBTestToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(917, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(962, 24);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -234,7 +234,7 @@
             // 
             // txtCSharpCode
             // 
-            this.txtCSharpCode.Location = new System.Drawing.Point(454, 27);
+            this.txtCSharpCode.Location = new System.Drawing.Point(499, 27);
             this.txtCSharpCode.Name = "txtCSharpCode";
             this.txtCSharpCode.ReadOnly = true;
             this.txtCSharpCode.Size = new System.Drawing.Size(451, 422);
@@ -249,7 +249,7 @@
             this.txtError.Name = "txtError";
             this.txtError.ReadOnly = true;
             this.txtError.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtError.Size = new System.Drawing.Size(892, 105);
+            this.txtError.Size = new System.Drawing.Size(937, 105);
             this.txtError.TabIndex = 3;
             // 
             // testToolStripMenuItem
@@ -276,7 +276,7 @@
             this.lineNumbersForRichText1.LineNumbersClippedByItemRectangle = true;
             this.lineNumbersForRichText1.LineNumbersLeadingZeroes = true;
             this.lineNumbersForRichText1.LineNumbersOffset = new System.Drawing.Size(0, 0);
-            this.lineNumbersForRichText1.Location = new System.Drawing.Point(433, 27);
+            this.lineNumbersForRichText1.Location = new System.Drawing.Point(478, 27);
             this.lineNumbersForRichText1.Margin = new System.Windows.Forms.Padding(0);
             this.lineNumbersForRichText1.MarginLinesColor = System.Drawing.Color.SlateGray;
             this.lineNumbersForRichText1.MarginLinesSide = LineNumbersControlForRichTextBox.LineNumbersForRichText.LineNumberDockSide.Right;
@@ -335,7 +335,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(917, 573);
+            this.ClientSize = new System.Drawing.Size(962, 573);
             this.Controls.Add(this.lineNumbersForRichText2);
             this.Controls.Add(this.lineNumbersForRichText1);
             this.Controls.Add(this.txtError);
