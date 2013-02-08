@@ -87,9 +87,9 @@ namespace OptimizingParallelCompiler
         {
             var test = new List<string>(txtOneilCode.Lines);
 
-            //test[0] = test[0].Replace("title", "//");
-            //const string usingstatements = "using System;\n" + "class Program\n" + "{";
-            //test.Insert(1, usingstatements);
+            test[0] = test[0].Replace("title", "//");
+            const string usingstatements = "using System;\n" + "class Program\n" + "{";
+            test.Insert(1, usingstatements);
 
             //var works = test.ToList().FindIndex(x => x.Contains("let"));
             //txtError.AppendText(works + "\n");
@@ -100,13 +100,8 @@ namespace OptimizingParallelCompiler
                     s = s.TrimEnd('\t', ' ');
                     var count = s.Count(x => x.Equals('\t'));
                     s = s.TrimStart('\t', ' ');
-                    if (s.IndexOf("title") == 0)
-                    {
-                        test[0] = test[0].Replace("title", "//");
-                        const string usingstatements = "using System;\n" + "class Program\n" + "{";
-                        test.Insert(1, usingstatements);
-                    }
-                    else if (s.IndexOf("while") == 0)
+
+                    if (s.IndexOf("while") == 0)
                     {
                         string tab = null;
                         for (var i = 0; i < count; i++)
@@ -127,7 +122,7 @@ namespace OptimizingParallelCompiler
                         var index = test.IndexOf(other);
                         test[index] = test[index].Replace(s, sentence);
                         ++_labelCounter;
-                        
+
                         var whilecount = test.Count(s1 => s1.Contains("while") && !s1.Contains("endwhile"));
                         txtError.AppendText("while : " + whilecount.ToString() + "\n");
                         var endwhile = test.Count(s1 => s1.Contains("endwhile"));
@@ -341,40 +336,91 @@ namespace OptimizingParallelCompiler
                         var index = test.IndexOf(other);
                         test[index] = test[index].Replace(s, s + ";");
                     }
-                        /*
-                    else if (reserveWord.Equals("if") && !test[i].Contains("goto"))
+                    else if (s.IndexOf("if") == 0 && s.Contains("then"))
                     {
-                        var label = "label" + _labelCounter;
-                        test[i] = test[i].Trim(' ', '\t');
-                        var sentence = test[i].Substring(0, test[i].Count() - "then".Length);
-                        sentence += "goto " + label + ";";
+                        var index = test.IndexOf(other);
+                        var statement = s.Substring(s.IndexOf("then") + "then".Length,
+                                                   s.Length - (s.IndexOf("then") + "then".Length));
+                        var equator = s.Substring(0, s.IndexOf(")") + 1);
 
-                        test[i] = sentence;
-                        test.Insert(i + 2, label + ":");
+                        if (equator.Contains("!="))
+                        {
+                            equator = equator.Replace("!=", "==");
+                        }
+                        else if (equator.Contains("=="))
+                        {
+                            equator = equator.Replace("==", "!=");
+                        }
+                        else if (equator.Contains("<") && !equator.Contains("<="))
+                        {
+                            equator = equator.Replace("<", ">=");
+                        }
+                        else if (equator.Contains(">") && !equator.Contains(">="))
+                        {
+                            equator = equator.Replace(">", "<=");
+                        }
+                        else if (equator.Contains("<="))
+                        {
+                            equator = equator.Replace("<=", ">");
+                        }
+                        else if (equator.Contains(">="))
+                        {
+                            equator = equator.Replace(">=", "<");
+                        }
 
-                        ++_labelCounter;
-                        break;
-
+                        if (statement.Contains("goto"))
+                        {
+                            statement += ";";
+                            equator += statement;
+                            test[index] = test[index].Replace(s, equator);
+                        }
+                        else if (statement.Contains("print"))
+                        {
+                            statement = statement.Replace("print", "Console.WriteLine(");
+                            statement += ");";
+                            equator += statement;
+                            test[index] = test[index].Replace(s, equator);
+                        }
+                        else if (statement.Contains("prompt"))
+                        {
+                            statement = statement.Replace("prompt", "Console.WriteLine(");
+                            statement += ");";
+                            equator += statement;
+                            test[index] = test[index].Replace(s, equator);
+                        }
+                        else if (statement.Contains("let"))
+                        {
+                            statement = statement.Replace("let", "");
+                            statement += ";";
+                            equator += statement;
+                            test[index] = test[index].Replace(s, equator);
+                        }
+                        else
+                        {
+                            var label = "label" + _labelCounter;
+                            statement += "goto " + label + ";";
+                            equator += statement;
+                            test[index] = test[index].Replace(s, equator);
+                            test.Insert(index + 2, label + ":");
+                            ++_labelCounter;
+                        }
                     }
-                    else if (reserveWord.Equals("=="))
+                    else if (s.IndexOf("goto") == 0)
                     {
-                        test[i] = test[i].Replace("==", "!=");
-                        break;
+                        var sentence = s;
+                        sentence += ";";
+                        var index = test.IndexOf(other);
+                        test[index] = test[index].Replace(s, sentence);
                     }
-                    else if (reserveWord.Equals("goto"))
+                    else if (s.IndexOf("label") == 0 && !s.Contains(":"))
                     {
-                        //var something = test[i].Length - 1;
-                        //test[i] = test[i].Replace(test[i].ElementAt(something), ';');
+                        var sentence = s;
+                        var index = s.IndexOf(other);
+                        sentence += ":";
+                        test[index] = test[index].Replace(s, sentence);
                     }
-                    else if (reserveWord.Equals("label"))
-                    {
-                        var something = test[i].Length - 1;
-                        test[i] = test[i].Replace(test[i].ElementAt(something), ':');
-                        break;
-                    }
-                         * */
                 });
-            
+
             /*
             for (var i = 2; i < test.Count; i++)
             {
