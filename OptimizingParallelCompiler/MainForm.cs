@@ -415,9 +415,21 @@ namespace OptimizingParallelCompiler
                     else if (s.IndexOf("label") == 0 && !s.Contains(":"))
                     {
                         var sentence = s;
-                        var index = s.IndexOf(other);
+                        var index = test.IndexOf(other);
                         sentence += ":";
+                        if (s.Contains(" "))
+                        {
+                            sentence = sentence.Replace("label", "");
+                            sentence = sentence.Replace(" ", "");
+                        }
                         test[index] = test[index].Replace(s, sentence);
+                    }
+                    else if (s.IndexOf("begin") == 0)
+                    {
+                        var statement = s;
+                        statement = statement.Replace("begin", "");
+                        var index = test.IndexOf(other);
+                        test[index] = test[index].Replace(s, statement);
                     }
                 });
 
