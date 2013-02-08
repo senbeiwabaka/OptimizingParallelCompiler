@@ -623,5 +623,21 @@ namespace OptimizingParallelCompiler
             //p.Start();
             //p.WaitForExit();
         }
+
+        //private void txtCSharpCode_MouseDown(object sender, MouseEventArgs e)
+        //{
+        //    switch (e.Button)
+        //    {
+        //        case (MouseButtons.Left):
+        //            break;
+        //        case (MouseButtons.Middle):
+        //            break;
+        //        case (MouseButtons.Right):
+        //            txtCSharpCode.Copy();
+        //            break;
+        //    }
+        //}
+
+
     }
 }
