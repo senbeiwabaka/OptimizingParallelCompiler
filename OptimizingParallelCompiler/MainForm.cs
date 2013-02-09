@@ -370,9 +370,12 @@ namespace OptimizingParallelCompiler
 
                         if (statement.Contains("goto"))
                         {
-                            statement += ";";
-                            equator += statement;
-                            test[index] = test[index].Replace(s, equator);
+                            //statement += ";";
+                            var sentence = s;
+                            sentence = sentence.Replace(statement, "");
+                            sentence = sentence.Replace("then", statement);
+                            sentence += ";";
+                            test[index] = test[index].Replace(s, sentence);
                         }
                         else if (statement.Contains("print"))
                         {
@@ -624,20 +627,18 @@ namespace OptimizingParallelCompiler
             //p.WaitForExit();
         }
 
-        //private void txtCSharpCode_MouseDown(object sender, MouseEventArgs e)
-        //{
-        //    switch (e.Button)
-        //    {
-        //        case (MouseButtons.Left):
-        //            break;
-        //        case (MouseButtons.Middle):
-        //            break;
-        //        case (MouseButtons.Right):
-        //            txtCSharpCode.Copy();
-        //            break;
-        //    }
-        //}
-
-
+        private void txtCSharpCode_MouseDown(object sender, MouseEventArgs e)
+        {
+            switch (e.Button)
+            {
+                case (MouseButtons.Left):
+                    break;
+                case (MouseButtons.Middle):
+                    break;
+                case (MouseButtons.Right):
+                    txtCSharpCode.Copy();
+                    break;
+            }
+        }
     }
 }

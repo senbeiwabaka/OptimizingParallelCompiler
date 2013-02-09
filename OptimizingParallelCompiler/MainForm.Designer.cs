@@ -233,6 +233,7 @@
             this.txtCSharpCode.Size = new System.Drawing.Size(451, 422);
             this.txtCSharpCode.TabIndex = 2;
             this.txtCSharpCode.Text = "";
+            this.txtCSharpCode.MouseDown += new System.Windows.Forms.MouseEventHandler(this.txtCSharpCode_MouseDown);
             // 
             // txtError
             // 
