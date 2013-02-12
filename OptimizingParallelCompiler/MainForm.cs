@@ -285,12 +285,12 @@ namespace OptimizingParallelCompiler
                         int index;
                         if (s.IndexOf("prompt") == 0)
                         {
-                            sentence = sentence.Replace("prompt", "Console.WriteLine(");
+                            sentence = sentence.Replace("prompt", "Console.Write(");
                             index = test.IndexOf(other);
                         }
                         else
                         {
-                            sentence = sentence.Replace("print", "Console.WriteLine(");
+                            sentence = sentence.Replace("print", "Console.Write(");
                             index = test.IndexOf(other);
                         }
                         sentence += ");";
@@ -379,7 +379,7 @@ namespace OptimizingParallelCompiler
                         }
                         else if (statement.Contains("print"))
                         {
-                            statement = statement.Replace("print", "Console.WriteLine(");
+                            statement = statement.Replace("print", "Console.Write(");
                             var label = "label" + _labelCounter;
                             statement = " goto " + label + "; " + statement;
                             statement += ");";
@@ -390,7 +390,7 @@ namespace OptimizingParallelCompiler
                         }
                         else if (statement.Contains("prompt"))
                         {
-                            statement = statement.Replace("prompt", "Console.WriteLine(");
+                            statement = statement.Replace("prompt", "Console.Write(");
                             var label = "label" + _labelCounter;
                             statement = " goto " + label + "; " + statement;
                             statement += ");";
