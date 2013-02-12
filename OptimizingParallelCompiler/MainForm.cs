@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace OptimizingParallelCompiler
@@ -15,17 +14,15 @@ namespace OptimizingParallelCompiler
         private string _output = "Out.exe";
         private CompilerResults _results;
         private int _labelCounter;
-        private List<string> _ListOfEndFors;
+        private readonly List<string> _ListOfEndFors;
         private const string ErrorFile = "error.txt";
-        private const string ResultsFile = "results.txt";
-        private const string BatFile = "batfile.bat";
 
         public MainForm()
         {
             InitializeComponent();
 
-            List<string> ListOfEndFors = new List<string>();
-            _ListOfEndFors = ListOfEndFors;
+            var listOfEndFors = new List<string>();
+            _ListOfEndFors = listOfEndFors;
 
             _reserveWords = new List<string>(25)
                 {
@@ -47,10 +44,7 @@ namespace OptimizingParallelCompiler
                     "for",
                     "while",
                     "begin",
-                    "==",
                 };
-
-            
         }
 
         private void RtbColor()
@@ -90,9 +84,6 @@ namespace OptimizingParallelCompiler
             test[0] = test[0].Replace("title", "//");
             const string usingstatements = "using System;\n" + "class Program\n" + "{";
             test.Insert(1, usingstatements);
-
-            //var works = test.ToList().FindIndex(x => x.Contains("let"));
-            //txtError.AppendText(works + "\n");
 
             test.ForEach(delegate(string s)
                 {
@@ -184,8 +175,6 @@ namespace OptimizingParallelCompiler
                     else if (s.IndexOf("for") == 0)
                     {
                         var index = test.IndexOf(other);
-                        string endForStringPart1;
-                        string endForStringPart2;
 
                         //variable for list of statements
                         string endForString = "";
@@ -216,22 +205,18 @@ namespace OptimizingParallelCompiler
                         var value = "\t\t" + s.Substring(id, end - id) + ";\n";
                         var value1 = "\t" + value.Substring(2, value.IndexOf("=") - 2) + "=" +
                                         value.Substring(2, value.IndexOf("=") - 2) + " + 1;";
-                        string bound = "";
+                        var bound = "";
 
                         var a1 = s.IndexOf("to") + 2;
-                        int a2 = s.Length - 1;
-                        int a3 = s.IndexOf("to") + 1;
-                        int a4 = a2 - a3;
+                        var a2 = s.Length - 1;
+                        var a3 = s.IndexOf("to") + 1;
+                        var a4 = a2 - a3;
 
                         bound = s.Substring(a1, a4);
                         var label = "Label" + _labelCounter.ToString();
-                        endForStringPart1 = value1;
+                        var endForStringPart1 = value1;
 
                         var sentence = value + "\t" + label + ":";
-                        var number = s.IndexOf("to") + 2;
-                        //test[i] = test[i].TrimEnd(' ');
-                        var lastvalue = s.Last();
-                        var number1 = s.IndexOf(lastvalue);
 
                         //Oneil Code                    //Translation
                         //for idx = 0 to bound – 1      let idx = 0
@@ -246,9 +231,9 @@ namespace OptimizingParallelCompiler
                         //                               + "\n"     this is endForStringPart2
 
                         //idx
-                        string idx = value.Substring(2, value.IndexOf("=") - 2);
+                        var idx = value.Substring(2, value.IndexOf("=") - 2);
 
-                        endForStringPart2 = "if (" + idx + " <= " + bound + ") goto " + label + ";";
+                        var endForStringPart2 = "if (" + idx + " <= " + bound + ") goto " + label + ";";
                         endForStringPart2 += "\n";
 
                         //var temp1 = "\tif( " + value.Substring(2, value.IndexOf("=") - 2) + " <= ";
@@ -260,7 +245,7 @@ namespace OptimizingParallelCompiler
                         //              " ) goto " + label + ";";
 
                         test[index] = sentence;
-                        endForString = endForStringPart1 += "\n";
+                        endForString = endForStringPart1 + "\n";
 
                         endForString += "\t" + endForStringPart2;
 
