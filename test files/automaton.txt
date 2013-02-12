@@ -36,7 +36,6 @@ begin
    prompt "I therefore reject this input.\n"
    goto finish
 
-
    label state2
    while (0 == 0)
       prompt "Give me a number (-1 to quit): "
@@ -70,5 +69,6 @@ begin
    prompt "You gave me an odd number of 1's.\n"
    prompt "I therefore reject this input.\n"
 
-   label finish   
+   label finish
+   prompt "Thats all folks.\n"
 end
