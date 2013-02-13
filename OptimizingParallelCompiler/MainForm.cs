@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace OptimizingParallelCompiler
@@ -14,15 +15,17 @@ namespace OptimizingParallelCompiler
         private string _output = "Out.exe";
         private CompilerResults _results;
         private int _labelCounter;
-        private readonly List<string> _ListOfEndFors;
+        private readonly List<string> _listOfEndFors;
         private const string ErrorFile = "error.txt";
+        private Thread _thread;
+        private bool _threadStop;
 
         public MainForm()
         {
             InitializeComponent();
 
             var listOfEndFors = new List<string>();
-            _ListOfEndFors = listOfEndFors;
+            _listOfEndFors = listOfEndFors;
 
             _reserveWords = new List<string>(25)
                 {
@@ -47,26 +50,35 @@ namespace OptimizingParallelCompiler
                 };
         }
 
+        /// <summary>
+        /// Colors the keywords of the language
+        /// Initial code was found online from stackoverflow.com - We have since done a little modification
+        /// </summary>
         private void RtbColor()
         {
+            const RichTextBoxFinds options = RichTextBoxFinds.MatchCase;
+
             foreach (var reserveWord in _reserveWords)
             {
                 var start = 0;
-                const RichTextBoxFinds options = RichTextBoxFinds.MatchCase;
+                
                 start = txtOneilCode.Find(reserveWord, start, options);
-                while (start >= 0)
+
+                var count = txtOneilCode.Lines.Count(x => x.Contains(reserveWord));
+                while (count > 0)
                 {
                     txtOneilCode.SelectionStart = start;
                     txtOneilCode.SelectionLength = reserveWord.Length;
-                    txtOneilCode.SelectionColor = Color.DodgerBlue;
+                    txtOneilCode.SelectionColor = Color.MediumBlue;
 
-                    var current = start + reserveWord.Length;
-                    if (current < txtOneilCode.TextLength)
-                        start = txtOneilCode.Find(reserveWord, current, options);
-                    else
-                        break;
+                    start = txtOneilCode.Find(reserveWord, start + reserveWord.Length, options);
+
+                    --count;
                 }
             }
+
+            txtOneilCode.SelectionStart = 0;
+            txtOneilCode.SelectionLength = 0;
         }
 
         private void richTextBox1_KeyPress(object sender, KeyPressEventArgs e)
@@ -77,22 +89,31 @@ namespace OptimizingParallelCompiler
             }
         }
 
+        /// <summary>
+        /// Converts the code from O'Neil Language to C#
+        /// </summary>
+        /// <param name="sender">Who sent the event</param>
+        /// <param name="e">The event thingy</param>
         private void convertToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var test = new List<string>(txtOneilCode.Lines);
+            var code = new List<string>(txtOneilCode.Lines);
 
-            test[0] = test[0].Replace("title", "//");
+            //starts a new thread for doing code analysis for making code 3 op and dead code removal
+            _thread = new Thread(() => ThreeOPCode(code));
+            _thread.Start();
+
+            code[0] = code[0].Replace("title", "//");
             const string usingstatements = "using System;\n" + "class Program\n" + "{";
-            test.Insert(1, usingstatements);
+            code.Insert(1, usingstatements);
 
-            test.ForEach(delegate(string s)
+            code.ForEach(s => 
                 {
                     var other = s;
                     s = s.TrimEnd('\t', ' ');
-                    var count = s.Count(x => x.Equals('\t'));
+                    var count = s.Count(x => x.Equals('\t') || x.Equals(' '));
                     s = s.TrimStart('\t', ' ');
 
-                    if (s.IndexOf("while") == 0)
+                    if (s.IndexOf("while", StringComparison.Ordinal) == 0)
                     {
                         string tab = null;
                         for (var i = 0; i < count; i++)
@@ -110,40 +131,36 @@ namespace OptimizingParallelCompiler
                         statement = tab + statement;
 
                         sentence += statement;
-                        var index = test.IndexOf(other);
-                        test[index] = test[index].Replace(s, sentence);
+                        var index = code.IndexOf(other);
+                        code[index] = code[index].Replace(s, sentence);
                         ++_labelCounter;
 
-                        var whilecount = test.Count(s1 => s1.Contains("while") && !s1.Contains("endwhile"));
-                        txtError.AppendText("while : " + whilecount.ToString() + "\n");
-                        var endwhile = test.Count(s1 => s1.Contains("endwhile"));
-                        txtError.AppendText("endwhile : " + endwhile.ToString() + "\n");
+                        var whilecount = code.Count(s1 => s1.Contains("while") && !s1.Contains("endwhile"));
                         var space = index;
                         while (whilecount > 0)
                         {
-                            var whileindex = test.FindIndex(space,
+                            var whileindex = code.FindIndex(space,
                                                             s1 => s1.Contains("while") && !s1.Contains("endwhile"));
-                            var endwhileindex = test.FindIndex(index, s1 => s1.Contains("endwhile"));
+                            var endwhile = code.FindIndex(index, s1 => s1.Contains("endwhile"));
 
                             if (whilecount > 1)
                             {
-                                endwhileindex = test.FindIndex(endwhileindex + 1, s1 => s1.Contains("endwhile"));
+                                endwhile = code.FindIndex(endwhile + 1, s1 => s1.Contains("endwhile"));
                             }
 
-                            if (whileindex > index && whileindex < endwhileindex)
+                            if (whileindex > index && whileindex < endwhile)
                             {
                                 space = whileindex;
 
-                                var tcount = test[whileindex].Count(x => x.Equals('\t'));
+                                var tcount = code[whileindex].Count(x => x.Equals('\t'));
                                 string nestedTabCount = null;
                                 for (var i = 0; i < tcount; ++i)
                                 {
                                     nestedTabCount += "\t";
                                 }
 
-                                txtError.AppendText("true\n");
                                 label = "label" + _labelCounter;
-                                var whileif = nestedTabCount + label + ":\n" + test[whileindex];
+                                var whileif = nestedTabCount + label + ":\n" + code[whileindex];
                                 ++_labelCounter;
                                 sentence = "goto " + label + ";\n";
                                 statement = "label" + _labelCounter + ":";
@@ -151,33 +168,31 @@ namespace OptimizingParallelCompiler
                                 whileif += " goto label" + _labelCounter + ";";
                                 sentence = nestedTabCount + sentence + statement;
 
-                                test[whileindex] = sentence;
+                                code[whileindex] = sentence;
                                 ++_labelCounter;
 
-                                test[endwhileindex] = whileif;
+                                code[endwhile] = whileif;
                             }
 
                             --whilecount;
                         }
 
-                        var endindex = test.FindIndex(x => x.Contains("endwhile"));
-                        var tabcount = test[endindex].Count(x => x.Equals('\t'));
-                        txtError.AppendText("tab count : " + tabcount + "\n");
-                        test[endindex] = newif;
+                        var endindex = code.FindIndex(x => x.Contains("endwhile"));
+                        code[endindex] = newif;
                     }
-                    else if (s.IndexOf("endfor") == 0)
+                    else if (s.IndexOf("endfor", StringComparison.Ordinal) == 0)
                     {
-                        var index = test.IndexOf(other);
+                        var index = code.IndexOf(other);
                         //take the last string off the list
-                        test[index] = _ListOfEndFors[_ListOfEndFors.Count - 1];
-                        _ListOfEndFors.RemoveAt(_ListOfEndFors.Count - 1);
+                        code[index] = _listOfEndFors[_listOfEndFors.Count - 1];
+                        _listOfEndFors.RemoveAt(_listOfEndFors.Count - 1);
                     }
-                    else if (s.IndexOf("for") == 0)
+                    else if (s.IndexOf("for", StringComparison.Ordinal) == 0)
                     {
-                        var index = test.IndexOf(other);
+                        var index = code.IndexOf(other);
 
                         //variable for list of statements
-                        string endForString = "";
+                        string endForString;
                         //_tempEndFor =;
 
                         //look ahead until you find the end for
@@ -196,20 +211,16 @@ namespace OptimizingParallelCompiler
                         //    tempI++;
                         //}
 
-
-
-                        //test[i] = test[i].Replace("\t", string.Empty);
-                        //var id = s.IndexOf("for") + reserveWord.Count() + 1;
-                        var id = s.IndexOf("for") + 4;
-                        var end = s.IndexOf("to") - 1;
+                        var id = s.IndexOf("for", StringComparison.Ordinal) + 4;
+                        var end = s.IndexOf("to", StringComparison.Ordinal) - 1;
                         var value = "\t\t" + s.Substring(id, end - id) + ";\n";
-                        var value1 = "\t" + value.Substring(2, value.IndexOf("=") - 2) + "=" +
-                                        value.Substring(2, value.IndexOf("=") - 2) + " + 1;";
-                        var bound = "";
+                        var value1 = "\t" + value.Substring(2, value.IndexOf("=", StringComparison.Ordinal) - 2) + "=" +
+                                        value.Substring(2, value.IndexOf("=", StringComparison.Ordinal) - 2) + " + 1;";
+                        string bound;
 
-                        var a1 = s.IndexOf("to") + 2;
+                        var a1 = s.IndexOf("to", System.StringComparison.Ordinal) + 2;
                         var a2 = s.Length - 1;
-                        var a3 = s.IndexOf("to") + 1;
+                        var a3 = s.IndexOf("to", System.StringComparison.Ordinal) + 1;
                         var a4 = a2 - a3;
 
                         bound = s.Substring(a1, a4);
@@ -231,7 +242,7 @@ namespace OptimizingParallelCompiler
                         //                               + "\n"     this is endForStringPart2
 
                         //idx
-                        var idx = value.Substring(2, value.IndexOf("=") - 2);
+                        var idx = value.Substring(2, value.IndexOf("=", System.StringComparison.Ordinal) - 2);
 
                         var endForStringPart2 = "if (" + idx + " <= " + bound + ") goto " + label + ";";
                         endForStringPart2 += "\n";
@@ -244,89 +255,89 @@ namespace OptimizingParallelCompiler
                         //              test[i].Substring(number, number1 - number + 1) +
                         //              " ) goto " + label + ";";
 
-                        test[index] = sentence;
+                        code[index] = sentence;
                         endForString = endForStringPart1 + "\n";
 
                         endForString += "\t" + endForStringPart2;
 
                         //test.Insert(i + 2, endForStringPart1);
                         //test.Insert(i + 3, last);
-                        _ListOfEndFors.Add(endForString);
+                        _listOfEndFors.Add(endForString);
                         ++_labelCounter;
                     }
-                    else if (s.IndexOf("var") == 0)
+                    else if (s.IndexOf("var", System.StringComparison.Ordinal) == 0)
                     {
-                        var index = test.IndexOf(other);
-                        test[index] = "\tstatic void Main()\n\t{";
+                        var index = code.IndexOf(other);
+                        code[index] = "\tstatic void Main()\n\t{";
                     }
-                    else if (s.IndexOf("end") == 0 && s.Length == 3)
+                    else if (s.IndexOf("end", System.StringComparison.Ordinal) == 0 && s.Length == 3)
                     {
-                        var index = test.IndexOf(other);
-                        test[index] = "\t}\n}";
+                        var index = code.IndexOf(other);
+                        code[index] = "\t}\n}";
                     }
-                    else if (s.IndexOf("prompt") == 0 || s.IndexOf("print") == 0)
+                    else if (s.IndexOf("prompt", System.StringComparison.Ordinal) == 0 || s.IndexOf("print") == 0)
                     {
                         var sentence = s;
                         int index;
-                        if (s.IndexOf("prompt") == 0)
+                        if (s.IndexOf("prompt", System.StringComparison.Ordinal) == 0)
                         {
                             sentence = sentence.Replace("prompt", "Console.Write(");
-                            index = test.IndexOf(other);
+                            index = code.IndexOf(other);
                         }
                         else
                         {
                             sentence = sentence.Replace("print", "Console.Write(");
-                            index = test.IndexOf(other);
+                            index = code.IndexOf(other);
                         }
                         sentence += ");";
-                        test[index] = test[index].Replace(s, sentence);
+                        code[index] = code[index].Replace(s, sentence);
                     }
-                    else if (s.IndexOf("rem") == 0)
+                    else if (s.IndexOf("rem", System.StringComparison.Ordinal) == 0)
                     {
                         var sentence = s;
                         sentence = sentence.Replace("rem", "//");
-                        var index = test.IndexOf(other);
-                        test[index] = test[index].Replace(s, sentence);
+                        var index = code.IndexOf(other);
+                        code[index] = code[index].Replace(s, sentence);
                     }
 
-                    else if (s.IndexOf("list") == 0)
+                    else if (s.IndexOf("list", System.StringComparison.Ordinal) == 0)
                     {
                         var sentence = s;
-                        var arrayBegin = sentence.IndexOf("[") + 1;
-                        var arrayEnd = sentence.IndexOf("]");
+                        var arrayBegin = sentence.IndexOf("[", System.StringComparison.Ordinal) + 1;
+                        var arrayEnd = sentence.IndexOf("]", System.StringComparison.Ordinal);
                         var value = sentence.Substring(arrayBegin, arrayEnd - arrayBegin);
                         sentence = sentence.Substring(arrayEnd + 1, sentence.Length - (arrayEnd + 1));
                         sentence = "int[] " + sentence + " = new int[" + value + "];";
-                        var index = test.IndexOf(other);
-                        test[index] = test[index].Replace(s, sentence);
+                        var index = code.IndexOf(other);
+                        code[index] = code[index].Replace(s, sentence);
                     }
-                    else if (s.IndexOf("let") == 0)
+                    else if (s.IndexOf("let", System.StringComparison.Ordinal) == 0)
                     {
                         var sentence = s;
                         sentence = sentence.Substring("let".Length, sentence.Length - "let".Length);
                         sentence = sentence + ";";
-                        var index = test.IndexOf(other);
-                        test[index] = test[index].Replace(s, sentence);
+                        var index = code.IndexOf(other);
+                        code[index] = code[index].Replace(s, sentence);
                     }
-                    else if (s.IndexOf("input") == 0)
+                    else if (s.IndexOf("input", System.StringComparison.Ordinal) == 0)
                     {
                         var sentence = s;
                         sentence = sentence.Replace("input", "");
-                        var index = test.IndexOf(other);
-                        test[index] = test[index].Replace(s, sentence + " = Convert.ToInt32(Console.ReadLine());");
+                        var index = code.IndexOf(other);
+                        code[index] = code[index].Replace(s, sentence + " = Convert.ToInt32(Console.ReadLine());");
 
                     }
-                    else if (s.IndexOf("int") == 0)
+                    else if (s.IndexOf("int", StringComparison.Ordinal) == 0)
                     {
-                        var index = test.IndexOf(other);
-                        test[index] = test[index].Replace(s, s + ";");
+                        var index = code.IndexOf(other);
+                        code[index] = code[index].Replace(s, s + ";");
                     }
-                    else if (s.IndexOf("if") == 0 && s.Contains("then"))
+                    else if (s.IndexOf("if", StringComparison.Ordinal) == 0 && s.Contains("then"))
                     {
-                        var index = test.IndexOf(other);
-                        var statement = s.Substring(s.IndexOf("then") + "then".Length,
-                                                   s.Length - (s.IndexOf("then") + "then".Length));
-                        var equator = s.Substring(0, s.IndexOf(")") + 1);
+                        var index = code.IndexOf(other);
+                        var statement = s.Substring(s.IndexOf("then", StringComparison.Ordinal) + "then".Length,
+                                                   s.Length - (s.IndexOf("then", StringComparison.Ordinal) + "then".Length));
+                        var equator = s.Substring(0, s.IndexOf(")", StringComparison.Ordinal) + 1);
 
                         if (equator.Contains("!="))
                         {
@@ -355,12 +366,11 @@ namespace OptimizingParallelCompiler
 
                         if (statement.Contains("goto"))
                         {
-                            //statement += ";";
                             var sentence = s;
                             sentence = sentence.Replace(statement, "");
                             sentence = sentence.Replace("then", statement);
                             sentence += ";";
-                            test[index] = test[index].Replace(s, sentence);
+                            code[index] = code[index].Replace(s, sentence);
                         }
                         else if (statement.Contains("print"))
                         {
@@ -369,8 +379,8 @@ namespace OptimizingParallelCompiler
                             statement = " goto " + label + "; " + statement;
                             statement += ");";
                             equator += statement;
-                            test[index] = test[index].Replace(s, equator);
-                            test.Insert(index + 2, label + ":");
+                            code[index] = code[index].Replace(s, equator);
+                            code.Insert(index + 2, label + ":");
                             ++_labelCounter;
                         }
                         else if (statement.Contains("prompt"))
@@ -380,8 +390,8 @@ namespace OptimizingParallelCompiler
                             statement = " goto " + label + "; " + statement;
                             statement += ");";
                             equator += statement;
-                            test[index] = test[index].Replace(s, equator);
-                            test.Insert(index + 2, label + ":");
+                            code[index] = code[index].Replace(s, equator);
+                            code.Insert(index + 2, label + ":");
                             ++_labelCounter;
                         }
                         else if (statement.Contains("let"))
@@ -391,8 +401,8 @@ namespace OptimizingParallelCompiler
                             statement = " goto " + label + "; " + statement;
                             statement += ";";
                             equator += statement;
-                            test[index] = test[index].Replace(s, equator);
-                            test.Insert(index + 2, label + ":");
+                            code[index] = code[index].Replace(s, equator);
+                            code.Insert(index + 2, label + ":");
                             ++_labelCounter;
                         }
                         else
@@ -400,44 +410,47 @@ namespace OptimizingParallelCompiler
                             var label = "label" + _labelCounter;
                             statement += "goto " + label + ";";
                             equator += statement;
-                            test[index] = test[index].Replace(s, equator);
-                            test.Insert(index + 2, label + ":");
+                            code[index] = code[index].Replace(s, equator);
+                            code.Insert(index + 2, label + ":");
                             ++_labelCounter;
                         }
                     }
-                    else if (s.IndexOf("goto") == 0)
+                    else if (s.IndexOf("goto", StringComparison.Ordinal) == 0)
                     {
                         var sentence = s;
                         sentence += ";";
-                        var index = test.IndexOf(other);
-                        test[index] = test[index].Replace(s, sentence);
+                        var index = code.IndexOf(other);
+                        code[index] = code[index].Replace(s, sentence);
                     }
-                    else if (s.IndexOf("label") == 0 && !s.Contains(":"))
+                    else if (s.IndexOf("label", StringComparison.Ordinal) == 0 && !s.Contains(":"))
                     {
                         var sentence = s;
-                        var index = test.IndexOf(other);
+                        var index = code.IndexOf(other);
                         sentence += ":";
                         if (s.Contains(" "))
                         {
                             sentence = sentence.Replace("label", "");
                             sentence = sentence.Replace(" ", "");
                         }
-                        test[index] = test[index].Replace(s, sentence);
+                        code[index] = code[index].Replace(s, sentence);
                     }
-                    else if (s.IndexOf("begin") == 0)
+                    else if (s.IndexOf("begin", StringComparison.Ordinal) == 0)
                     {
                         var statement = s;
                         statement = statement.Replace("begin", "");
-                        var index = test.IndexOf(other);
-                        test[index] = test[index].Replace(s, statement);
+                        var index = code.IndexOf(other);
+                        code[index] = code[index].Replace(s, statement);
                     }
                 });
 
+            //resets the label counter incase you want to transform another code and need to inspect it
             _labelCounter = 0;
 
+            //clears the box of previous everything
             txtCSharpCode.Clear();
 
-            foreach (var lines in test)
+            //puts the transformed code to the other text box for visual inspection
+            foreach (var lines in code)
             {
                 txtCSharpCode.Text += lines + "\n";
             }
@@ -462,13 +475,6 @@ namespace OptimizingParallelCompiler
                     CompilerOptions = "/platform:x86"
                 };
 
-            //Assembly a;
-            //par.ReferencedAssemblies.Add("C:/Program Files (x86)/Microsoft XNA/XNA Game Studio/v4.0/References/Windows/x86/Microsoft.Xna.Framework.dll");
-            //par.ReferencedAssemblies.Add("C:/Program Files (x86)/Microsoft XNA/XNA Game Studio/v4.0/References/Windows/x86/Microsoft.Xna.Framework.Game.dll");
-            //par.ReferencedAssemblies.Add("C:/Program Files (x86)/Microsoft XNA/XNA Game Studio/v4.0/References/Windows/x86/Microsoft.Xna.Framework.Graphics.dll");
-
-            //txtError.Text = par.LinkedResources + Environment.NewLine;
-
             _results = codeProvider.CompileAssemblyFromSource(par, txtCSharpCode.Text);
 
 
@@ -488,11 +494,6 @@ namespace OptimizingParallelCompiler
                 txtError.BackColor = Color.Blue;
                 txtError.ForeColor = Color.White;
                 txtError.Text = "Success!";
-
-                foreach (var text in par.ReferencedAssemblies)
-                {
-                    txtError.Text += text;
-                }
             }
         }
 
@@ -559,11 +560,11 @@ namespace OptimizingParallelCompiler
             try
             {
                 //Check if file exists
-                if (File.Exists(Environment.CurrentDirectory + "\\oneilcode\\" + fileName + ".txt"))
+                if (File.Exists(Environment.CurrentDirectory + @"\oneilcode\" + fileName + ".txt"))
                 {
                     //Code to read results
                     var resultsReader =
-                        new StreamReader(Environment.CurrentDirectory + "\\oneilcode\\" + fileName + ".txt");
+                        new StreamReader(Environment.CurrentDirectory + @"\oneilcode\" + fileName + ".txt");
 
                     txtOneilCode.Clear();
 
@@ -578,12 +579,12 @@ namespace OptimizingParallelCompiler
                 }
                 else
                 {
-                    MessageBox.Show("The " + fileName + " file does not exist!");
+                    MessageBox.Show(@"The " + fileName + @" file does not exist!");
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("An error has occurred trying to read " + fileName + " file!");
+                MessageBox.Show(@"An error has occurred trying to read " + fileName + @" file!");
                 if (File.Exists(ErrorFile))
                 {
                     File.AppendAllText(ErrorFile, ex.Message);
@@ -599,17 +600,9 @@ namespace OptimizingParallelCompiler
 
         private void toolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            //Create bat file
-            //WriteBatFile(_output + ".exe", _output);
-
             //Call bat file
-            var batPath = Environment.CurrentDirectory + "\\" + _output;
+            var batPath = Environment.CurrentDirectory + @"\" + _output;
             System.Diagnostics.Process.Start("cmd.exe", "/k " + batPath);
-            //System.Diagnostics.Process p = new System.Diagnostics.Process();
-            //p.StartInfo.WorkingDirectory = firebirdInstallationPath;
-            //p.StartInfo.FileName = _output + ".exe";
-            //p.Start();
-            //p.WaitForExit();
         }
 
         private void txtCSharpCode_MouseDown(object sender, MouseEventArgs e)
@@ -623,6 +616,34 @@ namespace OptimizingParallelCompiler
                 case (MouseButtons.Right):
                     txtCSharpCode.Copy();
                     break;
+            }
+        }
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            _threadStop = true;
+            //_thread.Abort();
+            while (_thread.IsAlive)
+            {
+                _thread.Abort();
+            }
+        }
+
+
+        private void ThreeOPCode(List<string> code)
+        {
+            var lines = new List<string>(code.ToList());
+
+            var index = lines.IndexOf("begin");
+
+            lines.RemoveRange(0, index + 1);
+
+            var stop = false;
+            while (_thread.IsAlive && !_threadStop && !stop)
+            {
+
+
+                stop = true;
             }
         }
     }
