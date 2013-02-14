@@ -278,9 +278,13 @@ namespace OptimizingParallelCompiler
         {
             _threadStop = true;
             //_thread.Abort();
-            while (_thread.IsAlive && _thread != null)
+
+            if (_thread != null)
             {
-                _thread.Abort();
+                while (_thread.IsAlive)
+                {
+                    _thread.Abort();
+                }
             }
         }
 
