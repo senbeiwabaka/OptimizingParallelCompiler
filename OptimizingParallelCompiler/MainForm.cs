@@ -135,7 +135,7 @@ namespace OptimizingParallelCompiler
 
             if (_results.Errors.Count > 0)
             {
-                txtError.ForeColor = Color.FromArgb(122, 77, 198);
+                txtError.ForeColor = Color.DarkRed;
 
                 foreach (CompilerError item in _results.Errors)
                 {
@@ -146,8 +146,7 @@ namespace OptimizingParallelCompiler
             else
             {
                 //Successful Compile
-                txtError.BackColor = Color.Blue;
-                txtError.ForeColor = Color.White;
+                txtError.ForeColor = Color.Green;
                 txtError.Text = @"Success!";
             }
         }
@@ -288,16 +287,17 @@ namespace OptimizingParallelCompiler
             }
         }
 
-
         private void ThreeOPCode(List<string> code)
         {
             var lines = new List<string>(code.ToList());
 
             var index = lines.IndexOf("begin");
 
-            lines.RemoveRange(0, index + 1);
+            //lines.RemoveRange(0, index + 1);
 
             var stop = false;
+
+            
 
             while (_thread.IsAlive && !_threadStop && !stop)
             {

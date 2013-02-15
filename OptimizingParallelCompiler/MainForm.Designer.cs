@@ -52,7 +52,15 @@
             this.testToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lineNumbersForRichText1 = new LineNumbersControlForRichTextBox.LineNumbersForRichText();
             this.lineNumbersForRichText2 = new LineNumbersControlForRichTextBox.LineNumbersForRichText();
+            this.tabFirstTransform = new System.Windows.Forms.TabControl();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.lineNumbersForRichText3 = new LineNumbersControlForRichTextBox.LineNumbersForRichText();
+            this.txtTransform = new System.Windows.Forms.RichTextBox();
             this.menuStrip1.SuspendLayout();
+            this.tabFirstTransform.SuspendLayout();
+            this.tabPage1.SuspendLayout();
+            this.tabPage2.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -227,10 +235,10 @@
             // 
             // txtCSharpCode
             // 
-            this.txtCSharpCode.Location = new System.Drawing.Point(499, 27);
+            this.txtCSharpCode.Location = new System.Drawing.Point(46, 0);
             this.txtCSharpCode.Name = "txtCSharpCode";
             this.txtCSharpCode.ReadOnly = true;
-            this.txtCSharpCode.Size = new System.Drawing.Size(451, 422);
+            this.txtCSharpCode.Size = new System.Drawing.Size(460, 395);
             this.txtCSharpCode.TabIndex = 2;
             this.txtCSharpCode.Text = "";
             this.txtCSharpCode.MouseDown += new System.Windows.Forms.MouseEventHandler(this.txtCSharpCode_MouseDown);
@@ -270,7 +278,7 @@
             this.lineNumbersForRichText1.LineNumbersClippedByItemRectangle = true;
             this.lineNumbersForRichText1.LineNumbersLeadingZeroes = true;
             this.lineNumbersForRichText1.LineNumbersOffset = new System.Drawing.Size(0, 0);
-            this.lineNumbersForRichText1.Location = new System.Drawing.Point(478, 27);
+            this.lineNumbersForRichText1.Location = new System.Drawing.Point(25, 0);
             this.lineNumbersForRichText1.Margin = new System.Windows.Forms.Padding(0);
             this.lineNumbersForRichText1.MarginLinesColor = System.Drawing.Color.SlateGray;
             this.lineNumbersForRichText1.MarginLinesSide = LineNumbersControlForRichTextBox.LineNumbersForRichText.LineNumberDockSide.Right;
@@ -285,7 +293,7 @@
             this.lineNumbersForRichText1.ShowGridLines = true;
             this.lineNumbersForRichText1.ShowLineNumbers = true;
             this.lineNumbersForRichText1.ShowMarginLines = true;
-            this.lineNumbersForRichText1.Size = new System.Drawing.Size(20, 422);
+            this.lineNumbersForRichText1.Size = new System.Drawing.Size(20, 395);
             this.lineNumbersForRichText1.TabIndex = 4;
             // 
             // lineNumbersForRichText2
@@ -325,15 +333,93 @@
             this.lineNumbersForRichText2.Size = new System.Drawing.Size(20, 421);
             this.lineNumbersForRichText2.TabIndex = 4;
             // 
+            // tabFirstTransform
+            // 
+            this.tabFirstTransform.Controls.Add(this.tabPage1);
+            this.tabFirstTransform.Controls.Add(this.tabPage2);
+            this.tabFirstTransform.Location = new System.Drawing.Point(436, 29);
+            this.tabFirstTransform.Name = "tabFirstTransform";
+            this.tabFirstTransform.SelectedIndex = 0;
+            this.tabFirstTransform.Size = new System.Drawing.Size(514, 421);
+            this.tabFirstTransform.TabIndex = 5;
+            // 
+            // tabPage1
+            // 
+            this.tabPage1.Controls.Add(this.txtTransform);
+            this.tabPage1.Controls.Add(this.lineNumbersForRichText3);
+            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(506, 395);
+            this.tabPage1.TabIndex = 0;
+            this.tabPage1.Text = "First Transform";
+            this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // tabPage2
+            // 
+            this.tabPage2.Controls.Add(this.lineNumbersForRichText1);
+            this.tabPage2.Controls.Add(this.txtCSharpCode);
+            this.tabPage2.Location = new System.Drawing.Point(4, 22);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(506, 395);
+            this.tabPage2.TabIndex = 1;
+            this.tabPage2.Text = "O\'Neil Code - C#";
+            this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // lineNumbersForRichText3
+            // 
+            this.lineNumbersForRichText3.AutoSizing = true;
+            this.lineNumbersForRichText3.BackgroundGradientAlphaColor = System.Drawing.Color.Transparent;
+            this.lineNumbersForRichText3.BackgroundGradientBetaColor = System.Drawing.Color.LightSteelBlue;
+            this.lineNumbersForRichText3.BackgroundGradientDirection = System.Drawing.Drawing2D.LinearGradientMode.Horizontal;
+            this.lineNumbersForRichText3.BorderLinesColor = System.Drawing.Color.SlateGray;
+            this.lineNumbersForRichText3.BorderLinesStyle = System.Drawing.Drawing2D.DashStyle.Dot;
+            this.lineNumbersForRichText3.BorderLinesThickness = 1F;
+            this.lineNumbersForRichText3.DockSide = LineNumbersControlForRichTextBox.LineNumbersForRichText.LineNumberDockSide.Left;
+            this.lineNumbersForRichText3.GridLinesColor = System.Drawing.Color.SlateGray;
+            this.lineNumbersForRichText3.GridLinesStyle = System.Drawing.Drawing2D.DashStyle.Dot;
+            this.lineNumbersForRichText3.GridLinesThickness = 1F;
+            this.lineNumbersForRichText3.LineNumbersAlignment = System.Drawing.ContentAlignment.TopRight;
+            this.lineNumbersForRichText3.LineNumbersAntiAlias = true;
+            this.lineNumbersForRichText3.LineNumbersAsHexadecimal = false;
+            this.lineNumbersForRichText3.LineNumbersClippedByItemRectangle = true;
+            this.lineNumbersForRichText3.LineNumbersLeadingZeroes = true;
+            this.lineNumbersForRichText3.LineNumbersOffset = new System.Drawing.Size(0, 0);
+            this.lineNumbersForRichText3.Location = new System.Drawing.Point(9, 0);
+            this.lineNumbersForRichText3.Margin = new System.Windows.Forms.Padding(0);
+            this.lineNumbersForRichText3.MarginLinesColor = System.Drawing.Color.SlateGray;
+            this.lineNumbersForRichText3.MarginLinesSide = LineNumbersControlForRichTextBox.LineNumbersForRichText.LineNumberDockSide.Right;
+            this.lineNumbersForRichText3.MarginLinesStyle = System.Drawing.Drawing2D.DashStyle.Solid;
+            this.lineNumbersForRichText3.MarginLinesThickness = 1F;
+            this.lineNumbersForRichText3.Name = "lineNumbersForRichText3";
+            this.lineNumbersForRichText3.Padding = new System.Windows.Forms.Padding(0, 0, 2, 0);
+            this.lineNumbersForRichText3.ParentRichTextBox = this.txtTransform;
+            this.lineNumbersForRichText3.SeeThroughMode = false;
+            this.lineNumbersForRichText3.ShowBackgroundGradient = true;
+            this.lineNumbersForRichText3.ShowBorderLines = true;
+            this.lineNumbersForRichText3.ShowGridLines = true;
+            this.lineNumbersForRichText3.ShowLineNumbers = true;
+            this.lineNumbersForRichText3.ShowMarginLines = true;
+            this.lineNumbersForRichText3.Size = new System.Drawing.Size(20, 395);
+            this.lineNumbersForRichText3.TabIndex = 1;
+            // 
+            // txtTransform
+            // 
+            this.txtTransform.Location = new System.Drawing.Point(30, 0);
+            this.txtTransform.Name = "txtTransform";
+            this.txtTransform.Size = new System.Drawing.Size(476, 395);
+            this.txtTransform.TabIndex = 2;
+            this.txtTransform.Text = "";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(962, 573);
+            this.Controls.Add(this.tabFirstTransform);
             this.Controls.Add(this.lineNumbersForRichText2);
-            this.Controls.Add(this.lineNumbersForRichText1);
             this.Controls.Add(this.txtError);
-            this.Controls.Add(this.txtCSharpCode);
             this.Controls.Add(this.txtOneilCode);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
@@ -342,6 +428,9 @@
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
+            this.tabFirstTransform.ResumeLayout(false);
+            this.tabPage1.ResumeLayout(false);
+            this.tabPage2.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -373,6 +462,11 @@
         private System.Windows.Forms.ToolStripMenuItem testToolStripMenuItem;
         private LineNumbersControlForRichTextBox.LineNumbersForRichText lineNumbersForRichText1;
         private LineNumbersControlForRichTextBox.LineNumbersForRichText lineNumbersForRichText2;
+        private System.Windows.Forms.TabControl tabFirstTransform;
+        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.TabPage tabPage2;
+        private LineNumbersControlForRichTextBox.LineNumbersForRichText lineNumbersForRichText3;
+        private System.Windows.Forms.RichTextBox txtTransform;
     }
 }
 
