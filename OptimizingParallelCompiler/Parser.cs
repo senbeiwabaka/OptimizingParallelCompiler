@@ -15,9 +15,8 @@ namespace OptimizingParallelCompiler
             var listOfEndFors = new List<string>();
 
             //replaces title with // and always inserts the using statements
+            code[0] += "\nusing System;\nclass Program\n{";
             code[0] = code[0].Replace("title", "//");
-            const string usingstatements = "using System;\n" + "class Program\n" + "{";
-            code.Insert(1, usingstatements);
 
             var labelCounter = 0;
 
@@ -48,11 +47,6 @@ namespace OptimizingParallelCompiler
                     else if (s.IndexOf("for", StringComparison.Ordinal) == 0)
                     {
                         ForTransform(s, code, other, ref labelCounter, listOfEndFors);
-                    }
-                    else if (s.IndexOf("var", StringComparison.Ordinal) == 0)
-                    {
-                        var index = code.IndexOf(other);
-                        code[index] = "\tstatic void Main()\n\t{";
                     }
                     else if (s.IndexOf("end", StringComparison.Ordinal) == 0 && s.Length == 3)
                     {
@@ -195,7 +189,9 @@ namespace OptimizingParallelCompiler
                             statement += "goto " + label + ";";
                             equator += statement;
                             code[index] = code[index].Replace(s, equator);
-                            code.Insert(index + 2, label + ":");
+                            statement = code[index + 2];
+                            statement += statement + "\n" + label + ":";
+                            code[index + 2] = code[index + 2].Replace(code[index + 2], statement);
                             ++labelCounter;
                         }
                     }
@@ -218,13 +214,6 @@ namespace OptimizingParallelCompiler
                         }
                         code[index] = code[index].Replace(s, sentence);
                     }
-                    else if (s.IndexOf("begin", StringComparison.Ordinal) == 0)
-                    {
-                        var statement = s;
-                        statement = statement.Replace("begin", "");
-                        var index = code.IndexOf(other);
-                        code[index] = code[index].Replace(s, statement);
-                    }
                 });
         }
 
@@ -235,24 +224,24 @@ namespace OptimizingParallelCompiler
             //variable for list of statements
             string endForString;
 
-            int id = s.IndexOf("for", StringComparison.Ordinal) + 4;
-            int end = s.IndexOf("to", StringComparison.Ordinal) - 1;
-            string value = "\t\t" + s.Substring(id, end - id) + ";\n";
-            string value1 = "\t" + value.Substring(2, value.IndexOf("=", StringComparison.Ordinal) - 2) +
+            var id = s.IndexOf("for", StringComparison.Ordinal) + 4;
+            var end = s.IndexOf("to", StringComparison.Ordinal) - 1;
+            var value = "\t\t" + s.Substring(id, end - id) + ";\n";
+            var value1 = "\t" + value.Substring(2, value.IndexOf("=", StringComparison.Ordinal) - 2) +
                             "=" +
                             value.Substring(2, value.IndexOf("=", StringComparison.Ordinal) - 2) + " + 1;";
             string bound;
 
-            int a1 = s.IndexOf("to", StringComparison.Ordinal) + 2;
-            int a2 = s.Length - 1;
-            int a3 = s.IndexOf("to", StringComparison.Ordinal) + 1;
-            int a4 = a2 - a3;
+            var a1 = s.IndexOf("to", StringComparison.Ordinal) + 2;
+            var a2 = s.Length - 1;
+            var a3 = s.IndexOf("to", StringComparison.Ordinal) + 1;
+            var a4 = a2 - a3;
 
             bound = s.Substring(a1, a4);
-            string label = "Label" + labelCounter.ToString();
-            string endForStringPart1 = value1;
+            var label = "Label" + labelCounter.ToString();
+            var endForStringPart1 = value1;
 
-            string sentence = value + "\t" + label + ":";
+            var sentence = value + "\t" + label + ":";
 
             //Oneil Code                    //Translation
             //for idx = 0 to bound – 1      let idx = 0
@@ -269,7 +258,7 @@ namespace OptimizingParallelCompiler
             //idx
             var idx = value.Substring(2, value.IndexOf("=", StringComparison.Ordinal) - 2);
 
-            string endForStringPart2 = "if (" + idx + " <= " + bound + ") goto " + label + ";";
+            var endForStringPart2 = "if (" + idx + " <= " + bound + ") goto " + label + ";";
             endForStringPart2 += "\n";
 
             code[index] = sentence;
