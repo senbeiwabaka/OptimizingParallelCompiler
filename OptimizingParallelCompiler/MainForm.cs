@@ -304,7 +304,9 @@ namespace OptimizingParallelCompiler
 
                     if (x.IndexOf("let", StringComparison.Ordinal) == 0)
                     {
-                        var count = Regex.Matches(x, "[[]]").Count;
+                        var count = Regex.Matches(x, "[[|]]").Count;
+
+                        if
                         
                         Console.WriteLine(count);
                     }
