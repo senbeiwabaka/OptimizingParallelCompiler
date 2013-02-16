@@ -6,13 +6,15 @@
         public bool Constant { get; set; }
         public int OperandCount { get; set; }
         public int Index { get; set; }
+        public bool ArrayAccess { get; set; }
 
-        public ThreeOPAnalysis(string vname, bool constant, int operandcount, int index)
+        public ThreeOPAnalysis(string vName, bool constant, int operandCount, int index, bool arrayAccess)
         {
-            VariableName = vname;
+            VariableName = vName;
             Constant = constant;
-            OperandCount = operandcount;
+            OperandCount = operandCount;
             Index = index;
+            ArrayAccess = arrayAccess;
         }
     }
 }
