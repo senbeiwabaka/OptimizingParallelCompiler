@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -291,13 +292,23 @@ namespace OptimizingParallelCompiler
         {
             var lines = new List<string>(code.ToList());
 
-            var index = lines.IndexOf("begin");
-
-            //lines.RemoveRange(0, index + 1);
-
             var stop = false;
 
-            
+            var letCount = lines.Count(x => x.Contains("let"));
+
+            var threeOP = new List<ThreeOPAnalysis>(letCount);
+
+            lines.ForEach(x =>
+                {
+                    x = x.Trim(' ', '\t');
+
+                    if (x.IndexOf("let", StringComparison.Ordinal) == 0)
+                    {
+                        var count = Regex.Matches(x, "[[]]").Count;
+                        
+                        Console.WriteLine(count);
+                    }
+                });
 
             while (_thread.IsAlive && !_threadStop && !stop)
             {
