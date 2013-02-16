@@ -53,7 +53,7 @@ namespace OptimizingParallelCompiler
                         var index = code.IndexOf(other);
                         code[index] = "\t}\n}";
                     }
-                    else if (s.IndexOf("prompt", StringComparison.Ordinal) == 0 || s.IndexOf("print") == 0)
+                    else if (s.IndexOf("prompt", StringComparison.Ordinal) == 0 || s.IndexOf("print", StringComparison.Ordinal) == 0)
                     {
                         var sentence = s;
                         int index;
@@ -113,8 +113,9 @@ namespace OptimizingParallelCompiler
                     {
                         var index = code.IndexOf(other);
                         var statement = s.Substring(s.IndexOf("then", StringComparison.Ordinal) + "then".Length,
-                                                       s.Length -
-                                                       (s.IndexOf("then", StringComparison.Ordinal) + "then".Length));
+                                                    s.Length -
+                                                    (s.IndexOf("then", StringComparison.Ordinal) + "then".Length));
+
                         var equator = s.Substring(0, s.IndexOf(")", StringComparison.Ordinal) + 1);
 
                         if (equator.Contains("!="))
@@ -158,7 +159,8 @@ namespace OptimizingParallelCompiler
                             statement += ");";
                             equator += statement;
                             code[index] = code[index].Replace(s, equator);
-                            code.Insert(index + 2, label + ":");
+                            statement = code[index + 2] + "\n" + label + ":";
+                            code[index + 2] = code[index + 2].Replace(code[index + 2], statement);
                             ++labelCounter;
                         }
                         else if (statement.Contains("prompt"))
@@ -169,7 +171,8 @@ namespace OptimizingParallelCompiler
                             statement += ");";
                             equator += statement;
                             code[index] = code[index].Replace(s, equator);
-                            code.Insert(index + 2, label + ":");
+                            statement = code[index + 2] + "\n" + label + ":";
+                            code[index + 2] = code[index + 2].Replace(code[index + 2], statement);
                             ++labelCounter;
                         }
                         else if (statement.Contains("let"))
@@ -180,7 +183,9 @@ namespace OptimizingParallelCompiler
                             statement += ";";
                             equator += statement;
                             code[index] = code[index].Replace(s, equator);
-                            code.Insert(index + 2, label + ":");
+                            statement = code[index + 2];
+                            statement += "\n" + label + ":";
+                            code[index + 2] = code[index + 2].Replace(code[index + 2], statement);
                             ++labelCounter;
                         }
                         else
@@ -238,7 +243,7 @@ namespace OptimizingParallelCompiler
             var a4 = a2 - a3;
 
             bound = s.Substring(a1, a4);
-            var label = "Label" + labelCounter.ToString();
+            var label = "Label" + labelCounter;
             var endForStringPart1 = value1;
 
             var sentence = value + "\t" + label + ":";
