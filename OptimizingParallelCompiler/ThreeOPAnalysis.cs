@@ -4,9 +4,9 @@ namespace OptimizingParallelCompiler
 {
     public class ThreeOPAnalysis
     {
-        public string ConstantName { get; set; }
+        public string Name { get; set; }
         public bool Constant { get; set; }
-        public string Value { get; set; }
+        public string NameValue { get; set; }
 
         public int OperandCount { get; set; }
         public int Index { get; set; }
@@ -17,15 +17,15 @@ namespace OptimizingParallelCompiler
 
         public int LetCount { get; set; }
 
-        public ThreeOPAnalysis(string constName, string value, bool constant, int operandCount, int index, bool arrayAccess,
+        public ThreeOPAnalysis(string name, string nameValue, bool constant, int operandCount, int index, bool arrayAccess,
             List<string> arrayName, List<string> arrayVariableName, int letCount = 1)
         {
-            ConstantName = constName;
+            Name = name;
             Constant = constant;
             OperandCount = operandCount;
             Index = index;
             ArrayAccess = arrayAccess;
-            Value = value;
+            NameValue = nameValue;
             ArrayName = arrayName;
             ArrayVariableName = arrayVariableName;
             LetCount = letCount;
