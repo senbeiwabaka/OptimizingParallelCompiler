@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading;
 using System.Windows.Forms;
 
 namespace OptimizingParallelCompiler
@@ -16,8 +14,6 @@ namespace OptimizingParallelCompiler
         private string _output = "Out.exe";
         private CompilerResults _results;
         private const string ErrorFile = "error.txt";
-        private Thread _thread;
-        private bool _threadStop;
 
         public MainForm()
         {
@@ -93,12 +89,6 @@ namespace OptimizingParallelCompiler
         private void convertToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var code = new List<string>(txtOneilCode.Lines);
-
-            var threeOPCode = new List<string>(txtOneilCode.Lines);
-
-            //starts a new thread for doing code analysis for making code 3 op and dead code removal
-            _thread = new Thread(() => ThreeOPCode(threeOPCode));
-            _thread.Start();
            
             Parser.Transform(code);
 
@@ -274,50 +264,20 @@ namespace OptimizingParallelCompiler
             }
         }
 
-        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        private void oPCodeToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            _threadStop = true;
-            //_thread.Abort();
+            var threeOPCode = new List<string>(txtOneilCode.Lines);
 
-            if (_thread != null)
+            ThreeOPConverter.Transform(threeOPCode);
+
+            txtTransform.Clear();
+
+            foreach (var variable in threeOPCode)
             {
-                while (_thread.IsAlive)
-                {
-                    _thread.Abort();
-                }
+                txtTransform.Text += variable + "\n";
             }
-        }
-
-        private void ThreeOPCode(List<string> code)
-        {
-            var lines = new List<string>(code.ToList());
-
-            var stop = false;
-
-            var letCount = lines.Count(x => x.Contains("let"));
-
-            var threeOP = new List<ThreeOPAnalysis>(letCount);
-
-            lines.ForEach(x =>
-                {
-                    x = x.Trim(' ', '\t');
-
-                    if (x.IndexOf("let", StringComparison.Ordinal) == 0)
-                    {
-                        var count = Regex.Matches(x, "[[|]]").Count;
-
-                        if
-                        
-                        Console.WriteLine(count);
-                    }
-                });
-
-            while (_thread.IsAlive && !_threadStop && !stop)
-            {
 
 
-                stop = true;
-            }
         }
     }
 }
