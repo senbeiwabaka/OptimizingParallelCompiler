@@ -41,10 +41,24 @@ namespace OptimizingParallelCompiler
 
                         countBracket = Regex.Matches(statement, "[[]").Count;
 
-                        threeOP.Add(new ThreeOPAnalysis("t_",false,0,code.IndexOf(x),true,counter.ToString(),
-                            "", x.Substring(indexBracketFront + 1, (indexBracketEnd - 1) - indexBracketFront)));
+                        threeOP.Add(new ThreeOPAnalysis("t_" + counter.ToString(),
+                                                        x.Substring(indexBracketFront + 1,
+                                                                    (indexBracketEnd - 1) - indexBracketFront), false,
+                                                        countBracket, code.IndexOf(x), true,
+                                                        new List<string>
+                                                            {
+                                                                x.Substring(x.IndexOf("t") + 2,
+                                                                            (x.IndexOf("[")) - (x.IndexOf("t") + 2))
+                                                            },
+                                                        new List<string>
+                                                            {
+                                                                x.Substring(indexBracketFront + 1,
+                                                                            (indexBracketEnd - 1) - indexBracketFront)
+                                                            }));
 
-                        while (countBracket > 1)
+                        ++counter;
+
+                        while (countBracket > 0)
                         {
                             indexBracketEnd = 0;
                             indexBracketFront = 0;
@@ -52,13 +66,20 @@ namespace OptimizingParallelCompiler
                             indexBracketEnd = statement.IndexOf("]", indexBracketEnd + 1, StringComparison.Ordinal);
                             var arrayIndex = statement.Substring(indexBracketFront + 1,
                                                                  (indexBracketEnd - 1) - indexBracketFront);
+                            
 
                             if (Regex.Matches(arrayIndex, "[-+*/]").Count > 0)
                             {
-                                //var match = 
-                                //threeOP.Add(new ThreeOPAnalysis("t_", false,
+                                var codeIndex = code.IndexOf(x);
+                                var index = threeOP.FindIndex(s => s.Index == codeIndex);
+                                threeOP[index].ArrayName.Add(statement.Substring(statement.IndexOf(" ") + 1,
+                                                                                 indexBracketFront -
+                                                                                 (statement.IndexOf(" ") + 1)));
+
                                 ++counter;
                             }
+
+                            statement = statement.Substring(indexBracketEnd + 2);
 
                             --countBracket;
                         }
