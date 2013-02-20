@@ -53,13 +53,14 @@
             this.lineNumbersForRichText1 = new LineNumbersControlForRichTextBox.LineNumbersForRichText();
             this.lineNumbersForRichText2 = new LineNumbersControlForRichTextBox.LineNumbersForRichText();
             this.tabFirstTransform = new System.Windows.Forms.TabControl();
-            this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.lineNumbersForRichText3 = new LineNumbersControlForRichTextBox.LineNumbersForRichText();
+            this.tbpThreeOPCode = new System.Windows.Forms.TabPage();
             this.txtTransform = new System.Windows.Forms.RichTextBox();
+            this.lineNumbersForRichText3 = new LineNumbersControlForRichTextBox.LineNumbersForRichText();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.oPCodeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.tabFirstTransform.SuspendLayout();
-            this.tabPage1.SuspendLayout();
+            this.tbpThreeOPCode.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -77,6 +78,7 @@
             // 
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.loadOneilCodeToolStripMenuItem,
+            this.oPCodeToolStripMenuItem,
             this.convertToolStripMenuItem,
             this.compileToolStripMenuItem,
             this.toolStripMenuItem1,
@@ -335,7 +337,7 @@
             // 
             // tabFirstTransform
             // 
-            this.tabFirstTransform.Controls.Add(this.tabPage1);
+            this.tabFirstTransform.Controls.Add(this.tbpThreeOPCode);
             this.tabFirstTransform.Controls.Add(this.tabPage2);
             this.tabFirstTransform.Location = new System.Drawing.Point(436, 29);
             this.tabFirstTransform.Name = "tabFirstTransform";
@@ -343,29 +345,25 @@
             this.tabFirstTransform.Size = new System.Drawing.Size(514, 421);
             this.tabFirstTransform.TabIndex = 5;
             // 
-            // tabPage1
+            // tbpThreeOPCode
             // 
-            this.tabPage1.Controls.Add(this.txtTransform);
-            this.tabPage1.Controls.Add(this.lineNumbersForRichText3);
-            this.tabPage1.Location = new System.Drawing.Point(4, 22);
-            this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(506, 395);
-            this.tabPage1.TabIndex = 0;
-            this.tabPage1.Text = "First Transform";
-            this.tabPage1.UseVisualStyleBackColor = true;
+            this.tbpThreeOPCode.Controls.Add(this.txtTransform);
+            this.tbpThreeOPCode.Controls.Add(this.lineNumbersForRichText3);
+            this.tbpThreeOPCode.Location = new System.Drawing.Point(4, 22);
+            this.tbpThreeOPCode.Name = "tbpThreeOPCode";
+            this.tbpThreeOPCode.Padding = new System.Windows.Forms.Padding(3);
+            this.tbpThreeOPCode.Size = new System.Drawing.Size(506, 395);
+            this.tbpThreeOPCode.TabIndex = 0;
+            this.tbpThreeOPCode.Text = "3 OP Code";
+            this.tbpThreeOPCode.UseVisualStyleBackColor = true;
             // 
-            // tabPage2
+            // txtTransform
             // 
-            this.tabPage2.Controls.Add(this.lineNumbersForRichText1);
-            this.tabPage2.Controls.Add(this.txtCSharpCode);
-            this.tabPage2.Location = new System.Drawing.Point(4, 22);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(506, 395);
-            this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "O\'Neil Code - C#";
-            this.tabPage2.UseVisualStyleBackColor = true;
+            this.txtTransform.Location = new System.Drawing.Point(30, 0);
+            this.txtTransform.Name = "txtTransform";
+            this.txtTransform.Size = new System.Drawing.Size(476, 395);
+            this.txtTransform.TabIndex = 2;
+            this.txtTransform.Text = "";
             // 
             // lineNumbersForRichText3
             // 
@@ -404,13 +402,24 @@
             this.lineNumbersForRichText3.Size = new System.Drawing.Size(20, 395);
             this.lineNumbersForRichText3.TabIndex = 1;
             // 
-            // txtTransform
+            // tabPage2
             // 
-            this.txtTransform.Location = new System.Drawing.Point(30, 0);
-            this.txtTransform.Name = "txtTransform";
-            this.txtTransform.Size = new System.Drawing.Size(476, 395);
-            this.txtTransform.TabIndex = 2;
-            this.txtTransform.Text = "";
+            this.tabPage2.Controls.Add(this.lineNumbersForRichText1);
+            this.tabPage2.Controls.Add(this.txtCSharpCode);
+            this.tabPage2.Location = new System.Drawing.Point(4, 22);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(506, 395);
+            this.tabPage2.TabIndex = 1;
+            this.tabPage2.Text = "O\'Neil Code - C#";
+            this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // oPCodeToolStripMenuItem
+            // 
+            this.oPCodeToolStripMenuItem.Name = "oPCodeToolStripMenuItem";
+            this.oPCodeToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
+            this.oPCodeToolStripMenuItem.Text = "3 OP Code";
+            this.oPCodeToolStripMenuItem.Click += new System.EventHandler(this.oPCodeToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -425,11 +434,10 @@
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "MainForm";
             this.Text = "Optimizing Parallel Complilers";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.tabFirstTransform.ResumeLayout(false);
-            this.tabPage1.ResumeLayout(false);
+            this.tbpThreeOPCode.ResumeLayout(false);
             this.tabPage2.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -463,10 +471,11 @@
         private LineNumbersControlForRichTextBox.LineNumbersForRichText lineNumbersForRichText1;
         private LineNumbersControlForRichTextBox.LineNumbersForRichText lineNumbersForRichText2;
         private System.Windows.Forms.TabControl tabFirstTransform;
-        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.TabPage tbpThreeOPCode;
         private System.Windows.Forms.TabPage tabPage2;
         private LineNumbersControlForRichTextBox.LineNumbersForRichText lineNumbersForRichText3;
         private System.Windows.Forms.RichTextBox txtTransform;
+        private System.Windows.Forms.ToolStripMenuItem oPCodeToolStripMenuItem;
     }
 }
 
