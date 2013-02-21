@@ -14,11 +14,12 @@ namespace OptimizingParallelCompiler
         public bool ArrayAccess { get; set; }
         public List<string> ArrayName { get; set; }
         public List<string> ArrayVariableName { get; set; }
+        public List<string> ArrayTempName { get; set; } 
 
         public int LetCount { get; set; }
 
         public ThreeOPAnalysis(string name, string nameValue, bool constant, int operandCount, int index, bool arrayAccess,
-            List<string> arrayName, List<string> arrayVariableName, int letCount = 1)
+            List<string> arrayName, List<string> arrayVariableName, List<string> arrayTempName, int letCount = 1)
         {
             Name = name;
             Constant = constant;
@@ -29,6 +30,7 @@ namespace OptimizingParallelCompiler
             ArrayName = arrayName;
             ArrayVariableName = arrayVariableName;
             LetCount = letCount;
+            ArrayTempName = arrayTempName;
         }
     }
 }
