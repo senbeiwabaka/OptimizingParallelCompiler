@@ -10,18 +10,16 @@ namespace OptimizingParallelCompiler
 
         public static void Transform(List<string> code)
         {
-            var list = code.ToList();
-            var lines = new List<string>(list);
-
-            var threeOP = new List<ThreeOPAnalysis>(lines.Count(x => x.Contains("let")));
+            var threeOP = new List<ThreeOPAnalysis>();
 
             var counter = 0;
 
-            var beginStatement = new List<string>();
-            var varStatement = new List<string>();
+            string intStatements = string.Empty;
+            string letStatement = string.Empty;
+            var lets = new Dictionary<int, string>();
 
             int index;
-            lines.ForEach(x =>
+            code.ForEach(x =>
                 {
                     var nonModifiedStatement = x;
 
@@ -29,6 +27,9 @@ namespace OptimizingParallelCompiler
 
                     var statement = x.Substring(x.IndexOf("=", StringComparison.Ordinal) + 1,
                                                     x.Length - (x.IndexOf("=", StringComparison.Ordinal) + 1));
+
+                    var codeIndex = code.IndexOf(nonModifiedStatement);
+                    
 
                     if (x.IndexOf("let", StringComparison.Ordinal) == 0)
                     {
@@ -39,19 +40,15 @@ namespace OptimizingParallelCompiler
 
                             var countBracket = Regex.Matches(statement, "[[]").Count;
 
-                            threeOP.Add(new ThreeOPAnalysis("t_" + counter.ToString(),
-                                                            x.Substring(indexBracketFront + 1,
-                                                                        (indexBracketEnd - 1) - indexBracketFront),
-                                                            false,
-                                                            countBracket, code.IndexOf(nonModifiedStatement), true,
-                                                            new List<string>
-                                                                {
-                                                                    x.Substring(x.IndexOf("t") + 2,
-                                                                                (x.IndexOf("[")) - (x.IndexOf("t") + 2))
-                                                                },
-                                                            new List<string>(), new List<string>()));
+                            intStatements = "int t_" + counter + "\n";
+                            letStatement = "let " + "t_" + counter + " = " + 
+                                        x.Substring(indexBracketFront + 1, (indexBracketEnd - 1) - indexBracketFront) + "\n";
 
-                            ++counter;
+                            var replace = x.Replace(
+                                x.Substring(indexBracketFront + 1, (indexBracketEnd - 1) - indexBracketFront),
+                                "t_" + counter++);
+
+                            
 
                             while (countBracket > 0)
                             {
@@ -63,18 +60,16 @@ namespace OptimizingParallelCompiler
                                 var arrayIndex = statement.Substring(indexBracketFront + 1,
                                                                      (indexBracketEnd - 1) - indexBracketFront);
 
-
                                 if (Regex.Matches(arrayIndex, "[-+*/]").Count > 0)
                                 {
-                                    var codeIndex = code.IndexOf(nonModifiedStatement);
-                                    index = threeOP.FindIndex(s => s.Index == codeIndex);
-                                    threeOP[index].ArrayName.Add(statement.Substring(statement.IndexOf(" ") + 1,
-                                                                                     indexBracketFront -
-                                                                                     (statement.IndexOf(" ") + 1)));
-                                    threeOP[index].ArrayTempName.Add("t_" + counter);
-                                    threeOP[index].ArrayVariableName.Add(arrayIndex);
-
-                                    ++counter;
+                                    intStatements += "int t_" + counter + "\n";
+                                    var variable = "t_" + counter;
+                                    letStatement += "let " + "t_" + counter++ + " = " +
+                                                    arrayIndex +"\n";
+                                    intStatements += "int t_" + counter;
+                                    letStatement += "let t_" + counter + " = " + statement.Substring(statement.IndexOf(" ") + 1,
+                                                                        indexBracketFront -
+                                                                        (statement.IndexOf(" ") + 1)) + "[" + variable + "]\n";
                                 }
 
                                 if (statement.Length < indexBracketEnd + 2)
@@ -82,32 +77,39 @@ namespace OptimizingParallelCompiler
                                     statement = statement.Substring(indexBracketEnd + 2);
                                 }
 
-                                --countBracket;
+                                --countBracket; 
                             }
+
+                            index = code.IndexOf(nonModifiedStatement);
+                            lets.Add(index, letStatement);
+                            code[index] = replace;
                         }
-                        else if(Regex.Matches(statement, "[-+/*]").Count > 2)
+                        else if (Regex.Matches(statement, "[-+/*]").Count > 2)
                         {
                             var operandAmount = Regex.Matches(statement, "[-+/*]").Count;
 
                             index = code.IndexOf(nonModifiedStatement);
 
-                            var threeOPIndex =
-                                (from opAnalysis in threeOP
-                                 where opAnalysis.Index == index
-                                 select threeOP.IndexOf(opAnalysis)).FirstOrDefault();
+                            while (operandAmount > 1)
+                            {
+                                var letAdd = "let";
 
-
+                                --operandAmount;
+                            }
                         }
+                        
                     }
                 });
 
-            var addition = threeOP.Aggregate("",
-                                             (current, opAnalysis) =>
-                                             current + ("int " + opAnalysis.Name + "\n"));
 
-            index = code.IndexOf("\tvar");
+            foreach (var @let in lets)
+            {
+                code.Insert(let.Key, let.Value);
+            }
 
-            code.Insert(index + 1, addition);
+            var varIndex = code.IndexOf("\tvar") != -1 ? code.IndexOf("\tvar") + 1 : code.IndexOf(" var") + 1;
+
+            code.Insert(varIndex, intStatements);
         }
     }
 }
