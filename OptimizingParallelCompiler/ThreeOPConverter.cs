@@ -59,22 +59,44 @@ namespace OptimizingParallelCompiler
                         {
                             var indexBracketFront = x.IndexOf("[", 0, StringComparison.Ordinal);
                             var indexBracketEnd = x.IndexOf("]", 0, StringComparison.Ordinal);
-                            var lastSpace = x.LastIndexOf(" ", StringComparison.Ordinal);
-                            var arrayName = x.Substring(lastSpace + 1,
-                                                            indexBracketFront - lastSpace - 1);
                             var arrayIndex = x.Substring(indexBracketFront + 1, (indexBracketEnd - 1) - indexBracketFront);
 
                             intStatements += "int t_" + counter + "\n";
                             index = code.IndexOf(nonModifiedStatement);
 
-                            var c = counter;
-                            lets.Add(index,
-                                     "let " + "t_" + counter++ + " = " + arrayIndex + "\n"
-                                     + "let " + "t_" + counter + " = " + arrayName + "[t_" + c + "]");
-                            intStatements += "int t_" + counter;
+                            if (Regex.Matches(arrayIndex, "[-+*/]").Count > 0)
+                            {
+                                code[index] = code[index].Replace(arrayIndex, "t_" + counter);
+                                x = x.Replace(arrayIndex, "t_" + counter);
 
-                            code[index] = code[index].Replace(arrayName + "[" + arrayIndex + "]", "t_" + counter++);
-                            Console.WriteLine(lastSpace);
+                                var lastSpace = x.LastIndexOf(" ", StringComparison.Ordinal);
+                                var arrayName = x.Substring(lastSpace + 1, indexBracketFront - lastSpace - 1);
+
+                                var c = counter;
+                                lets.Add(index,
+                                         "let " + "t_" + counter++ + " = " + arrayIndex + "\n"
+                                         + "let " + "t_" + counter + " = " + arrayName + "[t_" + c + "]");
+                                intStatements += "int t_" + counter;
+
+                                code[index] = code[index].Replace(arrayName + "[t_" + c + "]", "t_" + counter++);
+                            }
+                            else
+                            {
+
+
+
+                                var lastSpace = x.LastIndexOf(" ", StringComparison.Ordinal);
+                                var arrayName = x.Substring(lastSpace + 1, indexBracketFront - lastSpace - 1);
+
+                                var c = counter;
+                                lets.Add(index,
+                                         "let " + "t_" + counter++ + " = " + arrayIndex + "\n"
+                                         + "let " + "t_" + counter + " = " + arrayName + "[t_" + c + "]");
+                                intStatements += "int t_" + counter;
+
+                                code[index] = code[index].Replace(arrayName + "[" + arrayIndex + "]", "t_" + counter++);
+                                Console.WriteLine(lastSpace);
+                            }
                         }
                     }
                 });
@@ -88,6 +110,8 @@ namespace OptimizingParallelCompiler
             {
                 code.Insert(let.Key + i++, let.Value);
             }
+
+
         }
 
         private static void LetCreation(ref string line, ref int counter, ref string intStatements, ref Dictionary<int, string> lets, ref string statement,
