@@ -282,7 +282,7 @@ namespace OptimizingParallelCompiler
                 txtTransform.Text += variable + "\n";
             }
 
-
+            deadCodeRemovalToolStripMenuItem.Enabled = true;
         }
 
         private void RemoveRedundentStatements(List<string> code, int CodePosition)
@@ -462,6 +462,16 @@ namespace OptimizingParallelCompiler
                     //do nothing and continue to the next line
                 }
             }
+        }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+
+        private void deadCodeRemovalToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            tabFirstTransform.SelectTab(1);
         }
     }
 }

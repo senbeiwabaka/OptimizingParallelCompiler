@@ -42,6 +42,7 @@
             this.sortinsertionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.taxToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.triviaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.oPCodeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.convertToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.compileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
@@ -56,12 +57,13 @@
             this.tbpThreeOPCode = new System.Windows.Forms.TabPage();
             this.txtTransform = new System.Windows.Forms.RichTextBox();
             this.lineNumbersForRichText3 = new LineNumbersControlForRichTextBox.LineNumbersForRichText();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.oPCodeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.tbpOneilCodeCSharp = new System.Windows.Forms.TabPage();
+            this.deadCodeRemovalToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.tbpDeadCodeRemoval = new System.Windows.Forms.TabPage();
             this.menuStrip1.SuspendLayout();
             this.tabFirstTransform.SuspendLayout();
             this.tbpThreeOPCode.SuspendLayout();
-            this.tabPage2.SuspendLayout();
+            this.tbpOneilCodeCSharp.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -79,6 +81,7 @@
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.loadOneilCodeToolStripMenuItem,
             this.oPCodeToolStripMenuItem,
+            this.deadCodeRemovalToolStripMenuItem,
             this.convertToolStripMenuItem,
             this.compileToolStripMenuItem,
             this.toolStripMenuItem1,
@@ -193,8 +196,16 @@
             this.triviaToolStripMenuItem.Text = "trivia";
             this.triviaToolStripMenuItem.Click += new System.EventHandler(this.triviaToolStripMenuItem_Click);
             // 
+            // oPCodeToolStripMenuItem
+            // 
+            this.oPCodeToolStripMenuItem.Name = "oPCodeToolStripMenuItem";
+            this.oPCodeToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
+            this.oPCodeToolStripMenuItem.Text = "3 OP Code";
+            this.oPCodeToolStripMenuItem.Click += new System.EventHandler(this.oPCodeToolStripMenuItem_Click);
+            // 
             // convertToolStripMenuItem
             // 
+            this.convertToolStripMenuItem.Enabled = false;
             this.convertToolStripMenuItem.Name = "convertToolStripMenuItem";
             this.convertToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.C)));
@@ -204,6 +215,7 @@
             // 
             // compileToolStripMenuItem
             // 
+            this.compileToolStripMenuItem.Enabled = false;
             this.compileToolStripMenuItem.Name = "compileToolStripMenuItem";
             this.compileToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C)));
             this.compileToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
@@ -212,6 +224,7 @@
             // 
             // toolStripMenuItem1
             // 
+            this.toolStripMenuItem1.Enabled = false;
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
             this.toolStripMenuItem1.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.R)));
@@ -225,6 +238,7 @@
             this.exitToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.E)));
             this.exitToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
             this.exitToolStripMenuItem.Text = "Exit";
+            this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
             // txtOneilCode
             // 
@@ -338,7 +352,8 @@
             // tabFirstTransform
             // 
             this.tabFirstTransform.Controls.Add(this.tbpThreeOPCode);
-            this.tabFirstTransform.Controls.Add(this.tabPage2);
+            this.tabFirstTransform.Controls.Add(this.tbpDeadCodeRemoval);
+            this.tabFirstTransform.Controls.Add(this.tbpOneilCodeCSharp);
             this.tabFirstTransform.Location = new System.Drawing.Point(436, 29);
             this.tabFirstTransform.Name = "tabFirstTransform";
             this.tabFirstTransform.SelectedIndex = 0;
@@ -402,24 +417,34 @@
             this.lineNumbersForRichText3.Size = new System.Drawing.Size(20, 395);
             this.lineNumbersForRichText3.TabIndex = 1;
             // 
-            // tabPage2
+            // tbpOneilCodeCSharp
             // 
-            this.tabPage2.Controls.Add(this.lineNumbersForRichText1);
-            this.tabPage2.Controls.Add(this.txtCSharpCode);
-            this.tabPage2.Location = new System.Drawing.Point(4, 22);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(506, 395);
-            this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "O\'Neil Code - C#";
-            this.tabPage2.UseVisualStyleBackColor = true;
+            this.tbpOneilCodeCSharp.Controls.Add(this.lineNumbersForRichText1);
+            this.tbpOneilCodeCSharp.Controls.Add(this.txtCSharpCode);
+            this.tbpOneilCodeCSharp.Location = new System.Drawing.Point(4, 22);
+            this.tbpOneilCodeCSharp.Name = "tbpOneilCodeCSharp";
+            this.tbpOneilCodeCSharp.Padding = new System.Windows.Forms.Padding(3);
+            this.tbpOneilCodeCSharp.Size = new System.Drawing.Size(506, 395);
+            this.tbpOneilCodeCSharp.TabIndex = 1;
+            this.tbpOneilCodeCSharp.Text = "O\'Neil Code - C#";
+            this.tbpOneilCodeCSharp.UseVisualStyleBackColor = true;
             // 
-            // oPCodeToolStripMenuItem
+            // deadCodeRemovalToolStripMenuItem
             // 
-            this.oPCodeToolStripMenuItem.Name = "oPCodeToolStripMenuItem";
-            this.oPCodeToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
-            this.oPCodeToolStripMenuItem.Text = "3 OP Code";
-            this.oPCodeToolStripMenuItem.Click += new System.EventHandler(this.oPCodeToolStripMenuItem_Click);
+            this.deadCodeRemovalToolStripMenuItem.Enabled = false;
+            this.deadCodeRemovalToolStripMenuItem.Name = "deadCodeRemovalToolStripMenuItem";
+            this.deadCodeRemovalToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
+            this.deadCodeRemovalToolStripMenuItem.Text = "Dead Code Removal";
+            this.deadCodeRemovalToolStripMenuItem.Click += new System.EventHandler(this.deadCodeRemovalToolStripMenuItem_Click);
+            // 
+            // tbpDeadCodeRemoval
+            // 
+            this.tbpDeadCodeRemoval.Location = new System.Drawing.Point(4, 22);
+            this.tbpDeadCodeRemoval.Name = "tbpDeadCodeRemoval";
+            this.tbpDeadCodeRemoval.Size = new System.Drawing.Size(506, 395);
+            this.tbpDeadCodeRemoval.TabIndex = 2;
+            this.tbpDeadCodeRemoval.Text = "Dead Code Removal";
+            this.tbpDeadCodeRemoval.UseVisualStyleBackColor = true;
             // 
             // MainForm
             // 
@@ -438,7 +463,7 @@
             this.menuStrip1.PerformLayout();
             this.tabFirstTransform.ResumeLayout(false);
             this.tbpThreeOPCode.ResumeLayout(false);
-            this.tabPage2.ResumeLayout(false);
+            this.tbpOneilCodeCSharp.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -472,10 +497,12 @@
         private LineNumbersControlForRichTextBox.LineNumbersForRichText lineNumbersForRichText2;
         private System.Windows.Forms.TabControl tabFirstTransform;
         private System.Windows.Forms.TabPage tbpThreeOPCode;
-        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.TabPage tbpOneilCodeCSharp;
         private LineNumbersControlForRichTextBox.LineNumbersForRichText lineNumbersForRichText3;
         private System.Windows.Forms.RichTextBox txtTransform;
         private System.Windows.Forms.ToolStripMenuItem oPCodeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem deadCodeRemovalToolStripMenuItem;
+        private System.Windows.Forms.TabPage tbpDeadCodeRemoval;
     }
 }
 
