@@ -14,7 +14,12 @@ namespace OptimizingParallelCompiler
         private string _output = "Out.exe";
         private CompilerResults _results;
         private const string ErrorFile = "error.txt";
-
+        private List<string> _foundRedundantVariables;
+        private List<string> _checkedRedundantVariables;
+        private string _possibleLeftSideRedundant;
+        private string _possibleRightSideRedundant;
+        private List<string> _boundVariables;
+        private List<string> _incrementalVariables;
         public MainForm()
         {
             InitializeComponent();
@@ -278,6 +283,185 @@ namespace OptimizingParallelCompiler
             }
 
 
+        }
+
+        private void RemoveRedundentStatements(List<string> code, int CodePosition)
+        {
+            //create list of lines of code
+            var lines = new List<string>(code.ToList());
+
+            //set redundentStatementFound = false;
+            bool redundentStatementFound = false;
+
+            //Loop through all lines
+            foreach (string line in code)
+            {
+                //do not recheck lines that you have already checked
+
+                //get current index of line in code
+                int currentIndex;
+                currentIndex = code.FindIndex(s => s == line);
+                if (currentIndex <= CodePosition)
+                {
+                    //skip, you already checked those lines
+                }
+                else //continue
+                {
+                    //trim tab and any spaces
+                    string currentline = line.Trim(' ', '\t');
+
+                    //check if line starts with "var"
+                    if (currentline.IndexOf("let", StringComparison.Ordinal) == 0)
+                    {
+                        //the statement could contain a variable that has redundancy
+                        //parse the let statement ex. let t_1 = idx
+
+                        //remove accidental 2 and 3 spaces from line
+                        currentline = currentline.Trim().Replace("  ", " ").Replace("  ", " ").Replace("  ", " ");
+
+                        //create an array out of the line, split by spaces
+                        string[] lineArray;
+                        lineArray = line.Split(' ');
+
+                        //create temp varibles a check if far is already been checked
+                        string LeftSide = "";
+                        LeftSide = lineArray[1];
+
+                        string RightSide = "";
+                        //TO DO right side is everything after equal sign?
+                        // = ""
+
+                        if (_foundRedundantVariables.Contains(LeftSide) || _checkedRedundantVariables.Contains(LeftSide))
+                        {
+                            //the var was already checked, do nothing continue to next line in for loop
+                        }
+                        else
+                        {
+                            //add to checked list
+                            _checkedRedundantVariables.Add(LeftSide);
+
+                            //Call function to check for redundency
+                            if (removeRedundantStatements(LeftSide, RightSide, code, currentIndex + 1) == true)
+                            {
+                                //redundant statements removed, add to list
+                                _foundRedundantVariables.Add(LeftSide);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //do nothing and continue to the next line
+                    }
+                }   
+            }
+        }
+
+        bool removeRedundantStatements(string LeftSide, string RightSide, List<string> code, int startingIndex)
+        {
+            bool redundencysFound = false;
+
+            //create variable to determin if the variable stored in "LeftSide" is reset to anything
+            bool variableValueChange = false;
+
+            //starting at startingIndex, look for statements where the variable stored in "LeftSide" is used
+            //continue until the variable is reset,
+            //you get to the end of the code,
+            int counter = startingIndex;
+            while ((counter <= code.Count - 1) && variableValueChange == false)
+            {
+                //trim tab and any spaces
+                string currentline = code[counter].Trim(' ', '\t');
+
+                //check to see if the current line has the variable in it.
+                if (currentline.Contains(LeftSide))
+                {
+                    //split statement
+                    //remove accidental 2 and 3 spaces from line
+                    currentline = currentline.Trim().Replace("  ", " ").Replace("  ", " ").Replace("  ", " ");
+
+                    //create an array out of the line, split by spaces
+                    string[] lineArray;
+                    lineArray = currentline.Split(' ');
+
+                    //create temp varibles a check if far is already been checked
+                    //compare index of equal side and left side
+
+                    //see if there is an equal sign. 
+                    if (currentline.Contains("=") == false)
+                    {
+                        //no equal sign, we know the variable isn't being changed
+                    }
+                    else
+                    {
+                       //see if variable is in left or right side of equal sign
+                        int indexOfEqual;
+                        int indexOfVar;
+                        indexOfEqual = currentline.IndexOf("=");
+                        indexOfVar = currentline.IndexOf(LeftSide);
+
+                        if (indexOfVar < indexOfEqual)
+                        {
+                            //variable is on left side, high probability of change
+                            variableValueChange = true;
+                        }
+                        else
+                        {
+                            //variable is on right side, so the value hasn't changed
+                            //we can change this variable to the right side
+                            code[counter].Replace(LeftSide, RightSide);
+
+                            //a redundancy was found! redundencysFound
+
+                            //continue until end of code is reached, or the variable is found on left side further in code.
+                        }
+                    }   
+                }
+                else
+                {
+                    //done, go to next line
+                }
+            }
+            return redundencysFound;
+        }
+
+        void getBoundAndIncrementalVariables(List<string> code)
+        {
+            //get bound and incremental variables and store in a list 
+            //then we will use that list to look for the incrementer and it's redundencies
+            var lines = new List<string>(code.ToList());
+
+            //Loop through all lines, a redundent statement is removed
+            foreach (string line in code)
+            {
+                //trim tab and any spaces
+                string currentline = line.Trim(' ', '\t');
+
+                //check if line starts with "if"
+                if (currentline.IndexOf("if", StringComparison.Ordinal) == 0)
+                {
+                    //the statement has a bound value 
+                    //parse bound and incremental variable
+                    //example:
+                    //if (idx <= bound – 1)
+                    string incremental = "";
+                    string bound = "";
+
+                    //remove accidental 2 and 3 spaces from line
+                    currentline = currentline.Trim().Replace("  ", " ").Replace("  ", " ").Replace("  ", " ");
+                    string[] lineArray;
+                    lineArray = line.Split(' ');
+                    incremental = lineArray[1].Replace("(", "");
+                    bound = lineArray[3].Replace("-", "").Replace("+", "");
+
+                    //add the incremental and bound variables to lists
+                    _boundVariables.Add(bound);
+                    _incrementalVariables.Add(incremental);
+                }
+                else
+                {
+                    //do nothing and continue to the next line
+                }
+            }
         }
     }
 }
