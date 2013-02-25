@@ -44,9 +44,8 @@ namespace OptimizingParallelCompiler
                             letStatement = "let " + "t_" + counter + " = " + 
                                         x.Substring(indexBracketFront + 1, (indexBracketEnd - 1) - indexBracketFront) + "\n";
 
-                            var replace = x.Replace(
-                                x.Substring(indexBracketFront + 1, (indexBracketEnd - 1) - indexBracketFront),
-                                "t_" + counter++);
+                            var replace = "let" + x.Substring(x.IndexOf(" "), indexBracketFront - x.IndexOf(" ")) + "[t_" + counter++ + 
+                                x.Substring(indexBracketEnd, (x.Length) - indexBracketEnd);
 
                             
 
