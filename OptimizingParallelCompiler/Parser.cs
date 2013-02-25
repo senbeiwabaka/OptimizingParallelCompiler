@@ -15,7 +15,7 @@ namespace OptimizingParallelCompiler
             var listOfEndFors = new List<string>();
 
             //replaces title with // and always inserts the using statements
-            code[0] += "\nusing System;\nclass Program\n{";
+            code[0] += @"using System;\nclass Program{";
             code[0] = code[0].Replace("title", "//");
 
             var labelCounter = 0;
