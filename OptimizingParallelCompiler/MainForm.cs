@@ -471,6 +471,7 @@ namespace OptimizingParallelCompiler
 
         private void deadCodeRemovalToolStripMenuItem_Click(object sender, EventArgs e)
         {
+
             tabFirstTransform.SelectTab(1);
         }
     }
