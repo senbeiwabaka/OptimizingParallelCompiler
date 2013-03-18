@@ -43,6 +43,7 @@
             this.taxToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.triviaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.oPCodeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.deadCodeRemovalToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.convertToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.compileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
@@ -55,14 +56,16 @@
             this.lineNumbersForRichText2 = new LineNumbersControlForRichTextBox.LineNumbersForRichText();
             this.tabFirstTransform = new System.Windows.Forms.TabControl();
             this.tbpThreeOPCode = new System.Windows.Forms.TabPage();
-            this.txtTransform = new System.Windows.Forms.RichTextBox();
+            this.rtbThreeOPCode = new System.Windows.Forms.RichTextBox();
             this.lineNumbersForRichText3 = new LineNumbersControlForRichTextBox.LineNumbersForRichText();
-            this.tbpOneilCodeCSharp = new System.Windows.Forms.TabPage();
-            this.deadCodeRemovalToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tbpDeadCodeRemoval = new System.Windows.Forms.TabPage();
+            this.tbpOneilCodeCSharp = new System.Windows.Forms.TabPage();
+            this.txtDeadCode = new System.Windows.Forms.RichTextBox();
+            this.lineNumbersForRichText4 = new LineNumbersControlForRichTextBox.LineNumbersForRichText();
             this.menuStrip1.SuspendLayout();
             this.tabFirstTransform.SuspendLayout();
             this.tbpThreeOPCode.SuspendLayout();
+            this.tbpDeadCodeRemoval.SuspendLayout();
             this.tbpOneilCodeCSharp.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -202,6 +205,14 @@
             this.oPCodeToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
             this.oPCodeToolStripMenuItem.Text = "3 OP Code";
             this.oPCodeToolStripMenuItem.Click += new System.EventHandler(this.oPCodeToolStripMenuItem_Click);
+            // 
+            // deadCodeRemovalToolStripMenuItem
+            // 
+            this.deadCodeRemovalToolStripMenuItem.Enabled = false;
+            this.deadCodeRemovalToolStripMenuItem.Name = "deadCodeRemovalToolStripMenuItem";
+            this.deadCodeRemovalToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
+            this.deadCodeRemovalToolStripMenuItem.Text = "Dead Code Removal";
+            this.deadCodeRemovalToolStripMenuItem.Click += new System.EventHandler(this.deadCodeRemovalToolStripMenuItem_Click);
             // 
             // convertToolStripMenuItem
             // 
@@ -362,7 +373,7 @@
             // 
             // tbpThreeOPCode
             // 
-            this.tbpThreeOPCode.Controls.Add(this.txtTransform);
+            this.tbpThreeOPCode.Controls.Add(this.rtbThreeOPCode);
             this.tbpThreeOPCode.Controls.Add(this.lineNumbersForRichText3);
             this.tbpThreeOPCode.Location = new System.Drawing.Point(4, 22);
             this.tbpThreeOPCode.Name = "tbpThreeOPCode";
@@ -372,13 +383,13 @@
             this.tbpThreeOPCode.Text = "3 OP Code";
             this.tbpThreeOPCode.UseVisualStyleBackColor = true;
             // 
-            // txtTransform
+            // rtbThreeOPCode
             // 
-            this.txtTransform.Location = new System.Drawing.Point(30, 0);
-            this.txtTransform.Name = "txtTransform";
-            this.txtTransform.Size = new System.Drawing.Size(476, 395);
-            this.txtTransform.TabIndex = 2;
-            this.txtTransform.Text = "";
+            this.rtbThreeOPCode.Location = new System.Drawing.Point(30, 0);
+            this.rtbThreeOPCode.Name = "rtbThreeOPCode";
+            this.rtbThreeOPCode.Size = new System.Drawing.Size(476, 395);
+            this.rtbThreeOPCode.TabIndex = 2;
+            this.rtbThreeOPCode.Text = "";
             // 
             // lineNumbersForRichText3
             // 
@@ -407,7 +418,7 @@
             this.lineNumbersForRichText3.MarginLinesThickness = 1F;
             this.lineNumbersForRichText3.Name = "lineNumbersForRichText3";
             this.lineNumbersForRichText3.Padding = new System.Windows.Forms.Padding(0, 0, 2, 0);
-            this.lineNumbersForRichText3.ParentRichTextBox = this.txtTransform;
+            this.lineNumbersForRichText3.ParentRichTextBox = this.rtbThreeOPCode;
             this.lineNumbersForRichText3.SeeThroughMode = false;
             this.lineNumbersForRichText3.ShowBackgroundGradient = true;
             this.lineNumbersForRichText3.ShowBorderLines = true;
@@ -416,6 +427,17 @@
             this.lineNumbersForRichText3.ShowMarginLines = true;
             this.lineNumbersForRichText3.Size = new System.Drawing.Size(20, 395);
             this.lineNumbersForRichText3.TabIndex = 1;
+            // 
+            // tbpDeadCodeRemoval
+            // 
+            this.tbpDeadCodeRemoval.Controls.Add(this.txtDeadCode);
+            this.tbpDeadCodeRemoval.Controls.Add(this.lineNumbersForRichText4);
+            this.tbpDeadCodeRemoval.Location = new System.Drawing.Point(4, 22);
+            this.tbpDeadCodeRemoval.Name = "tbpDeadCodeRemoval";
+            this.tbpDeadCodeRemoval.Size = new System.Drawing.Size(506, 395);
+            this.tbpDeadCodeRemoval.TabIndex = 2;
+            this.tbpDeadCodeRemoval.Text = "Dead Code Removal";
+            this.tbpDeadCodeRemoval.UseVisualStyleBackColor = true;
             // 
             // tbpOneilCodeCSharp
             // 
@@ -429,22 +451,50 @@
             this.tbpOneilCodeCSharp.Text = "O\'Neil Code - C#";
             this.tbpOneilCodeCSharp.UseVisualStyleBackColor = true;
             // 
-            // deadCodeRemovalToolStripMenuItem
+            // txtDeadCode
             // 
-            this.deadCodeRemovalToolStripMenuItem.Enabled = false;
-            this.deadCodeRemovalToolStripMenuItem.Name = "deadCodeRemovalToolStripMenuItem";
-            this.deadCodeRemovalToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
-            this.deadCodeRemovalToolStripMenuItem.Text = "Dead Code Removal";
-            this.deadCodeRemovalToolStripMenuItem.Click += new System.EventHandler(this.deadCodeRemovalToolStripMenuItem_Click);
+            this.txtDeadCode.Location = new System.Drawing.Point(26, 0);
+            this.txtDeadCode.Name = "txtDeadCode";
+            this.txtDeadCode.Size = new System.Drawing.Size(476, 395);
+            this.txtDeadCode.TabIndex = 4;
+            this.txtDeadCode.Text = "";
             // 
-            // tbpDeadCodeRemoval
+            // lineNumbersForRichText4
             // 
-            this.tbpDeadCodeRemoval.Location = new System.Drawing.Point(4, 22);
-            this.tbpDeadCodeRemoval.Name = "tbpDeadCodeRemoval";
-            this.tbpDeadCodeRemoval.Size = new System.Drawing.Size(506, 395);
-            this.tbpDeadCodeRemoval.TabIndex = 2;
-            this.tbpDeadCodeRemoval.Text = "Dead Code Removal";
-            this.tbpDeadCodeRemoval.UseVisualStyleBackColor = true;
+            this.lineNumbersForRichText4.AutoSizing = true;
+            this.lineNumbersForRichText4.BackgroundGradientAlphaColor = System.Drawing.Color.Transparent;
+            this.lineNumbersForRichText4.BackgroundGradientBetaColor = System.Drawing.Color.LightSteelBlue;
+            this.lineNumbersForRichText4.BackgroundGradientDirection = System.Drawing.Drawing2D.LinearGradientMode.Horizontal;
+            this.lineNumbersForRichText4.BorderLinesColor = System.Drawing.Color.SlateGray;
+            this.lineNumbersForRichText4.BorderLinesStyle = System.Drawing.Drawing2D.DashStyle.Dot;
+            this.lineNumbersForRichText4.BorderLinesThickness = 1F;
+            this.lineNumbersForRichText4.DockSide = LineNumbersControlForRichTextBox.LineNumbersForRichText.LineNumberDockSide.Left;
+            this.lineNumbersForRichText4.GridLinesColor = System.Drawing.Color.SlateGray;
+            this.lineNumbersForRichText4.GridLinesStyle = System.Drawing.Drawing2D.DashStyle.Dot;
+            this.lineNumbersForRichText4.GridLinesThickness = 1F;
+            this.lineNumbersForRichText4.LineNumbersAlignment = System.Drawing.ContentAlignment.TopRight;
+            this.lineNumbersForRichText4.LineNumbersAntiAlias = true;
+            this.lineNumbersForRichText4.LineNumbersAsHexadecimal = false;
+            this.lineNumbersForRichText4.LineNumbersClippedByItemRectangle = true;
+            this.lineNumbersForRichText4.LineNumbersLeadingZeroes = true;
+            this.lineNumbersForRichText4.LineNumbersOffset = new System.Drawing.Size(0, 0);
+            this.lineNumbersForRichText4.Location = new System.Drawing.Point(5, 0);
+            this.lineNumbersForRichText4.Margin = new System.Windows.Forms.Padding(0);
+            this.lineNumbersForRichText4.MarginLinesColor = System.Drawing.Color.SlateGray;
+            this.lineNumbersForRichText4.MarginLinesSide = LineNumbersControlForRichTextBox.LineNumbersForRichText.LineNumberDockSide.Right;
+            this.lineNumbersForRichText4.MarginLinesStyle = System.Drawing.Drawing2D.DashStyle.Solid;
+            this.lineNumbersForRichText4.MarginLinesThickness = 1F;
+            this.lineNumbersForRichText4.Name = "lineNumbersForRichText4";
+            this.lineNumbersForRichText4.Padding = new System.Windows.Forms.Padding(0, 0, 2, 0);
+            this.lineNumbersForRichText4.ParentRichTextBox = this.txtDeadCode;
+            this.lineNumbersForRichText4.SeeThroughMode = false;
+            this.lineNumbersForRichText4.ShowBackgroundGradient = true;
+            this.lineNumbersForRichText4.ShowBorderLines = true;
+            this.lineNumbersForRichText4.ShowGridLines = true;
+            this.lineNumbersForRichText4.ShowLineNumbers = true;
+            this.lineNumbersForRichText4.ShowMarginLines = true;
+            this.lineNumbersForRichText4.Size = new System.Drawing.Size(20, 395);
+            this.lineNumbersForRichText4.TabIndex = 3;
             // 
             // MainForm
             // 
@@ -463,6 +513,7 @@
             this.menuStrip1.PerformLayout();
             this.tabFirstTransform.ResumeLayout(false);
             this.tbpThreeOPCode.ResumeLayout(false);
+            this.tbpDeadCodeRemoval.ResumeLayout(false);
             this.tbpOneilCodeCSharp.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -499,10 +550,12 @@
         private System.Windows.Forms.TabPage tbpThreeOPCode;
         private System.Windows.Forms.TabPage tbpOneilCodeCSharp;
         private LineNumbersControlForRichTextBox.LineNumbersForRichText lineNumbersForRichText3;
-        private System.Windows.Forms.RichTextBox txtTransform;
+        private System.Windows.Forms.RichTextBox rtbThreeOPCode;
         private System.Windows.Forms.ToolStripMenuItem oPCodeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem deadCodeRemovalToolStripMenuItem;
         private System.Windows.Forms.TabPage tbpDeadCodeRemoval;
+        private System.Windows.Forms.RichTextBox txtDeadCode;
+        private LineNumbersControlForRichTextBox.LineNumbersForRichText lineNumbersForRichText4;
     }
 }
 

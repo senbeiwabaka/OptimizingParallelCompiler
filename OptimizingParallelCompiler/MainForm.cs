@@ -93,7 +93,7 @@ namespace OptimizingParallelCompiler
         /// <param name="e">The event thingy</param>
         private void convertToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var code = new List<string>(txtOneilCode.Lines);
+            var code = new List<string>(txtDeadCode.Lines);
            
             Parser.Transform(code);
 
@@ -105,6 +105,10 @@ namespace OptimizingParallelCompiler
             {
                 txtCSharpCode.Text += lines + "\n";
             }
+
+            tabFirstTransform.SelectTab(2);
+
+            compileToolStripMenuItem.Enabled = true;
         }
 
         /// <summary>
@@ -275,11 +279,11 @@ namespace OptimizingParallelCompiler
 
             ThreeOPConverter.Transform(threeOPCode);
 
-            txtTransform.Clear();
+            rtbThreeOPCode.Clear();
 
             foreach (var variable in threeOPCode)
             {
-                txtTransform.Text += variable + "\n";
+                rtbThreeOPCode.Text += variable + "\n";
             }
 
             deadCodeRemovalToolStripMenuItem.Enabled = true;
@@ -471,8 +475,9 @@ namespace OptimizingParallelCompiler
 
         private void deadCodeRemovalToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            txtDeadCode.Text = rtbThreeOPCode.Text;
             tabFirstTransform.SelectTab(1);
+            convertToolStripMenuItem.Enabled = true;
         }
     }
 }
