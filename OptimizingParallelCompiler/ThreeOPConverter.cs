@@ -11,10 +11,10 @@ namespace OptimizingParallelCompiler
         /// 
         /// </summary>
         /// <param name="code"></param>
-        public static List<ThreeOPCreation> Transform(List<string> code)
+        public static List<ThreeOPCreation> Transform(List<string> code, out List<ThreeOPCreation> intStatments)
         {
             var counter = 0;
-            var intStatements = string.Empty;
+            var ints = new List<ThreeOPCreation>();
             var lets = new List<ThreeOPCreation>();
 
             int index;
@@ -31,9 +31,9 @@ namespace OptimizingParallelCompiler
                     //
                     if (x.StartsWith("let", StringComparison.Ordinal))
                     {
-                        LetArrayCreation(ref x, ref counter, ref intStatements, ref lets, ref statement, ref code, ref nonModifiedStatement);
+                        LetArrayCreation(ref x, ref counter, ints, lets, ref statement, ref code, nonModifiedStatement);
 
-                        LetParenthesis(ref x, ref counter, ref intStatements, ref lets, ref statement, ref code, ref nonModifiedStatement);
+                        LetParenthesis(ref x, ref counter, ints, lets, ref statement, ref code, nonModifiedStatement);
                     }
                     else if (x.StartsWith("if"))
                     {
@@ -45,14 +45,15 @@ namespace OptimizingParallelCompiler
                                                             indexBracketFront - x.IndexOf("(", StringComparison.Ordinal) - 1);
                             var arrayIndex = x.Substring(indexBracketFront + 1, (indexBracketEnd - 1) - indexBracketFront);
 
-                            intStatements += "int t_" + counter + Environment.NewLine;
+                            ints.Add(new ThreeOPCreation { Index = 2, Statements = "int t_" + counter });
+                            //intStatements += "int t_" + counter + Environment.NewLine;
                             index = code.IndexOf(nonModifiedStatement);
 
                             var c = counter;
                             lets.Add(new ThreeOPCreation { Index = index, Statements = "let " + "t_" + counter++ + " = " + arrayIndex });
                             lets.Add(new ThreeOPCreation { Index = index, Statements = "let " + "t_" + counter + " = " + arrayName + "[t_" + c + "]" });
-
-                            intStatements += "int t_" + counter + Environment.NewLine;
+                            ints.Add(new ThreeOPCreation { Index = 2, Statements = "int t_" + counter });
+                            //intStatements += "int t_" + counter + Environment.NewLine;
 
                             code[index] = "if (t_" + counter++ + x.Substring(indexBracketEnd + 1, x.Length - (indexBracketEnd + 1));
                         }
@@ -63,7 +64,8 @@ namespace OptimizingParallelCompiler
                             var amount = Regex.Matches(parenthesis, "[-+/*]").Count;
                             if (amount == 1)
                             {
-                                intStatements += "int t_" + counter + Environment.NewLine;
+                                ints.Add(new ThreeOPCreation { Index = 2, Statements = "int t_" + counter });
+                                //intStatements += "int t_" + counter + Environment.NewLine;
                                 var elements = string.Empty;
                                 var spaceCount = 3;
                                 while (spaceCount >= 1)
@@ -85,13 +87,15 @@ namespace OptimizingParallelCompiler
                     }
                     else if (x.StartsWith("print", StringComparison.Ordinal))
                     {
-                        Print(code, ref counter, lets, ref x, nonModifiedStatement, ref intStatements);
+                        Print(code, ref counter, lets, ref x, nonModifiedStatement, ints);
                     }
                 });
 
             //index = code.IndexOf("\tvar") > 0 ? code.IndexOf("\tvar") + 1 : code.IndexOf("var") + 1;
 
             //code.Insert(index, intStatements);
+
+            intStatments = ints;
 
             return lets;
         }
@@ -105,7 +109,7 @@ namespace OptimizingParallelCompiler
         /// <param name="x"></param>
         /// <param name="nonModifiedStatement"></param>
         /// <param name="intStatements"></param>
-        private static void Print(List<string> code, ref int counter, List<ThreeOPCreation> lets, ref string x, string nonModifiedStatement, ref string intStatements)
+        private static void Print(List<string> code, ref int counter, List<ThreeOPCreation> lets, ref string x, string nonModifiedStatement, List<ThreeOPCreation> ints)
         {
             if (Regex.Matches(x, "[[]").Count == 1)
             {
@@ -113,7 +117,8 @@ namespace OptimizingParallelCompiler
                 var indexBracketEnd = x.IndexOf("]", 0, StringComparison.Ordinal);
                 var arrayIndex = x.Substring(indexBracketFront + 1, (indexBracketEnd - 1) - indexBracketFront);
 
-                intStatements += "int t_" + counter + Environment.NewLine;
+                ints.Add(new ThreeOPCreation { Index = 2, Statements = "int t_" + counter });
+                //intStatements += "int t_" + counter + Environment.NewLine;
 
                 if (Regex.Matches(arrayIndex, "[-+*/]").Count > 0)
                 {
@@ -127,7 +132,8 @@ namespace OptimizingParallelCompiler
                     lets.Add(new ThreeOPCreation { Index = code.IndexOf(nonModifiedStatement), Statements = nonModifiedStatement.Substring(0, nonModifiedStatement.IndexOf("print", StringComparison.Ordinal)) + "let " + "t_" + counter++ + " = " + arrayIndex });
                     lets.Add(new ThreeOPCreation { Index = code.IndexOf(nonModifiedStatement), Statements = nonModifiedStatement.Substring(0, nonModifiedStatement.IndexOf("print", StringComparison.Ordinal)) + "let " + "t_" + counter + " = " + arrayName + "[t_" + c + "]" });
                     //lets.Add(code.IndexOf(nonModifiedStatement), nonModifiedStatement.Substring(0, nonModifiedStatement.IndexOf("print", StringComparison.Ordinal)) + "let " + "t_" + counter++ + " = " + arrayIndex + Environment.NewLine + nonModifiedStatement.Substring(0, nonModifiedStatement.IndexOf("print", StringComparison.Ordinal)) + "let " + "t_" + counter + " = " + arrayName + "[t_" + c + "]");
-                    intStatements += "int t_" + counter + Environment.NewLine;
+                    ints.Add(new ThreeOPCreation { Index = 2, Statements = "int t_" + counter });
+                    //intStatements += "int t_" + counter + Environment.NewLine;
 
                     code[code.IndexOf(nonModifiedStatement)] = code[code.IndexOf(nonModifiedStatement)].Replace(arrayName + "[t_" + c + "]", "t_" + counter++);
                 }
@@ -137,10 +143,11 @@ namespace OptimizingParallelCompiler
                     var arrayName = x.Substring(lastSpace + 1, indexBracketFront - lastSpace - 1);
 
                     var c = counter;
-                    lets.Add(new ThreeOPCreation { Index = code.IndexOf(nonModifiedStatement), Statements = nonModifiedStatement.Substring(0, nonModifiedStatement.IndexOf("print", StringComparison.Ordinal)) + "let " + "t_" + counter++ + " = " + arrayIndex + Environment.NewLine });
+                    lets.Add(new ThreeOPCreation { Index = code.IndexOf(nonModifiedStatement), Statements = nonModifiedStatement.Substring(0, nonModifiedStatement.IndexOf("print", StringComparison.Ordinal)) + "let " + "t_" + counter++ + " = " + arrayIndex });
                     lets.Add(new ThreeOPCreation { Index = code.IndexOf(nonModifiedStatement), Statements = nonModifiedStatement.Substring(0, nonModifiedStatement.IndexOf("print", StringComparison.Ordinal)) + "let " + "t_" + counter + " = " + arrayName + "[t_" + c + "]" });
                     //lets.Add(code.IndexOf(nonModifiedStatement), nonModifiedStatement.Substring(0, nonModifiedStatement.IndexOf("print", StringComparison.Ordinal)) + "let " + "t_" + counter++ + " = " + arrayIndex + Environment.NewLine + nonModifiedStatement.Substring(0, nonModifiedStatement.IndexOf("print", StringComparison.Ordinal)) + "let " + "t_" + counter + " = " + arrayName + "[t_" + c + "]");
-                    intStatements += "int t_" + counter + Environment.NewLine;
+                    ints.Add(new ThreeOPCreation { Index = 2, Statements = "int t_" + counter });
+                    //intStatements += "int t_" + counter + Environment.NewLine;
 
                     code[code.IndexOf(nonModifiedStatement)] = code[code.IndexOf(nonModifiedStatement)].Replace(arrayName + "[" + arrayIndex + "]", "t_" + counter++);
                     Console.WriteLine(lastSpace);
@@ -158,7 +165,7 @@ namespace OptimizingParallelCompiler
         /// <param name="statement"></param>
         /// <param name="code"></param>
         /// <param name="nonModifiedStatement"></param>
-        private static void LetArrayCreation(ref string line, ref int counter, ref string intStatements, ref List<ThreeOPCreation> lets, ref string statement, ref List<string> code, ref string nonModifiedStatement)
+        private static void LetArrayCreation(ref string line, ref int counter, List<ThreeOPCreation> ints, List<ThreeOPCreation> lets, ref string statement, ref List<string> code, string nonModifiedStatement)
         {
             var letStatement = string.Empty;
             if (Regex.Matches(line, "[[]").Count > 0)
@@ -176,8 +183,8 @@ namespace OptimizingParallelCompiler
                         line.Substring(indexBracketFront + 1, (indexBracketEnd - 1) - indexBracketFront),
                         out result) == false)
                 {
-
-                    intStatements += "int t_" + counter + Environment.NewLine;
+                    ints.Add(new ThreeOPCreation { Index = 2, Statements = "int t_" + counter });
+                    //intStatements += "int t_" + counter + Environment.NewLine;
                     lets.Add(new ThreeOPCreation
                     {
                         Index = code.IndexOf(nonModifiedStatement),
@@ -206,7 +213,8 @@ namespace OptimizingParallelCompiler
 
                     if (int.TryParse(arrayIndex, out result))
                     {
-                        intStatements += "int t_" + counter + Environment.NewLine;
+                        ints.Add(new ThreeOPCreation { Index = 2, Statements = "int t_" + counter });
+                        //intStatements += "int t_" + counter + Environment.NewLine;
                         var arrayName = statement.Substring(statement.IndexOf(" ", StringComparison.Ordinal),
                                                             indexBracketFront - statement.IndexOf(" ", StringComparison.Ordinal));
                         letStatement = nonModifiedStatement.Substring(0, nonModifiedStatement.IndexOf("let")) + "let t_" + counter + " = " + arrayName + "[" + arrayIndex + "]";
@@ -214,7 +222,8 @@ namespace OptimizingParallelCompiler
                     }
                     else
                     {
-                        intStatements += "int t_" + counter + Environment.NewLine;
+                        ints.Add(new ThreeOPCreation { Index = 2, Statements = "int t_" + counter });
+                        //intStatements += "int t_" + counter + Environment.NewLine;
                         var variable = "t_" + counter;
                         //letStatement += "let " + "t_" + counter++ + " = " + arrayIndex + Environment.NewLine;
                         lets.Add(new ThreeOPCreation
@@ -223,7 +232,8 @@ namespace OptimizingParallelCompiler
                             Statements = nonModifiedStatement.Substring(0, nonModifiedStatement.IndexOf("let")) + "let " + "t_" + counter++ + " = " +
                                 arrayIndex
                         });
-                        intStatements += "int t_" + counter + Environment.NewLine;
+                        ints.Add(new ThreeOPCreation { Index = 2, Statements = "int t_" + counter });
+                        //intStatements += "int t_" + counter + Environment.NewLine;
                         letStatement = nonModifiedStatement.Substring(0, nonModifiedStatement.IndexOf("let")) + "let t_" + counter + " = " + statement.Substring(statement.IndexOf(" ", StringComparison.Ordinal) + 1,
                              indexBracketFront - (statement.IndexOf(" ", StringComparison.Ordinal) + 1)) + "[" + variable + "]";
 
@@ -251,7 +261,7 @@ namespace OptimizingParallelCompiler
             }
         }
 
-        private static void LetParenthesis(ref string line, ref int counter, ref string intStatements, ref List<ThreeOPCreation> lets, ref string statement, ref List<string> code, ref string nonModifiedStatement)
+        private static void LetParenthesis(ref string line, ref int counter, List<ThreeOPCreation> ints, List<ThreeOPCreation> lets, ref string statement, ref List<string> code, string nonModifiedStatement)
         {
             if (Regex.Matches(line, "[(]").Count > 0)
             {
@@ -273,7 +283,8 @@ namespace OptimizingParallelCompiler
                         {
                             if (list[i] == "*")
                             {
-                                intStatements += "int t_" + counter + Environment.NewLine;
+                                ints.Add(new ThreeOPCreation { Index = 2, Statements = "int t_" + counter });
+                                //intStatements += "int t_" + counter + Environment.NewLine;
                                 previousInt = "t_" + counter;
                                 var before = nonModifiedStatement.Substring(0, nonModifiedStatement.IndexOf("l"));
                                 addition += before + "let t_" + counter++ + " = " + ((i - 1) < 0 ? previousInt : list[i - 1]) + list[i] + list[i + 1] + Environment.NewLine;
