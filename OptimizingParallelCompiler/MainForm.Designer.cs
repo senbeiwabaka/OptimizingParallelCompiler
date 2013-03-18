@@ -46,7 +46,7 @@
             this.deadCodeRemovalToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.convertToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.compileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.runtoolStripMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.txtOneilCode = new System.Windows.Forms.RichTextBox();
             this.txtCSharpCode = new System.Windows.Forms.RichTextBox();
@@ -87,7 +87,7 @@
             this.deadCodeRemovalToolStripMenuItem,
             this.convertToolStripMenuItem,
             this.compileToolStripMenuItem,
-            this.toolStripMenuItem1,
+            this.runtoolStripMenu,
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
@@ -233,15 +233,15 @@
             this.compileToolStripMenuItem.Text = "Compile";
             this.compileToolStripMenuItem.Click += new System.EventHandler(this.compileToolStripMenuItem_Click);
             // 
-            // toolStripMenuItem1
+            // runtoolStripMenu
             // 
-            this.toolStripMenuItem1.Enabled = false;
-            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            this.runtoolStripMenu.Enabled = false;
+            this.runtoolStripMenu.Name = "runtoolStripMenu";
+            this.runtoolStripMenu.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.R)));
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(190, 22);
-            this.toolStripMenuItem1.Text = "Run";
-            this.toolStripMenuItem1.Click += new System.EventHandler(this.toolStripMenuItem1_Click);
+            this.runtoolStripMenu.Size = new System.Drawing.Size(190, 22);
+            this.runtoolStripMenu.Text = "Run";
+            this.runtoolStripMenu.Click += new System.EventHandler(this.toolStripMenuItem1_Click);
             // 
             // exitToolStripMenuItem
             // 
@@ -541,7 +541,7 @@
         private System.Windows.Forms.ToolStripMenuItem sortinsertionToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem taxToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem triviaToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem runtoolStripMenu;
         private System.Windows.Forms.TextBox txtError;
         private System.Windows.Forms.ToolStripMenuItem testToolStripMenuItem;
         private LineNumbersControlForRichTextBox.LineNumbersForRichText lineNumbersForRichText1;
