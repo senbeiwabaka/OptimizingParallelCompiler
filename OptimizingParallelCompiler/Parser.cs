@@ -15,7 +15,7 @@ namespace OptimizingParallelCompiler
             var listOfEndFors = new List<string>();
 
             //replaces title with // and always inserts the using statements
-            code[0] += @"using System;\nclass Program{";
+            code[0] += Environment.NewLine + "using System;\nclass Program{";
             code[0] = code[0].Replace("title", "//");
 
             var labelCounter = 0;
@@ -24,7 +24,7 @@ namespace OptimizingParallelCompiler
             code.ForEach(s =>
                 {
                     //creates an unmodified instance of the current line
-                    var other = s;
+                    var notModified = s;
                     //removes all trailing spaces and tabs
                     s = s.TrimEnd('\t', ' ');
                     //counts the number of tabs or spaces for pretty code
@@ -35,23 +35,31 @@ namespace OptimizingParallelCompiler
                     //does the while loop
                     if (s.IndexOf("while", StringComparison.Ordinal) == 0)
                     {
-                       WhileTransform(count, other, s, code, ref labelCounter);
+                        WhileTransform(count, notModified, s, code, ref labelCounter);
+
+                        Console.WriteLine("Line number " + code.IndexOf(notModified) + " type is while sentence " + notModified);
                     }
                     else if (s.IndexOf("endfor", StringComparison.Ordinal) == 0)
                     {
-                        var index = code.IndexOf(other);
+                        var index = code.IndexOf(notModified);
                         //take the last string off the list
                         code[index] = listOfEndFors[listOfEndFors.Count - 1];
                         listOfEndFors.RemoveAt(listOfEndFors.Count - 1);
+
+                        Console.WriteLine("Line number " + code.IndexOf(notModified) + " type is endfor sentence " + notModified);
                     }
                     else if (s.IndexOf("for", StringComparison.Ordinal) == 0)
                     {
-                        ForTransform(s, code, other, ref labelCounter, listOfEndFors);
+                        ForTransform(s, code, notModified, ref labelCounter, listOfEndFors);
+
+                        Console.WriteLine("Line number " + code.IndexOf(notModified) + " type is for sentence " + notModified);
                     }
                     else if (s.IndexOf("end", StringComparison.Ordinal) == 0 && s.Length == 3)
                     {
-                        var index = code.IndexOf(other);
+                        var index = code.IndexOf(notModified);
                         code[index] = "\t}\n}";
+
+                        Console.WriteLine("Line number " + code.IndexOf(notModified) + " type is end sentence " + notModified);
                     }
                     else if (s.IndexOf("prompt", StringComparison.Ordinal) == 0 || s.IndexOf("print", StringComparison.Ordinal) == 0)
                     {
@@ -60,22 +68,26 @@ namespace OptimizingParallelCompiler
                         if (s.IndexOf("prompt", StringComparison.Ordinal) == 0)
                         {
                             sentence = sentence.Replace("prompt", "Console.Write(");
-                            index = code.IndexOf(other);
+                            index = code.IndexOf(notModified);
                         }
                         else
                         {
                             sentence = sentence.Replace("print", "Console.Write(");
-                            index = code.IndexOf(other);
+                            index = code.IndexOf(notModified);
                         }
                         sentence += ");";
                         code[index] = code[index].Replace(s, sentence);
+
+                        Console.WriteLine("Line number " + code.IndexOf(notModified) + " type is prompt/print sentence " + notModified);
                     }
                     else if (s.IndexOf("rem", StringComparison.Ordinal) == 0)
                     {
                         var sentence = s;
                         sentence = sentence.Replace("rem", "//");
-                        var index = code.IndexOf(other);
+                        var index = code.IndexOf(notModified);
                         code[index] = code[index].Replace(s, sentence);
+
+                        Console.WriteLine("Line number " + code.IndexOf(notModified) + " type is rem sentence " + notModified);
                     }
 
                     else if (s.IndexOf("list", StringComparison.Ordinal) == 0)
@@ -86,32 +98,40 @@ namespace OptimizingParallelCompiler
                         var value = sentence.Substring(arrayBegin, arrayEnd - arrayBegin);
                         sentence = sentence.Substring(arrayEnd + 1, sentence.Length - (arrayEnd + 1));
                         sentence = "int[] " + sentence + " = new int[" + value + "];";
-                        var index = code.IndexOf(other);
+                        var index = code.IndexOf(notModified);
                         code[index] = code[index].Replace(s, sentence);
+
+                        Console.WriteLine("Line number " + code.IndexOf(notModified) + " type is list sentence " + notModified);
                     }
                     else if (s.IndexOf("let", StringComparison.Ordinal) == 0)
                     {
                         var sentence = s;
-                        sentence = sentence.Substring("let".Length, sentence.Length - "let".Length);
-                        sentence = sentence + ";";
-                        var index = code.IndexOf(other);
-                        code[index] = code[index].Replace(s, sentence);
+                        sentence = sentence.Replace("let", "");
+                        sentence += ";";
+                        //var index = code.IndexOf(notModified);
+                        code[code.IndexOf(notModified)] = code[code.IndexOf(notModified)].Replace(s, sentence);
+
+                        Console.WriteLine("Line number " + code.IndexOf(notModified) + " type is let sentence " + notModified);
                     }
                     else if (s.IndexOf("input", StringComparison.Ordinal) == 0)
                     {
                         var sentence = s;
                         sentence = sentence.Replace("input", "");
-                        var index = code.IndexOf(other);
+                        var index = code.IndexOf(notModified);
                         code[index] = code[index].Replace(s, sentence + " = Convert.ToInt32(Console.ReadLine());");
+
+                        Console.WriteLine("Line number " + code.IndexOf(notModified) + " type is input sentence " + notModified);
                     }
                     else if (s.IndexOf("int", StringComparison.Ordinal) == 0)
                     {
-                        var index = code.IndexOf(other);
+                        var index = code.IndexOf(notModified);
                         code[index] = code[index].Replace(s, s + ";");
+
+                        Console.WriteLine("Line number " + code.IndexOf(notModified) + " type is int sentence " + notModified);
                     }
                     else if (s.IndexOf("if", StringComparison.Ordinal) == 0 && s.Contains("then"))
                     {
-                        var index = code.IndexOf(other);
+                        var index = code.IndexOf(notModified);
                         var statement = s.Substring(s.IndexOf("then", StringComparison.Ordinal) + "then".Length,
                                                     s.Length -
                                                     (s.IndexOf("then", StringComparison.Ordinal) + "then".Length));
@@ -199,18 +219,22 @@ namespace OptimizingParallelCompiler
                             code[index + 2] = code[index + 2].Replace(code[index + 2], statement);
                             ++labelCounter;
                         }
+
+                        Console.WriteLine("Line number " + code.IndexOf(notModified) + " type is if sentence " + notModified);
                     }
                     else if (s.IndexOf("goto", StringComparison.Ordinal) == 0)
                     {
                         var sentence = s;
                         sentence += ";";
-                        var index = code.IndexOf(other);
+                        var index = code.IndexOf(notModified);
                         code[index] = code[index].Replace(s, sentence);
+
+                        Console.WriteLine("Line number " + code.IndexOf(notModified) + " type is goto sentence " + notModified);
                     }
                     else if (s.IndexOf("label", StringComparison.Ordinal) == 0 && !s.Contains(":"))
                     {
                         var sentence = s;
-                        var index = code.IndexOf(other);
+                        var index = code.IndexOf(notModified);
                         sentence += ":";
                         if (s.Contains(" "))
                         {
@@ -218,6 +242,24 @@ namespace OptimizingParallelCompiler
                             sentence = sentence.Replace(" ", "");
                         }
                         code[index] = code[index].Replace(s, sentence);
+
+                        Console.WriteLine("Line number " + code.IndexOf(notModified) + " type is label sentence " + notModified);
+                    }
+                    else if (s.IndexOf("begin", StringComparison.Ordinal) == 0)
+                    {
+                        var statement = s;
+                        statement = statement.Replace("begin", "");
+                        var index = code.IndexOf(notModified);
+                        code[index] = code[index].Replace(s, statement);
+
+                        Console.WriteLine("Line number " + code.IndexOf(notModified) + " type is begin sentence " + notModified);
+                    }
+                    else if (s.IndexOf("var", StringComparison.Ordinal) == 0)
+                    {
+                        var index = code.IndexOf(notModified);
+                        code[index] = "\tstatic void Main()\n\t{";
+
+                        Console.WriteLine("Line number " + code.IndexOf(notModified) + " type is var sentence " + notModified);
                     }
                 });
         }
