@@ -21,6 +21,7 @@ namespace OptimizingParallelCompiler
         private List<string> _boundVariables;
         private List<string> _incrementalVariables;
         private List<ThreeOPCreation> letOPCode = new List<ThreeOPCreation>();
+        private List<ThreeOPCreation> intStatements = new List<ThreeOPCreation>();
 
         public MainForm()
         {
@@ -97,7 +98,7 @@ namespace OptimizingParallelCompiler
         {
             var code = new List<string>(txtDeadCode.Lines);
            
-            Parser.Transform(code, letOPCode);
+            Parser.Transform(code, letOPCode, intStatements);
 
             //clears the box of previous everything
             txtCSharpCode.Clear();
@@ -150,6 +151,7 @@ namespace OptimizingParallelCompiler
                 //Successful Compile
                 txtError.ForeColor = Color.Green;
                 txtError.Text = @"Success!";
+                runtoolStripMenu.Enabled = true;
             }
         }
 
@@ -279,7 +281,7 @@ namespace OptimizingParallelCompiler
         {
             var threeOPCode = new List<string>(txtOneilCode.Lines);
 
-            letOPCode = ThreeOPConverter.Transform(threeOPCode);
+            letOPCode = ThreeOPConverter.Transform(threeOPCode, out intStatements);
 
             rtbThreeOPCode.Clear();
 
