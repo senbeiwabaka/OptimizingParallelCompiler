@@ -11,7 +11,7 @@ namespace OptimizingParallelCompiler
         /// 
         /// </summary>
         /// <param name="code"></param>
-        public static void Transform(List<string> code)
+        public static List<ThreeOPCreation> Transform(List<string> code)
         {
             var counter = 0;
             var intStatements = string.Empty;
@@ -49,7 +49,7 @@ namespace OptimizingParallelCompiler
                             index = code.IndexOf(nonModifiedStatement);
 
                             var c = counter;
-                            lets.Add(new ThreeOPCreation { Index = index, Statements = "let " + "t_" + counter++ + " = " + arrayIndex + Environment.NewLine });
+                            lets.Add(new ThreeOPCreation { Index = index, Statements = "let " + "t_" + counter++ + " = " + arrayIndex });
                             lets.Add(new ThreeOPCreation { Index = index, Statements = "let " + "t_" + counter + " = " + arrayName + "[t_" + c + "]" });
 
                             intStatements += "int t_" + counter + Environment.NewLine;
@@ -89,19 +89,11 @@ namespace OptimizingParallelCompiler
                     }
                 });
 
-            index = code.IndexOf("\tvar") > 0 ? code.IndexOf("\tvar") + 1 : code.IndexOf("var") + 1;
+            //index = code.IndexOf("\tvar") > 0 ? code.IndexOf("\tvar") + 1 : code.IndexOf("var") + 1;
 
-            code.Insert(index, intStatements);
+            //code.Insert(index, intStatements);
 
-            var i = 1;
-            foreach (var @let in lets)
-            {
-                code.Insert(let.Index + i++, let.Statements);
-            }
-
-            code.ForEach(x =>
-                {
-                });
+            return lets;
         }
 
         /// <summary>
@@ -132,7 +124,7 @@ namespace OptimizingParallelCompiler
                     var arrayName = x.Substring(lastSpace + 1, indexBracketFront - lastSpace - 1);
 
                     var c = counter;
-                    lets.Add(new ThreeOPCreation { Index = code.IndexOf(nonModifiedStatement), Statements = nonModifiedStatement.Substring(0, nonModifiedStatement.IndexOf("print", StringComparison.Ordinal)) + "let " + "t_" + counter++ + " = " + arrayIndex + Environment.NewLine });
+                    lets.Add(new ThreeOPCreation { Index = code.IndexOf(nonModifiedStatement), Statements = nonModifiedStatement.Substring(0, nonModifiedStatement.IndexOf("print", StringComparison.Ordinal)) + "let " + "t_" + counter++ + " = " + arrayIndex });
                     lets.Add(new ThreeOPCreation { Index = code.IndexOf(nonModifiedStatement), Statements = nonModifiedStatement.Substring(0, nonModifiedStatement.IndexOf("print", StringComparison.Ordinal)) + "let " + "t_" + counter + " = " + arrayName + "[t_" + c + "]" });
                     //lets.Add(code.IndexOf(nonModifiedStatement), nonModifiedStatement.Substring(0, nonModifiedStatement.IndexOf("print", StringComparison.Ordinal)) + "let " + "t_" + counter++ + " = " + arrayIndex + Environment.NewLine + nonModifiedStatement.Substring(0, nonModifiedStatement.IndexOf("print", StringComparison.Ordinal)) + "let " + "t_" + counter + " = " + arrayName + "[t_" + c + "]");
                     intStatements += "int t_" + counter + Environment.NewLine;

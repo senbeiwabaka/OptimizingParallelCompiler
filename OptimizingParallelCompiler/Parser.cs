@@ -10,7 +10,7 @@ namespace OptimizingParallelCompiler
         /// Transforms O'Neil code to C#
         /// </summary>
         /// <param name="code">Takes in a (referenced) list of type string of the code in the txtOneil textbox</param>
-        public static void Transform(List<string> code)
+        public static void Transform(List<string> code, List<ThreeOPCreation> lets)
         {
             var listOfEndFors = new List<string>();
 
@@ -27,34 +27,10 @@ namespace OptimizingParallelCompiler
                     var notModified = s;
                     //removes all trailing spaces and tabs
                     s = s.TrimEnd('\t', ' ');
-                    //counts the number of tabs or spaces for pretty code
-                    var count = s.Count(x => x.Equals('\t') || x.Equals(' '));
                     //trims beginning of sentence
                     s = s.TrimStart('\t', ' ');
 
-                    //does the while loop
-                    if (s.IndexOf("while", StringComparison.Ordinal) == 0)
-                    {
-                        WhileTransform(count, notModified, s, code, ref labelCounter);
-
-                        Console.WriteLine("Line number " + code.IndexOf(notModified) + " type is while sentence " + notModified);
-                    }
-                    else if (s.IndexOf("endfor", StringComparison.Ordinal) == 0)
-                    {
-                        var index = code.IndexOf(notModified);
-                        //take the last string off the list
-                        code[index] = listOfEndFors[listOfEndFors.Count - 1];
-                        listOfEndFors.RemoveAt(listOfEndFors.Count - 1);
-
-                        Console.WriteLine("Line number " + code.IndexOf(notModified) + " type is endfor sentence " + notModified);
-                    }
-                    else if (s.IndexOf("for", StringComparison.Ordinal) == 0)
-                    {
-                        ForTransform(s, code, notModified, ref labelCounter, listOfEndFors);
-
-                        Console.WriteLine("Line number " + code.IndexOf(notModified) + " type is for sentence " + notModified);
-                    }
-                    else if (s.IndexOf("end", StringComparison.Ordinal) == 0 && s.Length == 3)
+                    if (s.IndexOf("end", StringComparison.Ordinal) == 0 && s.Length == 3)
                     {
                         var index = code.IndexOf(notModified);
                         code[index] = "\t}\n}";
@@ -103,16 +79,6 @@ namespace OptimizingParallelCompiler
 
                         Console.WriteLine("Line number " + code.IndexOf(notModified) + " type is list sentence " + notModified);
                     }
-                    else if (s.IndexOf("let", StringComparison.Ordinal) == 0)
-                    {
-                        var sentence = s;
-                        sentence = sentence.Replace("let", "");
-                        sentence += ";";
-                        //var index = code.IndexOf(notModified);
-                        code[code.IndexOf(notModified)] = code[code.IndexOf(notModified)].Replace(s, sentence);
-
-                        Console.WriteLine("Line number " + code.IndexOf(notModified) + " type is let sentence " + notModified);
-                    }
                     else if (s.IndexOf("input", StringComparison.Ordinal) == 0)
                     {
                         var sentence = s;
@@ -124,110 +90,20 @@ namespace OptimizingParallelCompiler
                     }
                     else if (s.IndexOf("int", StringComparison.Ordinal) == 0)
                     {
-                        var index = code.IndexOf(notModified);
-                        code[index] = code[index].Replace(s, s + ";");
+                        code[code.IndexOf(notModified)] = code[code.IndexOf(notModified)].Replace(s, notModified.Substring(0, notModified.IndexOf("int")) + s + ";");
 
                         Console.WriteLine("Line number " + code.IndexOf(notModified) + " type is int sentence " + notModified);
                     }
                     else if (s.IndexOf("if", StringComparison.Ordinal) == 0 && s.Contains("then"))
                     {
                         var index = code.IndexOf(notModified);
-                        var statement = s.Substring(s.IndexOf("then", StringComparison.Ordinal) + "then".Length,
-                                                    s.Length -
-                                                    (s.IndexOf("then", StringComparison.Ordinal) + "then".Length));
-
-                        var equator = s.Substring(0, s.IndexOf(")", StringComparison.Ordinal) + 1);
-
-                        if (equator.Contains("!="))
-                        {
-                            equator = equator.Replace("!=", "==");
-                        }
-                        else if (equator.Contains("=="))
-                        {
-                            equator = equator.Replace("==", "!=");
-                        }
-                        else if (equator.Contains("<") && !equator.Contains("<="))
-                        {
-                            equator = equator.Replace("<", ">=");
-                        }
-                        else if (equator.Contains(">") && !equator.Contains(">="))
-                        {
-                            equator = equator.Replace(">", "<=");
-                        }
-                        else if (equator.Contains("<="))
-                        {
-                            equator = equator.Replace("<=", ">");
-                        }
-                        else if (equator.Contains(">="))
-                        {
-                            equator = equator.Replace(">=", "<");
-                        }
-
-                        if (statement.Contains("goto"))
-                        {
-                            var sentence = s;
-                            sentence = sentence.Replace(statement, "");
-                            sentence = sentence.Replace("then", statement);
-                            sentence += ";";
-                            code[index] = code[index].Replace(s, sentence);
-                        }
-                        else if (statement.Contains("print"))
-                        {
-                            statement = statement.Replace("print", "Console.Write(");
-                            var label = "label" + labelCounter;
-                            statement = " goto " + label + "; " + statement;
-                            statement += ");";
-                            equator += statement;
-                            code[index] = code[index].Replace(s, equator);
-                            statement = code[index + 2] + "\n" + label + ":";
-                            code[index + 2] = code[index + 2].Replace(code[index + 2], statement);
-                            ++labelCounter;
-                        }
-                        else if (statement.Contains("prompt"))
-                        {
-                            statement = statement.Replace("prompt", "Console.Write(");
-                            var label = "label" + labelCounter;
-                            statement = " goto " + label + "; " + statement;
-                            statement += ");";
-                            equator += statement;
-                            code[index] = code[index].Replace(s, equator);
-                            statement = code[index + 2] + "\n" + label + ":";
-                            code[index + 2] = code[index + 2].Replace(code[index + 2], statement);
-                            ++labelCounter;
-                        }
-                        else if (statement.Contains("let"))
-                        {
-                            statement = statement.Replace("let", "");
-                            var label = "label" + labelCounter;
-                            statement = " goto " + label + "; " + statement;
-                            statement += ";";
-                            equator += statement;
-                            code[index] = code[index].Replace(s, equator);
-                            statement = code[index + 2];
-                            statement += "\n" + label + ":";
-                            code[index + 2] = code[index + 2].Replace(code[index + 2], statement);
-                            ++labelCounter;
-                        }
-                        else
-                        {
-                            var label = "label" + labelCounter;
-                            statement += "goto " + label + ";";
-                            equator += statement;
-                            code[index] = code[index].Replace(s, equator);
-                            statement = code[index + 2];
-                            statement += statement + "\n" + label + ":";
-                            code[index + 2] = code[index + 2].Replace(code[index + 2], statement);
-                            ++labelCounter;
-                        }
+                        IfMethod(code, ref labelCounter, s, notModified, index);
 
                         Console.WriteLine("Line number " + code.IndexOf(notModified) + " type is if sentence " + notModified);
                     }
                     else if (s.IndexOf("goto", StringComparison.Ordinal) == 0)
                     {
-                        var sentence = s;
-                        sentence += ";";
-                        var index = code.IndexOf(notModified);
-                        code[index] = code[index].Replace(s, sentence);
+                        code[code.IndexOf(notModified)] = code[code.IndexOf(notModified)].Replace(s, notModified.Substring(0, notModified.IndexOf("goto")) +  s + ";");
 
                         Console.WriteLine("Line number " + code.IndexOf(notModified) + " type is goto sentence " + notModified);
                     }
@@ -247,10 +123,7 @@ namespace OptimizingParallelCompiler
                     }
                     else if (s.IndexOf("begin", StringComparison.Ordinal) == 0)
                     {
-                        var statement = s;
-                        statement = statement.Replace("begin", "");
-                        var index = code.IndexOf(notModified);
-                        code[index] = code[index].Replace(s, statement);
+                        code[code.IndexOf(notModified)] = "";
 
                         Console.WriteLine("Line number " + code.IndexOf(notModified) + " type is begin sentence " + notModified);
                     }
@@ -262,6 +135,149 @@ namespace OptimizingParallelCompiler
                         Console.WriteLine("Line number " + code.IndexOf(notModified) + " type is var sentence " + notModified);
                     }
                 });
+
+            var i = 0;
+
+            foreach (var item in lets)
+            {
+                code.Insert(item.Index + i, item.Statements);
+
+                ++i;
+            }
+
+            code.ForEach(s =>
+                {
+                    //creates an unmodified instance of the current line
+                    var notModified = s;
+                    //removes all trailing spaces and tabs
+                    s = s.Trim('\t', ' ');
+                    //counts the number of tabs or spaces for pretty code
+                    var count = s.Count(x => x.Equals('\t') || x.Equals(' '));
+
+                    if (s.IndexOf("let", StringComparison.Ordinal) == 0)
+                    {
+                        var sentence = s;
+                        sentence = sentence.Replace("let", "");
+                        sentence += ";";
+                        //var index = code.IndexOf(notModified);
+                        code[code.IndexOf(notModified)] = code[code.IndexOf(notModified)].Replace(s, sentence);
+
+                        Console.WriteLine("Line number " + code.IndexOf(notModified) + " type is let sentence " + notModified + " new sentence " + sentence);
+                    }
+                    //does the while loop
+                    if (s.IndexOf("while", StringComparison.Ordinal) == 0)
+                    {
+                        WhileTransform(count, notModified, s, code, ref labelCounter);
+
+                        Console.WriteLine("Line number " + code.IndexOf(notModified) + " type is while sentence " + notModified);
+                    }
+                    else if (s.IndexOf("endfor", StringComparison.Ordinal) == 0)
+                    {
+                        var index = code.IndexOf(notModified);
+                        //take the last string off the list
+                        code[index] = listOfEndFors[listOfEndFors.Count - 1];
+                        listOfEndFors.RemoveAt(listOfEndFors.Count - 1);
+
+                        Console.WriteLine("Line number " + code.IndexOf(notModified) + " type is endfor sentence " + notModified);
+                    }
+                    else if (s.IndexOf("for", StringComparison.Ordinal) == 0)
+                    {
+                        ForTransform(s, code, notModified, ref labelCounter, listOfEndFors);
+
+                        Console.WriteLine("Line number " + code.IndexOf(notModified) + " type is for sentence " + notModified);
+                    }
+                });
+        }
+
+        private static void IfMethod(List<string> code, ref int labelCounter, string s, string notModified, int index)
+        {
+            var statement = s.Substring(s.IndexOf("then", StringComparison.Ordinal) + "then".Length,
+                                        s.Length -
+                                        (s.IndexOf("then", StringComparison.Ordinal) + "then".Length));
+
+            var equator = s.Substring(0, s.IndexOf(")", StringComparison.Ordinal) + 1);
+
+            if (equator.Contains("!="))
+            {
+                equator = equator.Replace("!=", "==");
+            }
+            else if (equator.Contains("=="))
+            {
+                equator = equator.Replace("==", "!=");
+            }
+            else if (equator.Contains("<") && !equator.Contains("<="))
+            {
+                equator = equator.Replace("<", ">=");
+            }
+            else if (equator.Contains(">") && !equator.Contains(">="))
+            {
+                equator = equator.Replace(">", "<=");
+            }
+            else if (equator.Contains("<="))
+            {
+                equator = equator.Replace("<=", ">");
+            }
+            else if (equator.Contains(">="))
+            {
+                equator = equator.Replace(">=", "<");
+            }
+
+            if (statement.Contains("goto"))
+            {
+                var sentence = s;
+                sentence = sentence.Replace(statement, "");
+                sentence = sentence.Replace("then", statement);
+                sentence += ";";
+                code[index] = code[index].Replace(s, sentence);
+            }
+            else if (statement.Contains("print"))
+            {
+                statement = statement.Replace("print", "Console.Write(");
+                var label = "label" + labelCounter;
+                statement = " goto " + label + "; " + statement;
+                statement += ");";
+                equator += statement;
+                code[index] = code[index].Replace(s, equator);
+                statement = code[index + 2] + Environment.NewLine + label + ":";
+                code[index + 2] = code[index + 2].Replace(code[index + 2], statement);
+                ++labelCounter;
+            }
+            else if (statement.Contains("prompt"))
+            {
+                statement = statement.Replace("prompt", "Console.Write(");
+                var label = "label" + labelCounter;
+                statement = " goto " + label + "; " + statement;
+                statement += ");";
+                equator += statement;
+                code[index] = code[index].Replace(s, equator);
+                statement = code[index + 2] + Environment.NewLine + label + ":";
+                code[index + 2] = code[index + 2].Replace(code[index + 2], statement);
+                ++labelCounter;
+            }
+            else if (statement.Contains("let"))
+            {
+                statement = statement.Replace("let", "");
+                var label = "label" + labelCounter;
+                statement = " goto " + label + "; " + statement;
+                statement += ";";
+                equator += statement;
+                code[index] = code[index].Replace(s, equator);
+                statement = code[index + 2];
+                statement += Environment.NewLine + label + ":";
+                code[index + 2] = code[index + 2].Replace(code[index + 2], statement);
+                ++labelCounter;
+            }
+            else
+            {
+                var label = "label" + labelCounter;
+                statement += " goto " + label + ";";
+                equator += statement;
+                code[index] = code[index].Replace(s, notModified.Substring(0, notModified.IndexOf("if")) + equator);
+                statement = code[index + 2];
+                statement = label + ":";
+                code.Insert(index + 2, notModified.Substring(0, notModified.IndexOf("if")) + statement);
+                ++labelCounter;
+            }
         }
 
         private static void ForTransform(string s, List<string> code, string other, ref int labelCounter, List<string> listOfEndFors)
@@ -306,10 +322,10 @@ namespace OptimizingParallelCompiler
             var idx = value.Substring(2, value.IndexOf("=", StringComparison.Ordinal) - 2);
 
             var endForStringPart2 = "if (" + idx + " <= " + bound + ") goto " + label + ";";
-            endForStringPart2 += "\n";
+            endForStringPart2 += Environment.NewLine;
 
             code[index] = sentence;
-            endForString = endForStringPart1 + "\n";
+            endForString = endForStringPart1 + Environment.NewLine;
 
             endForString += "\t" + endForStringPart2;
 

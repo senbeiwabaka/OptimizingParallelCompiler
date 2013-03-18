@@ -20,6 +20,8 @@ namespace OptimizingParallelCompiler
         private string _possibleRightSideRedundant;
         private List<string> _boundVariables;
         private List<string> _incrementalVariables;
+        private List<ThreeOPCreation> letOPCode = new List<ThreeOPCreation>();
+
         public MainForm()
         {
             InitializeComponent();
@@ -95,7 +97,7 @@ namespace OptimizingParallelCompiler
         {
             var code = new List<string>(txtDeadCode.Lines);
            
-            Parser.Transform(code);
+            Parser.Transform(code, letOPCode);
 
             //clears the box of previous everything
             txtCSharpCode.Clear();
@@ -277,7 +279,7 @@ namespace OptimizingParallelCompiler
         {
             var threeOPCode = new List<string>(txtOneilCode.Lines);
 
-            ThreeOPConverter.Transform(threeOPCode);
+            letOPCode = ThreeOPConverter.Transform(threeOPCode);
 
             rtbThreeOPCode.Clear();
 
