@@ -10,7 +10,7 @@ namespace OptimizingParallelCompiler
         /// Transforms O'Neil code to C#
         /// </summary>
         /// <param name="code">Takes in a (referenced) list of type string of the code in the txtOneil textbox</param>
-        public static void Transform(List<string> code, List<ThreeOPCreation> lets)
+        public static void Transform(List<string> code, List<ThreeOPCreation> lets, List<ThreeOPCreation> intStatements)
         {
             var listOfEndFors = new List<string>();
 
@@ -19,6 +19,8 @@ namespace OptimizingParallelCompiler
             code[0] = code[0].Replace("title", "//");
 
             var labelCounter = 0;
+
+            var ifs = new List<int>();
 
             //one loop that transforms the code to c#
             code.ForEach(s =>
@@ -88,16 +90,12 @@ namespace OptimizingParallelCompiler
 
                         Console.WriteLine("Line number " + code.IndexOf(notModified) + " type is input sentence " + notModified);
                     }
-                    else if (s.IndexOf("int", StringComparison.Ordinal) == 0)
-                    {
-                        code[code.IndexOf(notModified)] = code[code.IndexOf(notModified)].Replace(s, notModified.Substring(0, notModified.IndexOf("int")) + s + ";");
-
-                        Console.WriteLine("Line number " + code.IndexOf(notModified) + " type is int sentence " + notModified);
-                    }
                     else if (s.IndexOf("if", StringComparison.Ordinal) == 0 && s.Contains("then"))
                     {
                         var index = code.IndexOf(notModified);
                         IfMethod(code, ref labelCounter, s, notModified, index);
+
+                        ifs.Add(index + 2);
 
                         Console.WriteLine("Line number " + code.IndexOf(notModified) + " type is if sentence " + notModified);
                     }
@@ -140,9 +138,24 @@ namespace OptimizingParallelCompiler
 
             foreach (var item in lets)
             {
-                code.Insert(item.Index + i, item.Statements);
-
+                foreach (var ifValue in ifs)
+                {
+                    if (ifValue > item.Index)
+                    {
+                        code.Insert(item.Index + i, item.Statements);
+                    }
+                    else
+                    {
+                        code.Insert(item.Index + 1 + i, item.Statements);
+                    }
+                }
                 ++i;
+            }
+
+            i = 0;
+            foreach (var item in intStatements)
+            {
+                code.Insert(item.Index + i, item.Statements);
             }
 
             code.ForEach(s =>
@@ -185,6 +198,12 @@ namespace OptimizingParallelCompiler
                         ForTransform(s, code, notModified, ref labelCounter, listOfEndFors);
 
                         Console.WriteLine("Line number " + code.IndexOf(notModified) + " type is for sentence " + notModified);
+                    }
+                    else if (s.IndexOf("int", StringComparison.Ordinal) == 0)
+                    {
+                        code[code.IndexOf(notModified)] = code[code.IndexOf(notModified)].Replace(s, notModified.Substring(0, notModified.IndexOf("int")) + s + ";");
+
+                        Console.WriteLine("Line number " + code.IndexOf(notModified) + " type is int sentence " + notModified);
                     }
                 });
         }
