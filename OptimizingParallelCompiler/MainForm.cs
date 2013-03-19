@@ -231,7 +231,7 @@ namespace OptimizingParallelCompiler
 
                     resultsReader.Close();
 
-                    RtbColor();
+                    //RtbColor();
 
                     _output = fileName;
                 }
@@ -281,7 +281,7 @@ namespace OptimizingParallelCompiler
         {
             var threeOPCode = new List<string>(txtOneilCode.Lines);
 
-            letOPCode = ThreeOPConverter.Transform(threeOPCode, out intStatements);
+            letOPCode = ThreeOPConverter.Transform(threeOPCode, intStatements);
 
             rtbThreeOPCode.Clear();
 
