@@ -136,21 +136,24 @@ namespace OptimizingParallelCompiler
 
             var i = 0;
 
-            foreach (var item in lets)
+            for (int j = 0; j < lets.Count; j++)
             {
-                foreach (var ifValue in ifs)
+                for (int k = 0; k < ifs.Count; k++)
                 {
-                    if (ifValue > item.Index)
+                    if (ifs[k] < lets[j].Index)
                     {
-                        code.Insert(item.Index + i, item.Statements);
-                    }
-                    else
-                    {
-                        code.Insert(item.Index + 1 + i, item.Statements);
+                        lets[j].Index++;
                     }
                 }
+            }
+
+            foreach (var item in lets)
+            {
+                code.Insert(item.Index + i, item.Statements);
                 ++i;
             }
+
+            intStatements.Reverse();
 
             i = 0;
             foreach (var item in intStatements)
