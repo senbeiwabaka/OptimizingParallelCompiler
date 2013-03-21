@@ -225,6 +225,10 @@ namespace OptimizingParallelCompiler
                         new StreamReader(Environment.CurrentDirectory + @"\oneilcode\" + fileName + ".txt");
 
                     txtOneilCode.Clear();
+                    rtbThreeOPCode.Clear();
+                    txtCSharpCode.Clear();
+                    txtDeadCode.Clear();
+                    txtError.Clear();
 
                     //Write O'Neil code to to Screen?
                     txtOneilCode.Text = resultsReader.ReadToEnd();
@@ -281,14 +285,26 @@ namespace OptimizingParallelCompiler
         {
             var threeOPCode = new List<string>(txtOneilCode.Lines);
 
-            letOPCode = ThreeOPConverter.Transform(threeOPCode, intStatements);
+            intStatements.Clear();
+            letOPCode.Clear();
+
+            ThreeOPConverter.Transform(threeOPCode, intStatements, letOPCode);
 
             rtbThreeOPCode.Clear();
 
             foreach (var variable in threeOPCode)
             {
-                rtbThreeOPCode.Text += variable + "\n";
+                if (!variable.StartsWith("end"))
+                {
+                    rtbThreeOPCode.Text += variable + "\n";
+                }
+                else
+                {
+                    rtbThreeOPCode.Text += variable;
+                }
             }
+
+            tabFirstTransform.SelectTab(0);
 
             deadCodeRemovalToolStripMenuItem.Enabled = true;
         }
