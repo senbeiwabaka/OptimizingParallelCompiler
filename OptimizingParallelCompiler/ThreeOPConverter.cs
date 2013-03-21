@@ -7,19 +7,13 @@ namespace OptimizingParallelCompiler
 {
     internal class ThreeOPConverter
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="code"></param>
-        public static List<ThreeOPCreation> Transform(List<string> code, List<ThreeOPCreation> intStatements)
+        public static void Transform(List<string> code, List<ThreeOPCreation> generate, List<ThreeOPCreation> letStatementCreation)
         {
             var counter = 0;
-            //var intStatments = new List<ThreeOPCreation>();
-            var letStatementCreation = new List<ThreeOPCreation>();
 
             code.ForEach(x =>
                 {
-                    var nonModifiedStatement = x;
+                    var original = x;
 
                     x = x.Trim(' ', '\t');
 
@@ -30,204 +24,117 @@ namespace OptimizingParallelCompiler
                     {
                         afterEqual = x.Substring(x.IndexOf("=") + 1, x.Length - (x.IndexOf("=") + 1));
                         beforeEqual = x.Substring(0, x.IndexOf("="));
-                        Console.WriteLine(afterEqual);
-                        Console.WriteLine(beforeEqual);
                     }
                     else
                     {
                         afterEqual = x;
-                        Console.WriteLine(afterEqual);
                     }
 
-                    var index = code.IndexOf(nonModifiedStatement);
+                    var index = code.IndexOf(original);
 
                     if (x.StartsWith("let", StringComparison.Ordinal))
                     {
-                        LetBeforeEqualTransformation(code, nonModifiedStatement, ref beforeEqual, ref counter, intStatements, letStatementCreation);
-                        nonModifiedStatement = code[index];
+                        LetBeforeEqualTransformation(ref original, ref beforeEqual, ref counter, generate, letStatementCreation, index);
 
-                        LetAfterEqualTransformation(code, nonModifiedStatement, afterEqual, ref counter, intStatements, letStatementCreation);
+                        code[index] = original;
 
-                        nonModifiedStatement = code[index];
+                        LetAfterEqualTransformation(ref original, ref afterEqual, ref counter, generate, letStatementCreation, index);
 
-                        LetParenthesisTransformation(code, nonModifiedStatement, afterEqual, ref counter, intStatements, letStatementCreation);
-                    }
-                    else if (x.StartsWith("if"))
-                    {
-                        if (Regex.Matches(x, "[[]").Count == 1)
+                        code[index] = original;
+
+                        LetParenthesisTransformation(ref original, ref afterEqual, ref counter, generate, letStatementCreation, index);
+
+                        code[index] = original;
+
+                        var elements = new List<string>();
+                        afterEqual = afterEqual.Trim(' ');
+
+                        ValueExtration(elements, afterEqual);
+
+                        if (Regex.Matches(afterEqual, "[-+*/%]").Count < 2)
                         {
-                            var indexBracketFront = x.IndexOf("[", 0, StringComparison.Ordinal);
-                            var indexBracketEnd = x.IndexOf("]", 0, StringComparison.Ordinal);
-                            var arrayName = x.Substring(x.IndexOf("(", StringComparison.Ordinal) + 1,
-                                                            indexBracketFront - x.IndexOf("(", StringComparison.Ordinal) - 1);
-                            var arrayIndex = x.Substring(indexBracketFront + 1, (indexBracketEnd - 1) - indexBracketFront);
-
-                            intStatements.Add(new ThreeOPCreation { Index = 2, Statements = "int t_" + counter });
-                            index = code.IndexOf(nonModifiedStatement);
-
-                            var c = counter;
-                            letStatementCreation.Add(new ThreeOPCreation { Index = index, Statements = "let " + "t_" + counter++ + " = " + arrayIndex });
-                            letStatementCreation.Add(new ThreeOPCreation { Index = index, Statements = "let " + "t_" + counter + " = " + arrayName + "[t_" + c + "]" });
-                            intStatements.Add(new ThreeOPCreation { Index = 2, Statements = "int t_" + counter });
-
-                            code[index] = "if (t_" + counter++ + x.Substring(indexBracketEnd + 1, x.Length - (indexBracketEnd + 1));
+                            elements.Clear();
                         }
-                        else
-                        {
-                            var parenthesis = x.Substring(x.IndexOf("(") + 1, (x.IndexOf(")") - 1) - x.IndexOf("("));
-                            Console.WriteLine(parenthesis);
-                            var amount = Regex.Matches(parenthesis, "[-+/*]").Count;
 
-                            var returned = EquatorTypeAmount(parenthesis);
+                        OderOfOperations(ref original, afterEqual, elements, ref counter, generate, letStatementCreation, index);
 
-                            if (returned.SpacesBefore > 1)
-                            {
-                                intStatements.Add(new ThreeOPCreation { Index = 2, Statements = "int t_" + counter });
-                                var elements = new List<string>();
-
-                                ValueExtration(elements, parenthesis);
-
-                                letStatementCreation.Add(new ThreeOPCreation { Index = code.IndexOf(nonModifiedStatement), Statements = nonModifiedStatement.Substring(0, nonModifiedStatement.IndexOf("if", StringComparison.Ordinal)) + "let t_" + counter + " = " + elements });
-
-                                parenthesis = nonModifiedStatement.Substring(0, nonModifiedStatement.IndexOf("if", StringComparison.Ordinal)) + "if (t_" + counter++ + " " + parenthesis + nonModifiedStatement.Substring(nonModifiedStatement.IndexOf(")", StringComparison.Ordinal), nonModifiedStatement.Length - nonModifiedStatement.IndexOf(")", StringComparison.Ordinal));
-
-                                code[code.IndexOf(nonModifiedStatement)] = parenthesis;
-
-                                Console.WriteLine(x.IndexOf(parenthesis));
-                            }
-                        }
-                    }
-                    else if (x.StartsWith("print", StringComparison.Ordinal))
-                    {
-                        Print(code, nonModifiedStatement, ref x, ref counter, letStatementCreation, intStatements);
+                        code[index] = original;
                     }
                 });
-
-            return letStatementCreation;
         }
 
-        private static void Print(List<string> code, string nonModifiedStatement, ref string x, ref int counter, List<ThreeOPCreation> lets, List<ThreeOPCreation> ints)
+        private static void LetBeforeEqualTransformation(ref string originalStatement, ref string beforeEqual, ref int counter, List<ThreeOPCreation> generate, List<ThreeOPCreation> lets, int index)
         {
-            if (Regex.Matches(x, "[[]").Count == 1)
+            if (Regex.Matches(beforeEqual, "[[]").Count > 0)
             {
-                var indexBracketFront = x.IndexOf("[", 0, StringComparison.Ordinal);
-                var indexBracketEnd = x.IndexOf("]", 0, StringComparison.Ordinal);
-                var arrayIndex = x.Substring(indexBracketFront + 1, (indexBracketEnd - 1) - indexBracketFront);
-
-                ints.Add(new ThreeOPCreation { Index = 2, Statements = "int t_" + counter });
-                //intStatements += "int t_" + counter + Environment.NewLine;
-
-                if (Regex.Matches(arrayIndex, "[-+*/]").Count > 0)
-                {
-                    code[code.IndexOf(nonModifiedStatement)] = code[code.IndexOf(nonModifiedStatement)].Replace(arrayIndex, "t_" + counter);
-                    x = x.Replace(arrayIndex, "t_" + counter);
-
-                    var lastSpace = x.LastIndexOf(" ", StringComparison.Ordinal);
-                    var arrayName = x.Substring(lastSpace + 1, indexBracketFront - lastSpace - 1);
-
-                    var c = counter;
-                    lets.Add(new ThreeOPCreation { Index = code.IndexOf(nonModifiedStatement), Statements = nonModifiedStatement.Substring(0, nonModifiedStatement.IndexOf("print", StringComparison.Ordinal)) + "let " + "t_" + counter++ + " = " + arrayIndex });
-                    lets.Add(new ThreeOPCreation { Index = code.IndexOf(nonModifiedStatement), Statements = nonModifiedStatement.Substring(0, nonModifiedStatement.IndexOf("print", StringComparison.Ordinal)) + "let " + "t_" + counter + " = " + arrayName + "[t_" + c + "]" });
-                    //lets.Add(code.IndexOf(nonModifiedStatement), nonModifiedStatement.Substring(0, nonModifiedStatement.IndexOf("print", StringComparison.Ordinal)) + "let " + "t_" + counter++ + " = " + arrayIndex + Environment.NewLine + nonModifiedStatement.Substring(0, nonModifiedStatement.IndexOf("print", StringComparison.Ordinal)) + "let " + "t_" + counter + " = " + arrayName + "[t_" + c + "]");
-                    ints.Add(new ThreeOPCreation { Index = 2, Statements = "int t_" + counter });
-                    //intStatements += "int t_" + counter + Environment.NewLine;
-
-                    code[code.IndexOf(nonModifiedStatement)] = code[code.IndexOf(nonModifiedStatement)].Replace(arrayName + "[t_" + c + "]", "t_" + counter++);
-                }
-                else
-                {
-                    var lastSpace = x.LastIndexOf(" ", StringComparison.Ordinal);
-                    var arrayName = x.Substring(lastSpace + 1, indexBracketFront - lastSpace - 1);
-
-                    var c = counter;
-                    lets.Add(new ThreeOPCreation { Index = code.IndexOf(nonModifiedStatement), Statements = nonModifiedStatement.Substring(0, nonModifiedStatement.IndexOf("print", StringComparison.Ordinal)) + "let " + "t_" + counter++ + " = " + arrayIndex });
-                    lets.Add(new ThreeOPCreation { Index = code.IndexOf(nonModifiedStatement), Statements = nonModifiedStatement.Substring(0, nonModifiedStatement.IndexOf("print", StringComparison.Ordinal)) + "let " + "t_" + counter + " = " + arrayName + "[t_" + c + "]" });
-                    //lets.Add(code.IndexOf(nonModifiedStatement), nonModifiedStatement.Substring(0, nonModifiedStatement.IndexOf("print", StringComparison.Ordinal)) + "let " + "t_" + counter++ + " = " + arrayIndex + Environment.NewLine + nonModifiedStatement.Substring(0, nonModifiedStatement.IndexOf("print", StringComparison.Ordinal)) + "let " + "t_" + counter + " = " + arrayName + "[t_" + c + "]");
-                    ints.Add(new ThreeOPCreation { Index = 2, Statements = "int t_" + counter });
-                    //intStatements += "int t_" + counter + Environment.NewLine;
-
-                    code[code.IndexOf(nonModifiedStatement)] = code[code.IndexOf(nonModifiedStatement)].Replace(arrayName + "[" + arrayIndex + "]", "t_" + counter++);
-                    Console.WriteLine(lastSpace);
-                }
-            }
-        }
-
-        private static void LetBeforeEqualTransformation(List<string> code, string nonModifiedStatement, ref string statement, ref int counter, List<ThreeOPCreation> ints, List<ThreeOPCreation> lets)
-        {
-            if (Regex.Matches(statement, "[[]").Count > 0)
-            {
-                var indexBracketFront = statement.IndexOf("[", 0, StringComparison.Ordinal);
-                var indexBracketEnd = statement.IndexOf("]", 0, StringComparison.Ordinal);
+                var indexBracketFront = beforeEqual.IndexOf("[", 0, StringComparison.Ordinal);
+                var indexBracketEnd = beforeEqual.IndexOf("]", 0, StringComparison.Ordinal);
 
                 var result = 0;
                 var replace = string.Empty;
 
                 if (
                     int.TryParse(
-                        statement.Substring(indexBracketFront + 1, (indexBracketEnd - 1) - indexBracketFront),
+                        beforeEqual.Substring(indexBracketFront + 1, (indexBracketEnd - 1) - indexBracketFront),
                         out result) == false)
                 {
-                    ints.Add(new ThreeOPCreation { Index = 2, Statements = "int t_" + counter });
-                    //intStatements += "int t_" + counter + Environment.NewLine;
+                    generate.Add(new ThreeOPCreation { Index = 2, Statements = "int t_" + counter });
+
                     lets.Add(new ThreeOPCreation
                     {
-                        Index = code.IndexOf(nonModifiedStatement),
-                        Statements = nonModifiedStatement.Substring(0, nonModifiedStatement.IndexOf("let")) + "let " + "t_" + counter + " = " +
-                            statement.Substring(indexBracketFront + 1,
+                        Index = index,
+                        Statements = originalStatement.Substring(0, originalStatement.IndexOf("let")) + "let " + "t_" + counter + " = " +
+                            beforeEqual.Substring(indexBracketFront + 1,
                             (indexBracketEnd - 1) - indexBracketFront)
                     });
-                    //letStatement = "let " + "t_" + counter + " = " + line.Substring(indexBracketFront + 1,                                   (indexBracketEnd - 1) - indexBracketFront) + Environment.NewLine;
 
                     replace = "let" +
-                              statement.Substring(statement.IndexOf(" ", StringComparison.Ordinal),
-                                             indexBracketFront - statement.IndexOf(" ", StringComparison.Ordinal)) +
+                              beforeEqual.Substring(beforeEqual.IndexOf(" ", StringComparison.Ordinal),
+                                             indexBracketFront - beforeEqual.IndexOf(" ", StringComparison.Ordinal)) +
                               "[t_" + counter++ +
-                              statement.Substring(indexBracketEnd, (statement.Length) - indexBracketEnd);
+                              beforeEqual.Substring(indexBracketEnd, (beforeEqual.Length) - indexBracketEnd);
                 }
-
-                //lets.Add(new ThreeOPCreation { Index = code.IndexOf(nonModifiedStatement), Statements = letStatement });
 
                 if (!string.IsNullOrEmpty(replace))
                 {
-                    code[code.IndexOf(nonModifiedStatement)] = code[code.IndexOf(nonModifiedStatement)].Replace(statement, replace);
+                    originalStatement = originalStatement.Replace(beforeEqual, replace);
                 }
             }
         }
 
-        private static void LetAfterEqualTransformation(List<string> code, string nonModifiedStatement, string statement, ref int counter, List<ThreeOPCreation> ints, List<ThreeOPCreation> lets)
+        private static void LetAfterEqualTransformation(ref string originalStatement, ref string afterEqual, ref int counter, List<ThreeOPCreation> ints, List<ThreeOPCreation> lets, int index)
         {
             var letStatement = string.Empty;
-            if (Regex.Matches(statement, "[[]").Count > 0)
+            if (Regex.Matches(afterEqual, "[[]").Count > 0)
             {
-                var countBracket = Regex.Matches(statement, "[[]").Count;
+                var countBracket = Regex.Matches(afterEqual, "[[]").Count;
 
                 var result = 0;
                 var replace = string.Empty;
-                var index = code.IndexOf(nonModifiedStatement);
 
                 while (countBracket > 0)
                 {
-                    if (Regex.Matches(statement.Substring(0, statement.IndexOf("[")), " ").Count > 1)
+                    if (Regex.Matches(afterEqual.Substring(0, afterEqual.IndexOf("[")), " ").Count > 1)
                     {
-                        var arrayname = statement.Substring(0, statement.IndexOf("["));
+                        var arrayname = afterEqual.Substring(0, afterEqual.IndexOf("["));
                         var spaceindex = arrayname.LastIndexOf(" ");
-                        statement = statement.Substring(spaceindex);
-                        Console.WriteLine(statement);
+                        afterEqual = afterEqual.Substring(spaceindex);
+                        Console.WriteLine(afterEqual);
                     }
 
-                    var indexBracketFront = statement.IndexOf("[", 0, StringComparison.Ordinal);
-                    var indexBracketEnd = statement.IndexOf("]", 0, StringComparison.Ordinal);
+                    var indexBracketFront = afterEqual.IndexOf("[", 0, StringComparison.Ordinal);
+                    var indexBracketEnd = afterEqual.IndexOf("]", 0, StringComparison.Ordinal);
 
-                    var arrayIndex = statement.Substring(indexBracketFront + 1,
+                    var arrayIndex = afterEqual.Substring(indexBracketFront + 1,
                                                          (indexBracketEnd - 1) - indexBracketFront);
 
                     if (int.TryParse(arrayIndex, out result))
                     {
                         ints.Add(new ThreeOPCreation { Index = 2, Statements = "int t_" + counter });
-                        var arrayName = statement.Substring(statement.IndexOf(" ", StringComparison.Ordinal),
-                                                            indexBracketFront - statement.IndexOf(" ", StringComparison.Ordinal));
-                        letStatement = nonModifiedStatement.Substring(0, nonModifiedStatement.IndexOf("let")) + "let t_" + counter + " = " + arrayName + "[" + arrayIndex + "]";
-                        code[index] = code[index].Replace(arrayName + "[" + arrayIndex + "]", " t_" + counter++);
+                        var arrayName = afterEqual.Substring(afterEqual.IndexOf(" ", StringComparison.Ordinal),
+                                                            indexBracketFront - afterEqual.IndexOf(" ", StringComparison.Ordinal));
+                        letStatement = originalStatement.Substring(0, originalStatement.IndexOf("let")) + "let t_" + counter + " = " + arrayName + "[" + arrayIndex + "]";
+                        originalStatement = originalStatement.Replace(arrayName + "[" + arrayIndex + "]", " t_" + counter++);
                     }
                     else
                     {
@@ -238,25 +145,25 @@ namespace OptimizingParallelCompiler
                         lets.Add(new ThreeOPCreation
                         {
                             Index = index,
-                            Statements = nonModifiedStatement.Substring(0, nonModifiedStatement.IndexOf("let")) + "let " + "t_" + counter++ + " = " +
+                            Statements = originalStatement.Substring(0, originalStatement.IndexOf("let")) + "let " + "t_" + counter++ + " = " +
                                 arrayIndex
                         });
                         ints.Add(new ThreeOPCreation { Index = 2, Statements = "int t_" + counter });
                         //intStatements += "int t_" + counter + Environment.NewLine;
-                        letStatement = nonModifiedStatement.Substring(0, nonModifiedStatement.IndexOf("let")) + "let t_" + counter + " = " + statement.Substring(statement.IndexOf(" ", StringComparison.Ordinal) + 1,
-                             indexBracketFront - (statement.IndexOf(" ", StringComparison.Ordinal) + 1)) + "[" + previousInt + "]";
-                        var arrayname = statement.Substring(0, indexBracketFront);
+                        letStatement = originalStatement.Substring(0, originalStatement.IndexOf("let")) + "let t_" + counter + " = " + afterEqual.Substring(afterEqual.IndexOf(" ", StringComparison.Ordinal) + 1,
+                             indexBracketFront - (afterEqual.IndexOf(" ", StringComparison.Ordinal) + 1)) + "[" + previousInt + "]";
+                        var arrayname = afterEqual.Substring(0, indexBracketFront);
                         if (Regex.IsMatch(arrayname, " "))
                         {
                             arrayname = arrayname.Substring(arrayname.IndexOf(" "));
                         }
 
-                        code[index] = code[index].Replace(arrayname + "[" + arrayIndex + "]", " t_" + counter++);
+                        originalStatement = originalStatement.Replace(arrayname + "[" + arrayIndex + "]", " t_" + counter++);
                     }
 
-                    if (statement.Length > indexBracketEnd + 2)
+                    if (afterEqual.Length > indexBracketEnd + 2)
                     {
-                        statement = statement.Substring(indexBracketEnd + 2);
+                        afterEqual = afterEqual.Substring(indexBracketEnd + 2);
                     }
 
                     lets.Add(new ThreeOPCreation { Index = index, Statements = letStatement });
@@ -264,98 +171,125 @@ namespace OptimizingParallelCompiler
                     --countBracket;
                 }
             }
+
+            afterEqual = originalStatement.Substring(originalStatement.IndexOf("=") + 1);
         }
 
-        private static void LetParenthesisTransformation(List<string> code, string nonModifiedStatement, string statement, ref int counter, List<ThreeOPCreation> ints, List<ThreeOPCreation> lets)
+        private static void LetParenthesisTransformation(ref string originalStatement, ref string afterEqual, ref int counter, List<ThreeOPCreation> ints, List<ThreeOPCreation> lets, int index)
         {
-            var index = code.IndexOf(nonModifiedStatement);
-            if (Regex.Matches(statement, "[(]").Count > 0)
+            if (Regex.Matches(afterEqual, "[(]").Count > 0)
             {
-                Console.WriteLine("first index = " + statement.IndexOf("(").ToString());
-                Console.WriteLine("last index = " + statement.LastIndexOf("(").ToString());
-                var isNested = statement.LastIndexOf("(") - statement.IndexOf("(") == 1 ? true : false;
+                var isNested = afterEqual.LastIndexOf("(") - afterEqual.IndexOf("(") == 1 ? true : false;
                 var elements = new List<string>();
                 if (isNested)
                 {
+                    while (isNested)
+                    {
+                        ValueExtration(elements, afterEqual.Substring(afterEqual.LastIndexOf("(") + 1, afterEqual.IndexOf(")") - afterEqual.LastIndexOf("(") - 1));
+                        OderOfOperations(ref originalStatement, afterEqual.Substring(afterEqual.LastIndexOf("("), afterEqual.IndexOf(")") - afterEqual.LastIndexOf("(") + 1), elements, ref counter, ints, lets, index);
+                        afterEqual = originalStatement.Substring(originalStatement.IndexOf("=") + 1);
+                        isNested = afterEqual.LastIndexOf("(") - afterEqual.IndexOf("(") == 1 ? true : false;
+                    }
 
-                    ValueExtration(elements, statement.Substring(statement.LastIndexOf("(") + 1, statement.IndexOf(")") - statement.LastIndexOf("(") - 1));
-                    OderOfOperations(ref counter, ints, lets, code, ref nonModifiedStatement, elements, statement.Substring(statement.LastIndexOf("("), statement.IndexOf(")") - statement.LastIndexOf("(") + 1));
-                    //var index = code.IndexOf(nonModifiedStatement);
-                    //lets.Add(new ThreeOPCreation { Index = index, Statements = addition });
-                    //lets.Add(index, addition);
-                    
-                    //code[index] = nonModifiedStatement;
-                    Console.WriteLine(nonModifiedStatement);
-                    index = code.IndexOf(nonModifiedStatement);
-                    Console.WriteLine(code[index]);
+                    ValueExtration(elements, afterEqual.Substring(afterEqual.IndexOf("(") + 1, afterEqual.IndexOf(")") - afterEqual.IndexOf("(") - 1));
+                    OderOfOperations(ref originalStatement, afterEqual.Substring(afterEqual.IndexOf("("), afterEqual.IndexOf(")") - afterEqual.IndexOf("(") + 1), elements, ref counter, ints, lets, index);
+
+                    afterEqual = originalStatement.Substring(originalStatement.IndexOf("=") + 1);
                 }
                 else
                 {
-                    for (int i = 0; i <= Regex.Matches(statement, "[(]").Count; i++)
+                    for (int i = 0; i <= Regex.Matches(afterEqual, "[(]").Count; i++)
                     {
-                        ValueExtration(elements, statement.Substring(statement.IndexOf("(") + 1, statement.IndexOf(")") - statement.IndexOf("(") - 1));
-                        OderOfOperations(ref counter, ints, lets, code, ref nonModifiedStatement, elements, statement.Substring(statement.IndexOf("("), statement.IndexOf(")") - statement.IndexOf("(") + 1));
-                        statement = statement.Substring(0, statement.IndexOf("(")) + statement.Substring(statement.IndexOf(")") + 1, statement.Length - statement.IndexOf(")") - 1);
-                        Console.WriteLine(nonModifiedStatement);
-                        index = code.IndexOf(nonModifiedStatement);
-                        Console.WriteLine(code[index]);
+                        ValueExtration(elements, afterEqual.Substring(afterEqual.IndexOf("(") + 1, afterEqual.IndexOf(")") - afterEqual.IndexOf("(") - 1));
+                        OderOfOperations(ref originalStatement, afterEqual.Substring(afterEqual.IndexOf("("), afterEqual.IndexOf(")") - afterEqual.IndexOf("(") + 1), elements, ref counter, ints, lets, index);
+                        afterEqual = originalStatement.Substring(originalStatement.IndexOf("=") + 1);
                     }
                 }
             }
         }
 
-        private static void OderOfOperations(ref int counter, List<ThreeOPCreation> ints, List<ThreeOPCreation> lets, List<string> code, ref string nonModifiedStatement, List<string> elements, string statement)
+        private static void OderOfOperations(ref string originalStatement, string statement, List<string> elements, ref int counter, List<ThreeOPCreation> ints, List<ThreeOPCreation> lets, int index)
         {
+            var changedString = statement;
+
+            if (elements.Count == 0 || elements == null)
+            {
+                return;
+            }
+
             var previousInt = "t_" + counter;
             var i = 0;
-            var addition = string.Empty;
-            while (elements.Count > 1)
+            while (elements.Count > 1 && elements.Count > i)
             {
                 if (elements.Count > 1)
                 {
                     if (elements[i] == "*" || elements[i] == "/" || elements[i] == "%")
                     {
                         ints.Add(new ThreeOPCreation { Index = 2, Statements = "int t_" + counter });
-                        //intStatements += "int t_" + counter + Environment.NewLine;
-                        
-                        var before = nonModifiedStatement.Substring(0, nonModifiedStatement.IndexOf("l"));
-                        addition += before + "let t_" + counter + " = " + ((i - 1) < 0 ? previousInt : elements[i - 1]) + elements[i] + elements[i + 1] + Environment.NewLine;
-                        lets.Add(new ThreeOPCreation { Index = code.IndexOf(nonModifiedStatement), Statements = before + "let t_" + counter + " = " + ((i - 1) < 0 ? previousInt : elements[i - 1]) + elements[i] + elements[i + 1] });
+                        lets.Add(new ThreeOPCreation { Index = index, Statements = originalStatement.Substring(0, originalStatement.IndexOf("l")) + "let t_" + counter + " = " + ((i - 1) < 0 ? previousInt : elements[i - 1]) + elements[i] + elements[i + 1] });
+                        changedString = changedString.Replace(((i - 1) < 0 ? previousInt : elements[i - 1]) + " " + elements[i] + " " + elements[i + 1], "t_" + counter);
+
                         elements.RemoveRange(((i - 1) < 0 ? 0 : i - 1), ((i - 1) < 0 ? 2 : 3));
-                        Console.WriteLine(addition);
-                        
                         previousInt = "t_" + counter;
                         elements.Insert(i - 1, previousInt);
                         counter++;
 
-                        i = 0;
-                    }
-                    else if (elements[i] == "+" && i > (elements.IndexOf("*") > 0 ? elements.IndexOf("*") : elements.IndexOf("/")))
-                    {
-                        ints.Add(new ThreeOPCreation { Index = 2, Statements = "int t_" + counter });
-                        //intStatements += "int t_" + counter + Environment.NewLine;
-
-                        var before = nonModifiedStatement.Substring(0, nonModifiedStatement.IndexOf("l"));
-                        addition += before + "let t_" + counter + " = " + ((i - 1) < 0 ? previousInt : elements[i - 1]) + elements[i] + elements[i + 1] + Environment.NewLine;
-                        lets.Add(new ThreeOPCreation { Index = code.IndexOf(nonModifiedStatement), Statements = before + "let t_" + counter + " = " + ((i - 1) < 0 ? previousInt : elements[i - 1]) + elements[i] + elements[i + 1] });
-                        elements.RemoveRange(((i - 1) < 0 ? 0 : i - 1), ((i - 1) < 0 ? 2 : 3));
-                        Console.WriteLine(addition);
-                        previousInt = "t_" + counter;
-                        elements.Insert(i - 1, previousInt);
-                        counter++;
                         i = 0;
                     }
                     else
                     {
-                        i++;
+                        ++i;
                     }
+                }
+            }
+
+            originalStatement = originalStatement.Replace(statement, changedString);
+            statement = statement.Replace(statement, changedString);
+
+            if (Regex.Matches(originalStatement.Substring(originalStatement.IndexOf("=") + 1), "[-+/*%]").Count <= 1)
+            {
+                changedString = changedString.Replace("(", "");
+                changedString = changedString.Replace(")", "");
+                originalStatement = originalStatement.Replace(statement, changedString);
+                elements.Clear();
+                return;
+            }
+
+            i = 0;
+            while (elements.Count > 1)
+            {
+                originalStatement = originalStatement.Replace(statement, changedString);
+                statement = statement.Replace(statement, changedString);
+
+                if (Regex.Matches(originalStatement.Substring(originalStatement.IndexOf("=") + 1), "[-+/*%]").Count <= 1)
+                {
+                    changedString = changedString.Replace("(", "");
+                    changedString = changedString.Replace(")", "");
+                    originalStatement = originalStatement.Replace(statement, changedString);
+                    elements.Clear();
+                    return;
+                }
+
+                if (elements[i] == "+" || elements[i] == "-")
+                {
+                    ints.Add(new ThreeOPCreation { Index = 2, Statements = "int t_" + counter });
+                    lets.Add(new ThreeOPCreation { Index = index, Statements = originalStatement.Substring(0, originalStatement.IndexOf("l")) + "let t_" + counter + " = " + ((i - 1) < 0 ? previousInt : elements[i - 1]) + elements[i] + elements[i + 1] });
+                    changedString = changedString.Replace(((i - 1) < 0 ? previousInt : elements[i - 1]) + " " + elements[i] + " " + elements[i + 1], "t_" + counter);
+                    elements.RemoveRange(((i - 1) < 0 ? 0 : i - 1), ((i - 1) < 0 ? 2 : 3));
+                    previousInt = "t_" + counter;
+                    elements.Insert(i - 1, previousInt);
+                    counter++;
+                    i = 0;
+                }
+                else
+                {
+                    ++i;
                 }
             }
 
             elements.Clear();
 
-            code[code.IndexOf(nonModifiedStatement)] = code[code.IndexOf(nonModifiedStatement)].Replace(statement, previousInt);
-            nonModifiedStatement = nonModifiedStatement.Replace(statement, previousInt);
+            originalStatement = originalStatement.Replace(statement, previousInt);
         }
 
         private static void ValueExtration(List<string> words, string statment)
