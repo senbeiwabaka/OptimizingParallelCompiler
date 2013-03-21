@@ -93,9 +93,9 @@ namespace OptimizingParallelCompiler
                     else if (s.IndexOf("if", StringComparison.Ordinal) == 0 && s.Contains("then"))
                     {
                         var index = code.IndexOf(notModified);
-                        IfMethod(code, ref labelCounter, s, notModified, index);
+                        IfMethod(code, ref labelCounter, s, notModified, index, ifs);
 
-                        ifs.Add(index + 2);
+                        
 
                         Console.WriteLine("Line number " + code.IndexOf(notModified) + " type is if sentence " + notModified);
                     }
@@ -135,18 +135,23 @@ namespace OptimizingParallelCompiler
                 });
 
             var i = 0;
-
-            for (int j = 0; j < lets.Count; j++)
+            while(i < ifs.Count)
             {
-                for (int k = 0; k < ifs.Count; k++)
+                for (int k = 0; k < lets.Count; k++)
                 {
-                    if (ifs[k] < lets[j].Index)
+                    if (lets[k].Index > ifs[i])
                     {
-                        lets[j].Index++;
+                        Console.WriteLine(lets[k].Index);
+                        lets[k].Index++;
+                        //ifs.RemoveAt(i);
+                        //i = 0;
+                        Console.WriteLine(lets[k].Index);
                     }
                 }
+                ++i;
             }
 
+            i = 0;
             foreach (var item in lets)
             {
                 code.Insert(item.Index + i, item.Statements);
@@ -211,7 +216,7 @@ namespace OptimizingParallelCompiler
                 });
         }
 
-        private static void IfMethod(List<string> code, ref int labelCounter, string s, string notModified, int index)
+        private static void IfMethod(List<string> code, ref int labelCounter, string s, string notModified, int index, List<int> ifs)
         {
             var statement = s.Substring(s.IndexOf("then", StringComparison.Ordinal) + "then".Length,
                                         s.Length -
@@ -263,17 +268,22 @@ namespace OptimizingParallelCompiler
                 statement = code[index + 2] + Environment.NewLine + label + ":";
                 code[index + 2] = code[index + 2].Replace(code[index + 2], statement);
                 ++labelCounter;
+
+                ifs.Add(index + 2);
             }
             else if (statement.Contains("prompt"))
             {
                 statement = statement.Replace("prompt", "Console.Write(");
                 var label = "label" + labelCounter;
-                statement = " goto " + label + "; " + statement;
+                //statement = " goto " + label + "; " + statement;
                 statement += ");";
-                equator += statement;
+                equator += " goto " + label + ";";
                 code[index] = code[index].Replace(s, equator);
-                statement = code[index + 2] + Environment.NewLine + label + ":";
-                code[index + 2] = code[index + 2].Replace(code[index + 2], statement);
+                code.Insert(index + 1, statement + Environment.NewLine + label + ":");
+                //statement = code[index + 2] + Environment.NewLine + label + ":";
+                //code[index + 2] = code[index + 2].Length == 0 ? code[index + 2] = statement : code[index + 2].Replace(code[index + 2], statement);
+
+                ifs.Add(index + 2);
                 ++labelCounter;
             }
             else if (statement.Contains("let"))
@@ -288,6 +298,8 @@ namespace OptimizingParallelCompiler
                 statement += Environment.NewLine + label + ":";
                 code[index + 2] = code[index + 2].Replace(code[index + 2], statement);
                 ++labelCounter;
+
+                ifs.Add(index + 2);
             }
             else
             {
@@ -299,6 +311,8 @@ namespace OptimizingParallelCompiler
                 statement = label + ":";
                 code.Insert(index + 2, notModified.Substring(0, notModified.IndexOf("if")) + statement);
                 ++labelCounter;
+
+                ifs.Add(index + 2);
             }
         }
 
