@@ -17,26 +17,24 @@ namespace OptimizingParallelCompiler
 
                     x = x.Trim(' ', '\t');
 
-                    var afterEqual = string.Empty;
-                    var beforeEqual = string.Empty;
-
-                    if (x.StartsWith("let"))
-                    {
-                        afterEqual = x.Substring(x.IndexOf("=") + 1, x.Length - (x.IndexOf("=") + 1));
-                        beforeEqual = x.Substring(0, x.IndexOf("="));
-                    }
-                    else
-                    {
-                        afterEqual = x;
-                    }
+                    var afterEqual = x;
 
                     var index = code.IndexOf(original);
 
                     if (x.StartsWith("let", StringComparison.Ordinal))
                     {
-                        LetBeforeEqualTransformation(ref original, ref beforeEqual, ref counter, generate, letStatementCreation, index);
+                        afterEqual = x.Substring(x.IndexOf("=") + 1, x.Length - (x.IndexOf("=") + 1));
+                        var beforeEqual = x.Substring(0, x.IndexOf("="));
+
+                        //Console.WriteLine("original statement : " + original);
+                        //Console.WriteLine("before equal : " + beforeEqual);
+
+                        OneArrayTransformation(ref original, beforeEqual, ref counter, generate, letStatementCreation, index, "let");
 
                         code[index] = original;
+
+                        //Console.WriteLine("original statement : " + original);
+                        //Console.WriteLine("code : " + code[index]);
 
                         LetAfterEqualTransformation(ref original, ref afterEqual, ref counter, generate, letStatementCreation, index);
 
@@ -60,10 +58,74 @@ namespace OptimizingParallelCompiler
 
                         code[index] = original;
                     }
+                    else if (x.StartsWith("print", StringComparison.Ordinal))
+                    {
+                        //Console.WriteLine("original statement : " + original);
+                        //Console.WriteLine("trimmed statement : " + x);
+
+                        OneArrayTransformation(ref original, x, ref counter, generate, letStatementCreation, index, "print");
+
+                        code[index] = original;
+
+                        //Console.WriteLine("original statement : " + original);
+                        //Console.WriteLine("code statement : " + code[index]);
+                    }
+                    else if (x.StartsWith("if", StringComparison.Ordinal))
+                    {
+                        //Console.WriteLine("original statement : " + original);
+                        //Console.WriteLine("trimmed statement : " + x);
+
+                        //var begin = afterEqual.Substring(0, afterEqual.IndexOf(")"));
+
+                        if (afterEqual.Contains("let"))
+                        {
+                            var begin = afterEqual.Substring(0, afterEqual.IndexOf(")") + 1);
+                            Console.WriteLine("beginning of if statement : " + begin);
+                            afterEqual = afterEqual.Substring(afterEqual.IndexOf("then") + "then".Length);
+                            Console.WriteLine("let statement : " + afterEqual);
+                            var equator = EquatorTypeAmount(begin.Substring(begin.IndexOf("(") + 1, begin.IndexOf(")") - begin.IndexOf("(") - 1));
+                            begin = afterEqual.Substring(0, afterEqual.IndexOf("="));
+                            afterEqual = afterEqual.Substring(afterEqual.IndexOf("=") + 1);
+                            OneArrayTransformation(ref original, begin, ref counter, generate, letStatementCreation, index, " let");
+                            Console.WriteLine("original statement : " + original);
+                            Console.WriteLine("code statement : " + code[index]);
+                            OneArrayTransformation(ref original, original.Substring(original.IndexOf("(") + 1, original.IndexOf(equator.Type) - original.IndexOf("(") - 1), ref counter, generate, letStatementCreation, index, "if");
+                            Console.WriteLine("original statement : " + original);
+                            Console.WriteLine("code statement : " + code[index]);
+
+                            LetAfterEqualTransformation(ref original, ref afterEqual, ref counter, generate, letStatementCreation, index);
+                            Console.WriteLine("original statement : " + original);
+                            Console.WriteLine("code statement : " + code[index]);
+
+                            code[index] = original;
+                        }
+                        else
+                        {
+                            //var between = afterEqual.Substring(0, afterEqual.IndexOf(")") + 1);
+                            var equator = EquatorTypeAmount(afterEqual.Substring(afterEqual.IndexOf("(") + 1, afterEqual.IndexOf(")") - afterEqual.IndexOf("(") - 1));
+
+                            OneArrayTransformation(ref original, original.Substring(original.IndexOf("(") + 1, original.IndexOf(equator.Type) - original.IndexOf("(") - 1), ref counter, generate, letStatementCreation, index, "if");
+                            Console.WriteLine(original.Substring(original.IndexOf(equator.Type) + equator.Type.Length, original.IndexOf(")") - original.IndexOf(equator.Type) - equator.Type.Length));
+                            OneArrayTransformation(ref original, original.Substring(original.IndexOf(equator.Type) + equator.Type.Length, original.IndexOf(")") - original.IndexOf(equator.Type) - equator.Type.Length), ref counter, generate, letStatementCreation, index, "if");
+                            Console.WriteLine(original);
+                            equator = EquatorTypeAmount(original.Substring(original.IndexOf("(") + 1, original.IndexOf(")") - original.IndexOf("(") - 1));
+                            if (equator.SpacesBefore > 1 || equator.SpacesAfter > 1)
+                            {
+                                var between = equator.SpacesBefore > 1 ? original.Substring(original.IndexOf("(") + 1, original.IndexOf(equator.Type) - original.IndexOf("(") - 1) : original.Substring(original.IndexOf(equator.Type) + equator.Type.Length, original.IndexOf(")") - original.IndexOf(equator.Type) - equator.Type.Length);
+                                //LetParenthesisTransformation(ref original, ref between, ref counter, generate, letStatementCreation, index);
+                                var elements = new List<string>();
+                                ValueExtration(elements, between);
+                                OderOfOperations(ref original, between, elements, ref counter, generate, letStatementCreation, index);
+                                Console.WriteLine(original);
+                            }
+
+                            code[index] = original;
+                        }
+                    }
                 });
         }
 
-        private static void LetBeforeEqualTransformation(ref string originalStatement, ref string beforeEqual, ref int counter, List<ThreeOPCreation> generate, List<ThreeOPCreation> lets, int index)
+        private static void OneArrayTransformation(ref string originalStatement, string beforeEqual, ref int counter, List<ThreeOPCreation> generate, List<ThreeOPCreation> lets, int index, string type)
         {
             if (Regex.Matches(beforeEqual, "[[]").Count > 0)
             {
@@ -83,21 +145,44 @@ namespace OptimizingParallelCompiler
                     lets.Add(new ThreeOPCreation
                     {
                         Index = index,
-                        Statements = originalStatement.Substring(0, originalStatement.IndexOf("let")) + "let " + "t_" + counter + " = " +
+                        Statements = originalStatement.Substring(0, originalStatement.IndexOf(type)) + "let " + "t_" + counter + " = " +
                             beforeEqual.Substring(indexBracketFront + 1,
                             (indexBracketEnd - 1) - indexBracketFront)
                     });
 
-                    replace = "let" +
+                    replace = (!type.Contains("if") ? type +
                               beforeEqual.Substring(beforeEqual.IndexOf(" ", StringComparison.Ordinal),
                                              indexBracketFront - beforeEqual.IndexOf(" ", StringComparison.Ordinal)) +
                               "[t_" + counter++ +
-                              beforeEqual.Substring(indexBracketEnd, (beforeEqual.Length) - indexBracketEnd);
-                }
+                              beforeEqual.Substring(indexBracketEnd, (beforeEqual.Length) - indexBracketEnd) :
+                              beforeEqual.Substring(0, indexBracketFront - 1) + "[t_" + counter++ + "]");
 
-                if (!string.IsNullOrEmpty(replace))
-                {
+                    if (type.Contains("print") || type.Contains("if"))
+                    {
+                        originalStatement = originalStatement.Replace(beforeEqual, replace);
+                        beforeEqual = beforeEqual.Replace(beforeEqual, replace);
+
+                        indexBracketEnd = beforeEqual.IndexOf("]", 0, StringComparison.Ordinal);
+
+                        generate.Add(new ThreeOPCreation { Index = 2, Statements = "int t_" + counter });
+
+                        var arrayName = !type.Contains("if") ? beforeEqual.Substring(beforeEqual.IndexOf(" ", StringComparison.Ordinal),
+                                                            indexBracketFront - beforeEqual.IndexOf(" ", StringComparison.Ordinal))
+                                                            : beforeEqual.Substring(0, indexBracketFront - 1);
+                        lets.Add(new ThreeOPCreation
+                        {
+                            Index = index,
+                            Statements = originalStatement.Substring(0, originalStatement.IndexOf(type)) + "let " + "t_" + counter + " = " +
+                                arrayName + " " + beforeEqual.Substring(indexBracketFront,
+                                indexBracketEnd - indexBracketFront + 1)
+                        });
+
+                        replace = (type == "print" ? type + " t_" + counter++ : " t_" + counter++ + " ");
+                    }
+
                     originalStatement = originalStatement.Replace(beforeEqual, replace);
+
+                    Console.WriteLine(originalStatement);
                 }
             }
         }
@@ -119,7 +204,6 @@ namespace OptimizingParallelCompiler
                         var arrayname = afterEqual.Substring(0, afterEqual.IndexOf("["));
                         var spaceindex = arrayname.LastIndexOf(" ");
                         afterEqual = afterEqual.Substring(spaceindex);
-                        Console.WriteLine(afterEqual);
                     }
 
                     var indexBracketFront = afterEqual.IndexOf("[", 0, StringComparison.Ordinal);
@@ -139,9 +223,7 @@ namespace OptimizingParallelCompiler
                     else
                     {
                         ints.Add(new ThreeOPCreation { Index = 2, Statements = "int t_" + counter });
-                        //intStatements += "int t_" + counter + Environment.NewLine;
                         var previousInt = "t_" + counter;
-                        //letStatement += "let " + "t_" + counter++ + " = " + arrayIndex + Environment.NewLine;
                         lets.Add(new ThreeOPCreation
                         {
                             Index = index,
@@ -149,7 +231,6 @@ namespace OptimizingParallelCompiler
                                 arrayIndex
                         });
                         ints.Add(new ThreeOPCreation { Index = 2, Statements = "int t_" + counter });
-                        //intStatements += "int t_" + counter + Environment.NewLine;
                         letStatement = originalStatement.Substring(0, originalStatement.IndexOf("let")) + "let t_" + counter + " = " + afterEqual.Substring(afterEqual.IndexOf(" ", StringComparison.Ordinal) + 1,
                              indexBracketFront - (afterEqual.IndexOf(" ", StringComparison.Ordinal) + 1)) + "[" + previousInt + "]";
                         var arrayname = afterEqual.Substring(0, indexBracketFront);
@@ -319,36 +400,27 @@ namespace OptimizingParallelCompiler
 
             if (statement.IndexOf("!=") > 0)
             {
-                Console.WriteLine("!=");
                 type = "!=";
                 amount = 2;
                 spacesBefore = Regex.Matches(s.Substring(0, s.IndexOf(type)), " ").Count;
-                Console.WriteLine(spacesBefore);
                 spacesAfter = Regex.Matches(s.Substring(s.IndexOf(type)+ 1), " ").Count;
-                Console.WriteLine(spacesBefore);
             }
             else if (statement.IndexOf(">") > 0)
             {
                 statement = statement.Substring(statement.IndexOf(">"), 2);
                 if (statement == ">=")
                 {
-                    Console.WriteLine(">=");
                     type = ">=";
                     amount = 2;
                     spacesBefore = Regex.Matches(s.Substring(0, s.IndexOf(type)), " ").Count;
-                    Console.WriteLine(spacesBefore);
                     spacesAfter = Regex.Matches(s.Substring(s.IndexOf(type) + 1), " ").Count;
-                    Console.WriteLine(spacesBefore);
                 }
                 else
                 {
-                    Console.WriteLine(">");
                     type = ">";
                     amount = 1;
                     spacesBefore = Regex.Matches(s.Substring(0, s.IndexOf(type)), " ").Count;
-                    Console.WriteLine(spacesBefore);
                     spacesAfter = Regex.Matches(s.Substring(s.IndexOf(type) + 1), " ").Count;
-                    Console.WriteLine(spacesBefore);
                 }
             }
             else if (statement.IndexOf("<") > 0)
@@ -356,23 +428,17 @@ namespace OptimizingParallelCompiler
                 statement = statement.Substring(statement.IndexOf("<"), 2);
                 if (statement == "<=")
                 {
-                    Console.WriteLine("<=");
                     type = "<=";
                     amount = 2;
                     spacesBefore = Regex.Matches(s.Substring(0, s.IndexOf(type)), " ").Count;
-                    Console.WriteLine(spacesBefore);
                     spacesAfter = Regex.Matches(s.Substring(s.IndexOf(type) + 1), " ").Count;
-                    Console.WriteLine(spacesBefore);
                 }
                 else
                 {
-                    Console.WriteLine("<");
                     type = "<";
                     amount = 1;
                     spacesBefore = Regex.Matches(s.Substring(0, s.IndexOf(type)), " ").Count;
-                    Console.WriteLine(spacesBefore);
                     spacesAfter = Regex.Matches(s.Substring(s.IndexOf(type) + 1), " ").Count;
-                    Console.WriteLine(spacesBefore);
                 }
             }
             else if (statement.IndexOf("=") > 0)
@@ -380,23 +446,17 @@ namespace OptimizingParallelCompiler
                 statement = statement.Substring(statement.IndexOf("="), 2);
                 if (statement == "==")
                 {
-                    Console.WriteLine("==");
                     type = "==";
                     amount = 2;
                     spacesBefore = Regex.Matches(s.Substring(0, s.IndexOf(type)), " ").Count;
-                    Console.WriteLine(spacesBefore);
                     spacesAfter = Regex.Matches(s.Substring(s.IndexOf(type) + 1), " ").Count;
-                    Console.WriteLine(spacesBefore);
                 }
                 else
                 {
-                    Console.WriteLine("=");
                     type = "=";
                     amount = 1;
                     spacesBefore = Regex.Matches(s.Substring(0, s.IndexOf(type)), " ").Count;
-                    Console.WriteLine(spacesBefore);
                     spacesAfter = Regex.Matches(s.Substring(s.IndexOf(type) + 1), " ").Count;
-                    Console.WriteLine(spacesBefore);
                 }
             }
 
