@@ -59,14 +59,15 @@
             this.rtbThreeOPCode = new System.Windows.Forms.RichTextBox();
             this.lineNumbersForRichText3 = new LineNumbersControlForRichTextBox.LineNumbersForRichText();
             this.tbpDeadCodeRemoval = new System.Windows.Forms.TabPage();
-            this.tbpOneilCodeCSharp = new System.Windows.Forms.TabPage();
             this.txtDeadCode = new System.Windows.Forms.RichTextBox();
             this.lineNumbersForRichText4 = new LineNumbersControlForRichTextBox.LineNumbersForRichText();
+            this.tbpCSharp = new System.Windows.Forms.TabPage();
+            this.tbpOutPut = new System.Windows.Forms.TabPage();
             this.menuStrip1.SuspendLayout();
             this.tabFirstTransform.SuspendLayout();
             this.tbpThreeOPCode.SuspendLayout();
             this.tbpDeadCodeRemoval.SuspendLayout();
-            this.tbpOneilCodeCSharp.SuspendLayout();
+            this.tbpCSharp.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -262,10 +263,10 @@
             // 
             // txtCSharpCode
             // 
-            this.txtCSharpCode.Location = new System.Drawing.Point(46, 0);
+            this.txtCSharpCode.Location = new System.Drawing.Point(27, 0);
             this.txtCSharpCode.Name = "txtCSharpCode";
             this.txtCSharpCode.ReadOnly = true;
-            this.txtCSharpCode.Size = new System.Drawing.Size(460, 395);
+            this.txtCSharpCode.Size = new System.Drawing.Size(479, 395);
             this.txtCSharpCode.TabIndex = 2;
             this.txtCSharpCode.Text = "";
             this.txtCSharpCode.MouseDown += new System.Windows.Forms.MouseEventHandler(this.txtCSharpCode_MouseDown);
@@ -305,7 +306,7 @@
             this.lineNumbersForRichText1.LineNumbersClippedByItemRectangle = true;
             this.lineNumbersForRichText1.LineNumbersLeadingZeroes = true;
             this.lineNumbersForRichText1.LineNumbersOffset = new System.Drawing.Size(0, 0);
-            this.lineNumbersForRichText1.Location = new System.Drawing.Point(25, 0);
+            this.lineNumbersForRichText1.Location = new System.Drawing.Point(6, 0);
             this.lineNumbersForRichText1.Margin = new System.Windows.Forms.Padding(0);
             this.lineNumbersForRichText1.MarginLinesColor = System.Drawing.Color.SlateGray;
             this.lineNumbersForRichText1.MarginLinesSide = LineNumbersControlForRichTextBox.LineNumbersForRichText.LineNumberDockSide.Right;
@@ -362,9 +363,10 @@
             // 
             // tabFirstTransform
             // 
+            this.tabFirstTransform.Controls.Add(this.tbpOutPut);
             this.tabFirstTransform.Controls.Add(this.tbpThreeOPCode);
             this.tabFirstTransform.Controls.Add(this.tbpDeadCodeRemoval);
-            this.tabFirstTransform.Controls.Add(this.tbpOneilCodeCSharp);
+            this.tabFirstTransform.Controls.Add(this.tbpCSharp);
             this.tabFirstTransform.Location = new System.Drawing.Point(436, 29);
             this.tabFirstTransform.Name = "tabFirstTransform";
             this.tabFirstTransform.SelectedIndex = 0;
@@ -439,18 +441,6 @@
             this.tbpDeadCodeRemoval.Text = "Dead Code Removal";
             this.tbpDeadCodeRemoval.UseVisualStyleBackColor = true;
             // 
-            // tbpOneilCodeCSharp
-            // 
-            this.tbpOneilCodeCSharp.Controls.Add(this.lineNumbersForRichText1);
-            this.tbpOneilCodeCSharp.Controls.Add(this.txtCSharpCode);
-            this.tbpOneilCodeCSharp.Location = new System.Drawing.Point(4, 22);
-            this.tbpOneilCodeCSharp.Name = "tbpOneilCodeCSharp";
-            this.tbpOneilCodeCSharp.Padding = new System.Windows.Forms.Padding(3);
-            this.tbpOneilCodeCSharp.Size = new System.Drawing.Size(506, 395);
-            this.tbpOneilCodeCSharp.TabIndex = 1;
-            this.tbpOneilCodeCSharp.Text = "O\'Neil Code - C#";
-            this.tbpOneilCodeCSharp.UseVisualStyleBackColor = true;
-            // 
             // txtDeadCode
             // 
             this.txtDeadCode.Location = new System.Drawing.Point(26, 0);
@@ -496,6 +486,27 @@
             this.lineNumbersForRichText4.Size = new System.Drawing.Size(20, 395);
             this.lineNumbersForRichText4.TabIndex = 3;
             // 
+            // tbpCSharp
+            // 
+            this.tbpCSharp.Controls.Add(this.lineNumbersForRichText1);
+            this.tbpCSharp.Controls.Add(this.txtCSharpCode);
+            this.tbpCSharp.Location = new System.Drawing.Point(4, 22);
+            this.tbpCSharp.Name = "tbpCSharp";
+            this.tbpCSharp.Padding = new System.Windows.Forms.Padding(3);
+            this.tbpCSharp.Size = new System.Drawing.Size(506, 395);
+            this.tbpCSharp.TabIndex = 1;
+            this.tbpCSharp.Text = "O\'Neil Code - C#";
+            this.tbpCSharp.UseVisualStyleBackColor = true;
+            // 
+            // tbpOutPut
+            // 
+            this.tbpOutPut.Location = new System.Drawing.Point(4, 22);
+            this.tbpOutPut.Name = "tbpOutPut";
+            this.tbpOutPut.Size = new System.Drawing.Size(506, 395);
+            this.tbpOutPut.TabIndex = 3;
+            this.tbpOutPut.Text = "Depenency Output";
+            this.tbpOutPut.UseVisualStyleBackColor = true;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -514,7 +525,7 @@
             this.tabFirstTransform.ResumeLayout(false);
             this.tbpThreeOPCode.ResumeLayout(false);
             this.tbpDeadCodeRemoval.ResumeLayout(false);
-            this.tbpOneilCodeCSharp.ResumeLayout(false);
+            this.tbpCSharp.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -548,7 +559,7 @@
         private LineNumbersControlForRichTextBox.LineNumbersForRichText lineNumbersForRichText2;
         private System.Windows.Forms.TabControl tabFirstTransform;
         private System.Windows.Forms.TabPage tbpThreeOPCode;
-        private System.Windows.Forms.TabPage tbpOneilCodeCSharp;
+        private System.Windows.Forms.TabPage tbpCSharp;
         private LineNumbersControlForRichTextBox.LineNumbersForRichText lineNumbersForRichText3;
         private System.Windows.Forms.RichTextBox rtbThreeOPCode;
         private System.Windows.Forms.ToolStripMenuItem oPCodeToolStripMenuItem;
@@ -556,6 +567,7 @@
         private System.Windows.Forms.TabPage tbpDeadCodeRemoval;
         private System.Windows.Forms.RichTextBox txtDeadCode;
         private LineNumbersControlForRichTextBox.LineNumbersForRichText lineNumbersForRichText4;
+        private System.Windows.Forms.TabPage tbpOutPut;
     }
 }
 

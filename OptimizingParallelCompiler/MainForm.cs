@@ -106,10 +106,12 @@ namespace OptimizingParallelCompiler
             //puts the transformed code to the other text box for visual inspection
             foreach (var lines in code)
             {
-                txtCSharpCode.Text += lines + "\n";
+                //txtCSharpCode.Text += lines + "\n";
             }
 
-            tabFirstTransform.SelectTab(2);
+            txtCSharpCode.Lines = code.ToArray();
+
+            tabFirstTransform.SelectTab("tbpCSharp");
 
             compileToolStripMenuItem.Enabled = true;
         }
@@ -304,7 +306,7 @@ namespace OptimizingParallelCompiler
                 }
             }
 
-            tabFirstTransform.SelectTab(0);
+            tabFirstTransform.SelectTab("tbpThreeOPCode");
 
             deadCodeRemovalToolStripMenuItem.Enabled = true;
         }
@@ -496,7 +498,7 @@ namespace OptimizingParallelCompiler
         private void deadCodeRemovalToolStripMenuItem_Click(object sender, EventArgs e)
         {
             txtDeadCode.Text = rtbThreeOPCode.Text;
-            tabFirstTransform.SelectTab(1);
+            tabFirstTransform.SelectTab("tbpDeadCodeRemoval");
             convertToolStripMenuItem.Enabled = true;
         }
     }
