@@ -58,12 +58,16 @@ namespace OptimizingParallelCompiler
 
                         code[index] = original;
                     }
-                    else if (x.StartsWith("print", StringComparison.Ordinal))
+                    else if (x.StartsWith("print", StringComparison.Ordinal) && x.Contains("["))
                     {
                         //Console.WriteLine("original statement : " + original);
                         //Console.WriteLine("trimmed statement : " + x);
 
-                        OneArrayTransformation(ref original, x, ref counter, generate, letStatementCreation, index, "print");
+                        var array = x.Substring(0, x.IndexOf("["));
+                        array = array.Substring(array.LastIndexOf(" ") + 1);
+                        array += x.Substring(x.IndexOf("["), x.IndexOf("]") - x.IndexOf("[")) + "]";
+
+                        OneArrayTransformation(ref original, array, ref counter, generate, letStatementCreation, index, "print");
 
                         code[index] = original;
 
@@ -77,50 +81,54 @@ namespace OptimizingParallelCompiler
 
                         //var begin = afterEqual.Substring(0, afterEqual.IndexOf(")"));
 
-                        if (afterEqual.Contains("let"))
+                        if (x.Contains("let"))
                         {
-                            var begin = afterEqual.Substring(0, afterEqual.IndexOf(")") + 1);
-                            Console.WriteLine("beginning of if statement : " + begin);
-                            afterEqual = afterEqual.Substring(afterEqual.IndexOf("then") + "then".Length);
-                            Console.WriteLine("let statement : " + afterEqual);
-                            var equator = EquatorTypeAmount(begin.Substring(begin.IndexOf("(") + 1, begin.IndexOf(")") - begin.IndexOf("(") - 1));
-                            begin = afterEqual.Substring(0, afterEqual.IndexOf("="));
-                            afterEqual = afterEqual.Substring(afterEqual.IndexOf("=") + 1);
-                            OneArrayTransformation(ref original, begin, ref counter, generate, letStatementCreation, index, " let");
-                            Console.WriteLine("original statement : " + original);
-                            Console.WriteLine("code statement : " + code[index]);
-                            OneArrayTransformation(ref original, original.Substring(original.IndexOf("(") + 1, original.IndexOf(equator.Type) - original.IndexOf("(") - 1), ref counter, generate, letStatementCreation, index, "if");
-                            Console.WriteLine("original statement : " + original);
-                            Console.WriteLine("code statement : " + code[index]);
+                            code.Insert(index + 1, x.Substring(x.IndexOf("then") + "then".Length));
 
-                            LetAfterEqualTransformation(ref original, ref afterEqual, ref counter, generate, letStatementCreation, index);
+                            original = original.Replace(x.Substring(x.IndexOf("then") + "then".Length), "");
+                            x = x.Substring(0, x.IndexOf("then") + "then".Length);
+
                             Console.WriteLine("original statement : " + original);
                             Console.WriteLine("code statement : " + code[index]);
 
                             code[index] = original;
-                        }
-                        else
-                        {
-                            //var between = afterEqual.Substring(0, afterEqual.IndexOf(")") + 1);
-                            var equator = EquatorTypeAmount(afterEqual.Substring(afterEqual.IndexOf("(") + 1, afterEqual.IndexOf(")") - afterEqual.IndexOf("(") - 1));
 
-                            OneArrayTransformation(ref original, original.Substring(original.IndexOf("(") + 1, original.IndexOf(equator.Type) - original.IndexOf("(") - 1), ref counter, generate, letStatementCreation, index, "if");
-                            Console.WriteLine(original.Substring(original.IndexOf(equator.Type) + equator.Type.Length, original.IndexOf(")") - original.IndexOf(equator.Type) - equator.Type.Length));
-                            OneArrayTransformation(ref original, original.Substring(original.IndexOf(equator.Type) + equator.Type.Length, original.IndexOf(")") - original.IndexOf(equator.Type) - equator.Type.Length), ref counter, generate, letStatementCreation, index, "if");
+                            //var equator = EquatorTypeAmount(begin.Substring(begin.IndexOf("(") + 1, begin.IndexOf(")") - begin.IndexOf("(") - 1));
+                            //begin = afterEqual.Substring(0, afterEqual.IndexOf("="));
+                            //afterEqual = afterEqual.Substring(afterEqual.IndexOf("=") + 1);
+                            //OneArrayTransformation(ref original, begin, ref counter, generate, letStatementCreation, index, " let");
+                            //Console.WriteLine("original statement : " + original);
+                            //Console.WriteLine("code statement : " + code[index]);
+                            //OneArrayTransformation(ref original, original.Substring(original.IndexOf("(") + 1, original.IndexOf(equator.Type) - original.IndexOf("(") - 1), ref counter, generate, letStatementCreation, index, "if");
+                            //Console.WriteLine("original statement : " + original);
+                            //Console.WriteLine("code statement : " + code[index]);
+
+                            //LetAfterEqualTransformation(ref original, ref afterEqual, ref counter, generate, letStatementCreation, index);
+                            //Console.WriteLine("original statement : " + original);
+                            //Console.WriteLine("code statement : " + code[index]);
+
+                            //code[index] = original;
+                        }
+                        //var between = afterEqual.Substring(0, afterEqual.IndexOf(")") + 1);
+                        var equator = EquatorTypeAmount(afterEqual.Substring(afterEqual.IndexOf("(") + 1, afterEqual.IndexOf(")") - afterEqual.IndexOf("(") - 1));
+
+                        OneArrayTransformation(ref original, original.Substring(original.IndexOf("(") + 1, original.IndexOf(equator.Type) - original.IndexOf("(") - 1), ref counter, generate, letStatementCreation, index, "if");
+                        Console.WriteLine(original.Substring(original.IndexOf(equator.Type) + equator.Type.Length, original.IndexOf(")") - original.IndexOf(equator.Type) - equator.Type.Length));
+                        OneArrayTransformation(ref original, original.Substring(original.IndexOf(equator.Type) + equator.Type.Length, original.IndexOf(")") - original.IndexOf(equator.Type) - equator.Type.Length), ref counter, generate, letStatementCreation, index, "if");
+                        Console.WriteLine(original);
+                        equator = EquatorTypeAmount(original.Substring(original.IndexOf("(") + 1, original.IndexOf(")") - original.IndexOf("(") - 1));
+                        if (equator.SpacesBefore > 1 || equator.SpacesAfter > 1)
+                        {
+                            var between = equator.SpacesBefore > 1 ? original.Substring(original.IndexOf("(") + 1, original.IndexOf(equator.Type) - original.IndexOf("(") - 1) : original.Substring(original.IndexOf(equator.Type) + equator.Type.Length, original.IndexOf(")") - original.IndexOf(equator.Type) - equator.Type.Length);
+                            //LetParenthesisTransformation(ref original, ref between, ref counter, generate, letStatementCreation, index);
+                            var elements = new List<string>();
+                            between = between.Trim(' ');
+                            ValueExtration(elements, between);
+                            OderOfOperations(ref original, between, elements, ref counter, generate, letStatementCreation, index, "if");
                             Console.WriteLine(original);
-                            equator = EquatorTypeAmount(original.Substring(original.IndexOf("(") + 1, original.IndexOf(")") - original.IndexOf("(") - 1));
-                            if (equator.SpacesBefore > 1 || equator.SpacesAfter > 1)
-                            {
-                                var between = equator.SpacesBefore > 1 ? original.Substring(original.IndexOf("(") + 1, original.IndexOf(equator.Type) - original.IndexOf("(") - 1) : original.Substring(original.IndexOf(equator.Type) + equator.Type.Length, original.IndexOf(")") - original.IndexOf(equator.Type) - equator.Type.Length);
-                                //LetParenthesisTransformation(ref original, ref between, ref counter, generate, letStatementCreation, index);
-                                var elements = new List<string>();
-                                ValueExtration(elements, between);
-                                OderOfOperations(ref original, between, elements, ref counter, generate, letStatementCreation, index);
-                                Console.WriteLine(original);
-                            }
-
-                            code[index] = original;
                         }
+
+                        code[index] = original;
                     }
                 });
         }
@@ -150,12 +158,16 @@ namespace OptimizingParallelCompiler
                             (indexBracketEnd - 1) - indexBracketFront)
                     });
 
-                    replace = (!type.Contains("if") ? type +
-                              beforeEqual.Substring(beforeEqual.IndexOf(" ", StringComparison.Ordinal),
-                                             indexBracketFront - beforeEqual.IndexOf(" ", StringComparison.Ordinal)) +
-                              "[t_" + counter++ +
-                              beforeEqual.Substring(indexBracketEnd, (beforeEqual.Length) - indexBracketEnd) :
-                              beforeEqual.Substring(0, indexBracketFront - 1) + "[t_" + counter++ + "]");
+                    var previous = "t_" + counter;
+
+                    //replace = (!type.Contains("if") ? type +
+                    //          beforeEqual.Substring(beforeEqual.IndexOf(" ", StringComparison.Ordinal),
+                    //                         indexBracketFront - beforeEqual.IndexOf(" ", StringComparison.Ordinal)) +
+                    //          "[t_" + counter++ +
+                    //          beforeEqual.Substring(indexBracketEnd, (beforeEqual.Length) - indexBracketEnd) :
+                    //          beforeEqual.Substring(0, indexBracketFront - 1) + "[t_" + counter++ + "]");
+
+                    replace = beforeEqual.Substring(0, indexBracketFront) + "[t_" + counter++ + "]";
 
                     if (type.Contains("print") || type.Contains("if"))
                     {
@@ -166,18 +178,19 @@ namespace OptimizingParallelCompiler
 
                         generate.Add(new ThreeOPCreation { Index = 2, Statements = "int t_" + counter });
 
-                        var arrayName = !type.Contains("if") ? beforeEqual.Substring(beforeEqual.IndexOf(" ", StringComparison.Ordinal),
-                                                            indexBracketFront - beforeEqual.IndexOf(" ", StringComparison.Ordinal))
-                                                            : beforeEqual.Substring(0, indexBracketFront - 1);
+                        //var arrayName = !type.Contains("if") ? beforeEqual.Substring(beforeEqual.IndexOf(" ", StringComparison.Ordinal),
+                        //                                    indexBracketFront - beforeEqual.IndexOf(" ", StringComparison.Ordinal))
+                        //                                    : beforeEqual.Substring(0, indexBracketFront - 1);
+                        var arrayName = beforeEqual.Substring(0, indexBracketFront);
                         lets.Add(new ThreeOPCreation
                         {
                             Index = index,
                             Statements = originalStatement.Substring(0, originalStatement.IndexOf(type)) + "let " + "t_" + counter + " = " +
-                                arrayName + " " + beforeEqual.Substring(indexBracketFront,
-                                indexBracketEnd - indexBracketFront + 1)
+                                arrayName + "[" + previous + "]"
                         });
 
-                        replace = (type == "print" ? type + " t_" + counter++ : " t_" + counter++ + " ");
+                        //replace = (type == "print" ? type + " t_" + counter++ : " t_" + counter++ + " ");
+                        replace = " t_" + counter++ + " ";
                     }
 
                     originalStatement = originalStatement.Replace(beforeEqual, replace);
@@ -289,12 +302,13 @@ namespace OptimizingParallelCompiler
             }
         }
 
-        private static void OderOfOperations(ref string originalStatement, string statement, List<string> elements, ref int counter, List<ThreeOPCreation> ints, List<ThreeOPCreation> lets, int index)
+        private static void OderOfOperations(ref string originalStatement, string statement, List<string> elements, ref int counter, List<ThreeOPCreation> ints, List<ThreeOPCreation> lets, int index, string type = "")
         {
             var changedString = statement;
 
-            if (elements.Count == 0 || elements == null)
+            if (elements.Count <= 2 || elements == null)
             {
+                elements.Clear();
                 return;
             }
 
@@ -302,32 +316,41 @@ namespace OptimizingParallelCompiler
             var i = 0;
             while (elements.Count > 1 && elements.Count > i)
             {
-                if (elements.Count > 1)
+                originalStatement = originalStatement.Replace(statement, changedString);
+                statement = statement.Replace(statement, changedString);
+
+                if (Regex.Matches(originalStatement.Substring(originalStatement.IndexOf("=") + 1), "[-+/*%]").Count <= 1 && type != "if")
                 {
-                    if (elements[i] == "*" || elements[i] == "/" || elements[i] == "%")
-                    {
-                        ints.Add(new ThreeOPCreation { Index = 2, Statements = "int t_" + counter });
-                        lets.Add(new ThreeOPCreation { Index = index, Statements = originalStatement.Substring(0, originalStatement.IndexOf("l")) + "let t_" + counter + " = " + ((i - 1) < 0 ? previousInt : elements[i - 1]) + elements[i] + elements[i + 1] });
-                        changedString = changedString.Replace(((i - 1) < 0 ? previousInt : elements[i - 1]) + " " + elements[i] + " " + elements[i + 1], "t_" + counter);
+                    changedString = changedString.Replace("(", "");
+                    changedString = changedString.Replace(")", "");
+                    originalStatement = originalStatement.Replace(statement, changedString);
+                    elements.Clear();
+                    return;
+                }
 
-                        elements.RemoveRange(((i - 1) < 0 ? 0 : i - 1), ((i - 1) < 0 ? 2 : 3));
-                        previousInt = "t_" + counter;
-                        elements.Insert(i - 1, previousInt);
-                        counter++;
+                if (elements[i] == "*" || elements[i] == "/" || elements[i] == "%")
+                {
+                    ints.Add(new ThreeOPCreation { Index = 2, Statements = "int t_" + counter });
+                    lets.Add(new ThreeOPCreation { Index = index, Statements = originalStatement.Substring(0, originalStatement.IndexOf(type)) + "let t_" + counter + " = " + ((i - 1) < 0 ? previousInt : elements[i - 1]) + elements[i] + elements[i + 1] });
+                    changedString = changedString.Replace(((i - 1) < 0 ? previousInt : elements[i - 1]) + " " + elements[i] + " " + elements[i + 1], "t_" + counter);
 
-                        i = 0;
-                    }
-                    else
-                    {
-                        ++i;
-                    }
+                    elements.RemoveRange(((i - 1) < 0 ? 0 : i - 1), ((i - 1) < 0 ? 2 : 3));
+                    previousInt = "t_" + counter;
+                    elements.Insert(i - 1, previousInt);
+                    counter++;
+
+                    i = 0;
+                }
+                else
+                {
+                    ++i;
                 }
             }
 
             originalStatement = originalStatement.Replace(statement, changedString);
             statement = statement.Replace(statement, changedString);
 
-            if (Regex.Matches(originalStatement.Substring(originalStatement.IndexOf("=") + 1), "[-+/*%]").Count <= 1)
+            if (Regex.Matches(originalStatement.Substring(originalStatement.IndexOf("=") + 1), "[-+/*%]").Count <= 1 && type != "if")
             {
                 changedString = changedString.Replace("(", "");
                 changedString = changedString.Replace(")", "");
@@ -337,12 +360,12 @@ namespace OptimizingParallelCompiler
             }
 
             i = 0;
-            while (elements.Count > 1)
+            while (elements.Count > 1 && elements.Count > i)
             {
                 originalStatement = originalStatement.Replace(statement, changedString);
                 statement = statement.Replace(statement, changedString);
 
-                if (Regex.Matches(originalStatement.Substring(originalStatement.IndexOf("=") + 1), "[-+/*%]").Count <= 1)
+                if (Regex.Matches(originalStatement.Substring(originalStatement.IndexOf("=") + 1), "[-+/*%]").Count <= 1 && type != "if")
                 {
                     changedString = changedString.Replace("(", "");
                     changedString = changedString.Replace(")", "");
@@ -354,7 +377,7 @@ namespace OptimizingParallelCompiler
                 if (elements[i] == "+" || elements[i] == "-")
                 {
                     ints.Add(new ThreeOPCreation { Index = 2, Statements = "int t_" + counter });
-                    lets.Add(new ThreeOPCreation { Index = index, Statements = originalStatement.Substring(0, originalStatement.IndexOf("l")) + "let t_" + counter + " = " + ((i - 1) < 0 ? previousInt : elements[i - 1]) + elements[i] + elements[i + 1] });
+                    lets.Add(new ThreeOPCreation { Index = index, Statements = originalStatement.Substring(0, originalStatement.IndexOf(type)) + "let t_" + counter + " = " + ((i - 1) < 0 ? previousInt : elements[i - 1]) + elements[i] + elements[i + 1] });
                     changedString = changedString.Replace(((i - 1) < 0 ? previousInt : elements[i - 1]) + " " + elements[i] + " " + elements[i + 1], "t_" + counter);
                     elements.RemoveRange(((i - 1) < 0 ? 0 : i - 1), ((i - 1) < 0 ? 2 : 3));
                     previousInt = "t_" + counter;
