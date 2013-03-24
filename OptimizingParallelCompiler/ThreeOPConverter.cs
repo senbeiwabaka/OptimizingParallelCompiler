@@ -26,15 +26,15 @@ namespace OptimizingParallelCompiler
                         afterEqual = x.Substring(x.IndexOf("=") + 1, x.Length - (x.IndexOf("=") + 1));
                         var beforeEqual = x.Substring(0, x.IndexOf("="));
 
-                        //Console.WriteLine("original statement : " + original);
-                        //Console.WriteLine("before equal : " + beforeEqual);
+                        //InformationOutput.InformationPrint("original statement : " + original);
+                        //InformationOutput.InformationPrint("before equal : " + beforeEqual);
 
                         OneArrayTransformation(ref original, beforeEqual, ref counter, generate, letStatementCreation, index, "let");
 
                         code[index] = original;
 
-                        //Console.WriteLine("original statement : " + original);
-                        //Console.WriteLine("code : " + code[index]);
+                        //InformationOutput.InformationPrint("original statement : " + original);
+                        //InformationOutput.InformationPrint("code : " + code[index]);
 
                         LetAfterEqualTransformation(ref original, ref afterEqual, ref counter, generate, letStatementCreation, index);
 
@@ -60,8 +60,8 @@ namespace OptimizingParallelCompiler
                     }
                     else if (x.StartsWith("print", StringComparison.Ordinal) && x.Contains("["))
                     {
-                        //Console.WriteLine("original statement : " + original);
-                        //Console.WriteLine("trimmed statement : " + x);
+                        //InformationOutput.InformationPrint("original statement : " + original);
+                        //InformationOutput.InformationPrint("trimmed statement : " + x);
 
                         var array = x.Substring(0, x.IndexOf("["));
                         array = array.Substring(array.LastIndexOf(" ") + 1);
@@ -71,13 +71,13 @@ namespace OptimizingParallelCompiler
 
                         code[index] = original;
 
-                        //Console.WriteLine("original statement : " + original);
-                        //Console.WriteLine("code statement : " + code[index]);
+                        //InformationOutput.InformationPrint("original statement : " + original);
+                        //InformationOutput.InformationPrint("code statement : " + code[index]);
                     }
                     else if (x.StartsWith("if", StringComparison.Ordinal))
                     {
-                        //Console.WriteLine("original statement : " + original);
-                        //Console.WriteLine("trimmed statement : " + x);
+                        //InformationOutput.InformationPrint("original statement : " + original);
+                        //InformationOutput.InformationPrint("trimmed statement : " + x);
 
                         //var begin = afterEqual.Substring(0, afterEqual.IndexOf(")"));
 
@@ -88,8 +88,8 @@ namespace OptimizingParallelCompiler
                             original = original.Replace(x.Substring(x.IndexOf("then") + "then".Length), "");
                             x = x.Substring(0, x.IndexOf("then") + "then".Length);
 
-                            Console.WriteLine("original statement : " + original);
-                            Console.WriteLine("code statement : " + code[index]);
+                            InformationOutput.InformationPrint("original statement : " + original);
+                            InformationOutput.InformationPrint("code statement : " + code[index]);
 
                             code[index] = original;
 
@@ -97,15 +97,15 @@ namespace OptimizingParallelCompiler
                             //begin = afterEqual.Substring(0, afterEqual.IndexOf("="));
                             //afterEqual = afterEqual.Substring(afterEqual.IndexOf("=") + 1);
                             //OneArrayTransformation(ref original, begin, ref counter, generate, letStatementCreation, index, " let");
-                            //Console.WriteLine("original statement : " + original);
-                            //Console.WriteLine("code statement : " + code[index]);
+                            //InformationOutput.InformationPrint("original statement : " + original);
+                            //InformationOutput.InformationPrint("code statement : " + code[index]);
                             //OneArrayTransformation(ref original, original.Substring(original.IndexOf("(") + 1, original.IndexOf(equator.Type) - original.IndexOf("(") - 1), ref counter, generate, letStatementCreation, index, "if");
-                            //Console.WriteLine("original statement : " + original);
-                            //Console.WriteLine("code statement : " + code[index]);
+                            //InformationOutput.InformationPrint("original statement : " + original);
+                            //InformationOutput.InformationPrint("code statement : " + code[index]);
 
                             //LetAfterEqualTransformation(ref original, ref afterEqual, ref counter, generate, letStatementCreation, index);
-                            //Console.WriteLine("original statement : " + original);
-                            //Console.WriteLine("code statement : " + code[index]);
+                            //InformationOutput.InformationPrint("original statement : " + original);
+                            //InformationOutput.InformationPrint("code statement : " + code[index]);
 
                             //code[index] = original;
                         }
@@ -113,9 +113,9 @@ namespace OptimizingParallelCompiler
                         var equator = EquatorTypeAmount(afterEqual.Substring(afterEqual.IndexOf("(") + 1, afterEqual.IndexOf(")") - afterEqual.IndexOf("(") - 1));
 
                         OneArrayTransformation(ref original, original.Substring(original.IndexOf("(") + 1, original.IndexOf(equator.Type) - original.IndexOf("(") - 1), ref counter, generate, letStatementCreation, index, "if");
-                        Console.WriteLine(original.Substring(original.IndexOf(equator.Type) + equator.Type.Length, original.IndexOf(")") - original.IndexOf(equator.Type) - equator.Type.Length));
+                        InformationOutput.InformationPrint(original.Substring(original.IndexOf(equator.Type) + equator.Type.Length, original.IndexOf(")") - original.IndexOf(equator.Type) - equator.Type.Length));
                         OneArrayTransformation(ref original, original.Substring(original.IndexOf(equator.Type) + equator.Type.Length, original.IndexOf(")") - original.IndexOf(equator.Type) - equator.Type.Length), ref counter, generate, letStatementCreation, index, "if");
-                        Console.WriteLine(original);
+                        InformationOutput.InformationPrint(original);
                         equator = EquatorTypeAmount(original.Substring(original.IndexOf("(") + 1, original.IndexOf(")") - original.IndexOf("(") - 1));
                         if (equator.SpacesBefore > 1 || equator.SpacesAfter > 1)
                         {
@@ -125,7 +125,7 @@ namespace OptimizingParallelCompiler
                             between = between.Trim(' ');
                             ValueExtration(elements, between);
                             OderOfOperations(ref original, between, elements, ref counter, generate, letStatementCreation, index, "if");
-                            Console.WriteLine(original);
+                            InformationOutput.InformationPrint(original);
                         }
 
                         code[index] = original;
@@ -195,7 +195,7 @@ namespace OptimizingParallelCompiler
 
                     originalStatement = originalStatement.Replace(beforeEqual, replace);
 
-                    Console.WriteLine(originalStatement);
+                    InformationOutput.InformationPrint(originalStatement);
                 }
             }
         }
