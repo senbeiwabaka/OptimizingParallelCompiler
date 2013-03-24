@@ -50,11 +50,11 @@
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.txtOneilCode = new System.Windows.Forms.RichTextBox();
             this.txtCSharpCode = new System.Windows.Forms.RichTextBox();
-            this.txtError = new System.Windows.Forms.TextBox();
             this.testToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lineNumbersForRichText1 = new LineNumbersControlForRichTextBox.LineNumbersForRichText();
             this.lineNumbersForRichText2 = new LineNumbersControlForRichTextBox.LineNumbersForRichText();
             this.tabFirstTransform = new System.Windows.Forms.TabControl();
+            this.tbpOutPut = new System.Windows.Forms.TabPage();
             this.tbpThreeOPCode = new System.Windows.Forms.TabPage();
             this.rtbThreeOPCode = new System.Windows.Forms.RichTextBox();
             this.lineNumbersForRichText3 = new LineNumbersControlForRichTextBox.LineNumbersForRichText();
@@ -62,7 +62,7 @@
             this.txtDeadCode = new System.Windows.Forms.RichTextBox();
             this.lineNumbersForRichText4 = new LineNumbersControlForRichTextBox.LineNumbersForRichText();
             this.tbpCSharp = new System.Windows.Forms.TabPage();
-            this.tbpOutPut = new System.Windows.Forms.TabPage();
+            this.rtbError = new System.Windows.Forms.RichTextBox();
             this.menuStrip1.SuspendLayout();
             this.tabFirstTransform.SuspendLayout();
             this.tbpThreeOPCode.SuspendLayout();
@@ -256,31 +256,20 @@
             // 
             this.txtOneilCode.Location = new System.Drawing.Point(24, 29);
             this.txtOneilCode.Name = "txtOneilCode";
-            this.txtOneilCode.Size = new System.Drawing.Size(406, 421);
+            this.txtOneilCode.Size = new System.Drawing.Size(406, 389);
             this.txtOneilCode.TabIndex = 1;
             this.txtOneilCode.Text = "";
             this.txtOneilCode.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.richTextBox1_KeyPress);
             // 
             // txtCSharpCode
             // 
-            this.txtCSharpCode.Location = new System.Drawing.Point(27, 0);
+            this.txtCSharpCode.Location = new System.Drawing.Point(25, 0);
             this.txtCSharpCode.Name = "txtCSharpCode";
             this.txtCSharpCode.ReadOnly = true;
-            this.txtCSharpCode.Size = new System.Drawing.Size(479, 395);
+            this.txtCSharpCode.Size = new System.Drawing.Size(481, 363);
             this.txtCSharpCode.TabIndex = 2;
             this.txtCSharpCode.Text = "";
             this.txtCSharpCode.MouseDown += new System.Windows.Forms.MouseEventHandler(this.txtCSharpCode_MouseDown);
-            // 
-            // txtError
-            // 
-            this.txtError.BackColor = System.Drawing.SystemColors.Window;
-            this.txtError.Location = new System.Drawing.Point(13, 456);
-            this.txtError.Multiline = true;
-            this.txtError.Name = "txtError";
-            this.txtError.ReadOnly = true;
-            this.txtError.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtError.Size = new System.Drawing.Size(937, 105);
-            this.txtError.TabIndex = 3;
             // 
             // testToolStripMenuItem
             // 
@@ -306,7 +295,7 @@
             this.lineNumbersForRichText1.LineNumbersClippedByItemRectangle = true;
             this.lineNumbersForRichText1.LineNumbersLeadingZeroes = true;
             this.lineNumbersForRichText1.LineNumbersOffset = new System.Drawing.Size(0, 0);
-            this.lineNumbersForRichText1.Location = new System.Drawing.Point(6, 0);
+            this.lineNumbersForRichText1.Location = new System.Drawing.Point(4, 0);
             this.lineNumbersForRichText1.Margin = new System.Windows.Forms.Padding(0);
             this.lineNumbersForRichText1.MarginLinesColor = System.Drawing.Color.SlateGray;
             this.lineNumbersForRichText1.MarginLinesSide = LineNumbersControlForRichTextBox.LineNumbersForRichText.LineNumberDockSide.Right;
@@ -321,7 +310,7 @@
             this.lineNumbersForRichText1.ShowGridLines = true;
             this.lineNumbersForRichText1.ShowLineNumbers = true;
             this.lineNumbersForRichText1.ShowMarginLines = true;
-            this.lineNumbersForRichText1.Size = new System.Drawing.Size(20, 395);
+            this.lineNumbersForRichText1.Size = new System.Drawing.Size(20, 363);
             this.lineNumbersForRichText1.TabIndex = 4;
             // 
             // lineNumbersForRichText2
@@ -358,7 +347,7 @@
             this.lineNumbersForRichText2.ShowGridLines = true;
             this.lineNumbersForRichText2.ShowLineNumbers = true;
             this.lineNumbersForRichText2.ShowMarginLines = true;
-            this.lineNumbersForRichText2.Size = new System.Drawing.Size(20, 421);
+            this.lineNumbersForRichText2.Size = new System.Drawing.Size(20, 389);
             this.lineNumbersForRichText2.TabIndex = 4;
             // 
             // tabFirstTransform
@@ -370,8 +359,17 @@
             this.tabFirstTransform.Location = new System.Drawing.Point(436, 29);
             this.tabFirstTransform.Name = "tabFirstTransform";
             this.tabFirstTransform.SelectedIndex = 0;
-            this.tabFirstTransform.Size = new System.Drawing.Size(514, 421);
+            this.tabFirstTransform.Size = new System.Drawing.Size(514, 389);
             this.tabFirstTransform.TabIndex = 5;
+            // 
+            // tbpOutPut
+            // 
+            this.tbpOutPut.Location = new System.Drawing.Point(4, 22);
+            this.tbpOutPut.Name = "tbpOutPut";
+            this.tbpOutPut.Size = new System.Drawing.Size(506, 363);
+            this.tbpOutPut.TabIndex = 3;
+            this.tbpOutPut.Text = "Depenency Output";
+            this.tbpOutPut.UseVisualStyleBackColor = true;
             // 
             // tbpThreeOPCode
             // 
@@ -380,16 +378,17 @@
             this.tbpThreeOPCode.Location = new System.Drawing.Point(4, 22);
             this.tbpThreeOPCode.Name = "tbpThreeOPCode";
             this.tbpThreeOPCode.Padding = new System.Windows.Forms.Padding(3);
-            this.tbpThreeOPCode.Size = new System.Drawing.Size(506, 395);
+            this.tbpThreeOPCode.Size = new System.Drawing.Size(506, 363);
             this.tbpThreeOPCode.TabIndex = 0;
             this.tbpThreeOPCode.Text = "3 OP Code";
             this.tbpThreeOPCode.UseVisualStyleBackColor = true;
             // 
             // rtbThreeOPCode
             // 
-            this.rtbThreeOPCode.Location = new System.Drawing.Point(30, 0);
+            this.rtbThreeOPCode.Location = new System.Drawing.Point(26, 0);
             this.rtbThreeOPCode.Name = "rtbThreeOPCode";
-            this.rtbThreeOPCode.Size = new System.Drawing.Size(476, 395);
+            this.rtbThreeOPCode.ReadOnly = true;
+            this.rtbThreeOPCode.Size = new System.Drawing.Size(480, 363);
             this.rtbThreeOPCode.TabIndex = 2;
             this.rtbThreeOPCode.Text = "";
             // 
@@ -412,7 +411,7 @@
             this.lineNumbersForRichText3.LineNumbersClippedByItemRectangle = true;
             this.lineNumbersForRichText3.LineNumbersLeadingZeroes = true;
             this.lineNumbersForRichText3.LineNumbersOffset = new System.Drawing.Size(0, 0);
-            this.lineNumbersForRichText3.Location = new System.Drawing.Point(9, 0);
+            this.lineNumbersForRichText3.Location = new System.Drawing.Point(5, 0);
             this.lineNumbersForRichText3.Margin = new System.Windows.Forms.Padding(0);
             this.lineNumbersForRichText3.MarginLinesColor = System.Drawing.Color.SlateGray;
             this.lineNumbersForRichText3.MarginLinesSide = LineNumbersControlForRichTextBox.LineNumbersForRichText.LineNumberDockSide.Right;
@@ -427,7 +426,7 @@
             this.lineNumbersForRichText3.ShowGridLines = true;
             this.lineNumbersForRichText3.ShowLineNumbers = true;
             this.lineNumbersForRichText3.ShowMarginLines = true;
-            this.lineNumbersForRichText3.Size = new System.Drawing.Size(20, 395);
+            this.lineNumbersForRichText3.Size = new System.Drawing.Size(20, 363);
             this.lineNumbersForRichText3.TabIndex = 1;
             // 
             // tbpDeadCodeRemoval
@@ -436,16 +435,17 @@
             this.tbpDeadCodeRemoval.Controls.Add(this.lineNumbersForRichText4);
             this.tbpDeadCodeRemoval.Location = new System.Drawing.Point(4, 22);
             this.tbpDeadCodeRemoval.Name = "tbpDeadCodeRemoval";
-            this.tbpDeadCodeRemoval.Size = new System.Drawing.Size(506, 395);
+            this.tbpDeadCodeRemoval.Size = new System.Drawing.Size(506, 363);
             this.tbpDeadCodeRemoval.TabIndex = 2;
             this.tbpDeadCodeRemoval.Text = "Dead Code Removal";
             this.tbpDeadCodeRemoval.UseVisualStyleBackColor = true;
             // 
             // txtDeadCode
             // 
-            this.txtDeadCode.Location = new System.Drawing.Point(26, 0);
+            this.txtDeadCode.Location = new System.Drawing.Point(33, 0);
             this.txtDeadCode.Name = "txtDeadCode";
-            this.txtDeadCode.Size = new System.Drawing.Size(476, 395);
+            this.txtDeadCode.ReadOnly = true;
+            this.txtDeadCode.Size = new System.Drawing.Size(469, 360);
             this.txtDeadCode.TabIndex = 4;
             this.txtDeadCode.Text = "";
             // 
@@ -468,7 +468,7 @@
             this.lineNumbersForRichText4.LineNumbersClippedByItemRectangle = true;
             this.lineNumbersForRichText4.LineNumbersLeadingZeroes = true;
             this.lineNumbersForRichText4.LineNumbersOffset = new System.Drawing.Size(0, 0);
-            this.lineNumbersForRichText4.Location = new System.Drawing.Point(5, 0);
+            this.lineNumbersForRichText4.Location = new System.Drawing.Point(12, 0);
             this.lineNumbersForRichText4.Margin = new System.Windows.Forms.Padding(0);
             this.lineNumbersForRichText4.MarginLinesColor = System.Drawing.Color.SlateGray;
             this.lineNumbersForRichText4.MarginLinesSide = LineNumbersControlForRichTextBox.LineNumbersForRichText.LineNumberDockSide.Right;
@@ -483,7 +483,7 @@
             this.lineNumbersForRichText4.ShowGridLines = true;
             this.lineNumbersForRichText4.ShowLineNumbers = true;
             this.lineNumbersForRichText4.ShowMarginLines = true;
-            this.lineNumbersForRichText4.Size = new System.Drawing.Size(20, 395);
+            this.lineNumbersForRichText4.Size = new System.Drawing.Size(20, 360);
             this.lineNumbersForRichText4.TabIndex = 3;
             // 
             // tbpCSharp
@@ -493,28 +493,29 @@
             this.tbpCSharp.Location = new System.Drawing.Point(4, 22);
             this.tbpCSharp.Name = "tbpCSharp";
             this.tbpCSharp.Padding = new System.Windows.Forms.Padding(3);
-            this.tbpCSharp.Size = new System.Drawing.Size(506, 395);
+            this.tbpCSharp.Size = new System.Drawing.Size(506, 363);
             this.tbpCSharp.TabIndex = 1;
             this.tbpCSharp.Text = "O\'Neil Code - C#";
             this.tbpCSharp.UseVisualStyleBackColor = true;
             // 
-            // tbpOutPut
+            // rtbError
             // 
-            this.tbpOutPut.Location = new System.Drawing.Point(4, 22);
-            this.tbpOutPut.Name = "tbpOutPut";
-            this.tbpOutPut.Size = new System.Drawing.Size(506, 395);
-            this.tbpOutPut.TabIndex = 3;
-            this.tbpOutPut.Text = "Depenency Output";
-            this.tbpOutPut.UseVisualStyleBackColor = true;
+            this.rtbError.Location = new System.Drawing.Point(3, 424);
+            this.rtbError.Name = "rtbError";
+            this.rtbError.ReadOnly = true;
+            this.rtbError.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
+            this.rtbError.Size = new System.Drawing.Size(943, 137);
+            this.rtbError.TabIndex = 6;
+            this.rtbError.Text = "";
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(962, 573);
+            this.Controls.Add(this.rtbError);
             this.Controls.Add(this.tabFirstTransform);
             this.Controls.Add(this.lineNumbersForRichText2);
-            this.Controls.Add(this.txtError);
             this.Controls.Add(this.txtOneilCode);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
@@ -553,7 +554,6 @@
         private System.Windows.Forms.ToolStripMenuItem taxToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem triviaToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem runtoolStripMenu;
-        private System.Windows.Forms.TextBox txtError;
         private System.Windows.Forms.ToolStripMenuItem testToolStripMenuItem;
         private LineNumbersControlForRichTextBox.LineNumbersForRichText lineNumbersForRichText1;
         private LineNumbersControlForRichTextBox.LineNumbersForRichText lineNumbersForRichText2;
@@ -568,6 +568,7 @@
         private System.Windows.Forms.RichTextBox txtDeadCode;
         private LineNumbersControlForRichTextBox.LineNumbersForRichText lineNumbersForRichText4;
         private System.Windows.Forms.TabPage tbpOutPut;
+        private System.Windows.Forms.RichTextBox rtbError;
     }
 }
 

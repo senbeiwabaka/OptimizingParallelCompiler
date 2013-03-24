@@ -4,13 +4,13 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace OptimizingParallelCompiler
 {
     public partial class MainForm : Form
     {
-        private readonly List<string> _reserveWords;
         private string _output = "Out.exe";
         private CompilerResults _results;
         private const string ErrorFile = "error.txt";
@@ -27,27 +27,7 @@ namespace OptimizingParallelCompiler
         {
             InitializeComponent();
 
-            _reserveWords = new List<string>(25)
-                {
-                    "title",
-                    "var",
-                    "label",
-                    "goto",
-                    "let",
-                    "int",
-                    "list",
-                    "rem",
-                    "if",
-                    "endfor",
-                    "then",
-                    "input",
-                    "print",
-                    "prompt",
-                    "end",
-                    "for",
-                    "while",
-                    "begin",
-                };
+            InformationOutput.MainFormTextBox = rtbError;
         }
 
         /// <summary>
@@ -56,29 +36,15 @@ namespace OptimizingParallelCompiler
         /// </summary>
         private void RtbColor()
         {
-            const RichTextBoxFinds options = RichTextBoxFinds.MatchCase;
+            Regex regExp = new Regex("^for|^while|if|then|title|", RegexOptions.IgnorePatternWhitespace);
 
-            foreach (var reserveWord in _reserveWords)
+            foreach (Match match in regExp.Matches(txtOneilCode.Text))
             {
-                var start = 0;
-                
-                start = txtOneilCode.Find(reserveWord, start, options);
-
-                var count = txtOneilCode.Lines.Count(x => x.Contains(reserveWord));
-                while (count > 0)
-                {
-                    txtOneilCode.SelectionStart = start;
-                    txtOneilCode.SelectionLength = reserveWord.Length;
-                    txtOneilCode.SelectionColor = Color.MediumBlue;
-
-                    start = txtOneilCode.Find(reserveWord, start + reserveWord.Length, options);
-
-                    --count;
-                }
+                txtOneilCode.Select(match.Index, match.Length);
+                txtOneilCode.SelectionColor = Color.Blue;
             }
 
-            txtOneilCode.SelectionStart = 0;
-            txtOneilCode.SelectionLength = 0;
+            txtOneilCode.Select(0, 0);
         }
 
         private void richTextBox1_KeyPress(object sender, KeyPressEventArgs e)
@@ -125,7 +91,7 @@ namespace OptimizingParallelCompiler
         {
             var codeProvider = CodeDomProvider.CreateProvider("CSharp");
 
-            txtError.Text = "";
+            rtbError.Text = "";
 
             //generate exe not dll
             var par = new CompilerParameters
@@ -140,19 +106,24 @@ namespace OptimizingParallelCompiler
 
             if (_results.Errors.Count > 0)
             {
-                txtError.ForeColor = Color.DarkRed;
+                rtbError.ForeColor = Color.DarkRed;
+                rtbError.Font = new System.Drawing.Font("Times New Roman", 10f, FontStyle.Italic);
 
                 foreach (CompilerError item in _results.Errors)
                 {
-                    txtError.Text += @"line number " + item.Line + @", error num" + item.ErrorNumber +
+                    rtbError.Text += @"line number " + item.Line + @", error num" + item.ErrorNumber +
                                      @" , " + item.ErrorText + Environment.NewLine + Environment.NewLine;
                 }
             }
             else
             {
                 //Successful Compile
-                txtError.ForeColor = Color.Green;
-                txtError.Text = @"Success!";
+                rtbError.ForeColor = Color.Green;
+                rtbError.Font = new System.Drawing.Font("Times New Roman", 16f, FontStyle.Bold);
+                rtbError.Text = @"Success!";
+                //rtbError.SelectedText = "Success!";
+                //rtbError.SelectionColor = Color.Green;
+                //rtbError.SelectionFont = new System.Drawing.Font("Times New Roman", 16f, FontStyle.Bold);
                 runtoolStripMenu.Enabled = true;
             }
         }
@@ -230,14 +201,14 @@ namespace OptimizingParallelCompiler
                     rtbThreeOPCode.Clear();
                     txtCSharpCode.Clear();
                     txtDeadCode.Clear();
-                    txtError.Clear();
+                    rtbError.Clear();
 
                     //Write O'Neil code to to Screen?
                     txtOneilCode.Text = resultsReader.ReadToEnd();
 
                     resultsReader.Close();
 
-                    //RtbColor();
+                    RtbColor();
 
                     _output = fileName;
                 }
@@ -294,17 +265,19 @@ namespace OptimizingParallelCompiler
 
             rtbThreeOPCode.Clear();
 
-            foreach (var variable in threeOPCode)
-            {
-                if (!variable.StartsWith("end"))
-                {
-                    rtbThreeOPCode.Text += variable + "\n";
-                }
-                else
-                {
-                    rtbThreeOPCode.Text += variable;
-                }
-            }
+            //foreach (var variable in threeOPCode)
+            //{
+            //    if (!variable.StartsWith("end"))
+            //    {
+            //        rtbThreeOPCode.Text += variable + "\n";
+            //    }
+            //    else
+            //    {
+            //        rtbThreeOPCode.Text += variable;
+            //    }
+            //}
+
+            rtbThreeOPCode.Lines = threeOPCode.ToArray();
 
             tabFirstTransform.SelectTab("tbpThreeOPCode");
 
