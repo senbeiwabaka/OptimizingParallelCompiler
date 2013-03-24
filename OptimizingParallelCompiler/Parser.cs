@@ -68,7 +68,7 @@ namespace OptimizingParallelCompiler
                         Console.WriteLine("Line number " + code.IndexOf(notModified) + " type is rem sentence " + notModified);
                     }
 
-                    else if (s.IndexOf("list", StringComparison.Ordinal) == 0)
+                    else if (s.IndexOf("list", StringComparison.Ordinal) == 0 || s.StartsWith("table") || s.StartsWith("box"))
                     {
                         var sentence = s;
                         var arrayBegin = sentence.IndexOf("[", StringComparison.Ordinal) + 1;
@@ -207,9 +207,10 @@ namespace OptimizingParallelCompiler
 
                         Console.WriteLine("Line number " + code.IndexOf(notModified) + " type is for sentence " + notModified);
                     }
-                    else if (s.IndexOf("int", StringComparison.Ordinal) == 0)
+                    else if (s.StartsWith("int") && !s.EndsWith(";"))
                     {
-                        code[code.IndexOf(notModified)] = code[code.IndexOf(notModified)].Replace(s, notModified.Substring(0, notModified.IndexOf("int")) + s + ";");
+                        //code[code.IndexOf(notModified)] = code[code.IndexOf(notModified)].Replace(s, notModified.Substring(0, notModified.IndexOf("int")) + s + ";");
+                        code[code.IndexOf(notModified)] += ";";
 
                         Console.WriteLine("Line number " + code.IndexOf(notModified) + " type is int sentence " + notModified);
                     }
