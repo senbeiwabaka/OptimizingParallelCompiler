@@ -81,7 +81,7 @@ namespace OptimizingParallelCompiler
 
                         //var begin = afterEqual.Substring(0, afterEqual.IndexOf(")"));
 
-                        if (x.Contains("let"))
+                        if (x.Contains("let") || x.Contains("goto") || x.Contains("print") || x.Contains("prompt"))
                         {
                             code.Insert(index + 1, x.Substring(x.IndexOf("then") + "then".Length));
 
