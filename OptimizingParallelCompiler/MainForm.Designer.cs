@@ -202,6 +202,7 @@
             // 
             // oPCodeToolStripMenuItem
             // 
+            this.oPCodeToolStripMenuItem.Enabled = false;
             this.oPCodeToolStripMenuItem.Name = "oPCodeToolStripMenuItem";
             this.oPCodeToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
             this.oPCodeToolStripMenuItem.Text = "3 OP Code";
@@ -259,7 +260,6 @@
             this.txtOneilCode.Size = new System.Drawing.Size(406, 389);
             this.txtOneilCode.TabIndex = 1;
             this.txtOneilCode.Text = "";
-            this.txtOneilCode.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.richTextBox1_KeyPress);
             // 
             // txtCSharpCode
             // 

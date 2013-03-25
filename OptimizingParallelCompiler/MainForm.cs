@@ -47,14 +47,6 @@ namespace OptimizingParallelCompiler
             txtOneilCode.Select(0, 0);
         }
 
-        private void richTextBox1_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (e.KeyChar.Equals((char) Keys.Enter))
-            {
-                //RtbColor();
-            }
-        }
-
         /// <summary>
         /// Converts the code from O'Neil Language to C#
         /// </summary>
@@ -69,12 +61,6 @@ namespace OptimizingParallelCompiler
             //clears the box of previous everything
             txtCSharpCode.Clear();
 
-            //puts the transformed code to the other text box for visual inspection
-            foreach (var lines in code)
-            {
-                //txtCSharpCode.Text += lines + "\n";
-            }
-
             txtCSharpCode.Lines = code.ToArray();
 
             tabFirstTransform.SelectTab("tbpCSharp");
@@ -83,7 +69,7 @@ namespace OptimizingParallelCompiler
         }
 
         /// <summary>
-        ///     Menu item to compile the code to an executable
+        /// Menu item to compile the code to an executable
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -121,9 +107,6 @@ namespace OptimizingParallelCompiler
                 rtbError.ForeColor = Color.Green;
                 rtbError.Font = new System.Drawing.Font("Times New Roman", 16f, FontStyle.Bold);
                 rtbError.Text = @"Success!";
-                //rtbError.SelectedText = "Success!";
-                //rtbError.SelectionColor = Color.Green;
-                //rtbError.SelectionFont = new System.Drawing.Font("Times New Roman", 16f, FontStyle.Bold);
                 runtoolStripMenu.Enabled = true;
             }
         }
@@ -203,31 +186,37 @@ namespace OptimizingParallelCompiler
                     txtDeadCode.Clear();
                     rtbError.Clear();
 
+                    deadCodeRemovalToolStripMenuItem.Enabled = false;
+                    convertToolStripMenuItem.Enabled = false;
+                    compileToolStripMenuItem.Enabled = false;
+                    runtoolStripMenu.Enabled = false;
+                    oPCodeToolStripMenuItem.Enabled = true;
+
                     //Write O'Neil code to to Screen?
                     txtOneilCode.Text = resultsReader.ReadToEnd();
 
                     resultsReader.Close();
 
-                    RtbColor();
+                    //RtbColor();
 
                     _output = fileName;
                 }
                 else
                 {
                     MessageBox.Show(@"The " + fileName + @" file does not exist!");
+
+                    deadCodeRemovalToolStripMenuItem.Enabled = false;
+                    convertToolStripMenuItem.Enabled = false;
+                    compileToolStripMenuItem.Enabled = false;
+                    runtoolStripMenu.Enabled = false;
+                    oPCodeToolStripMenuItem.Enabled = false;
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show(@"An error has occurred trying to read " + fileName + @" file!");
-                if (File.Exists(ErrorFile))
-                {
-                    File.AppendAllText(ErrorFile, ex.Message);
-                }
-                else
-                {
-                    File.WriteAllText(ErrorFile, ex.Message);
-                }
+
+                File.AppendAllText(ErrorFile, ex.Message);
             }
         }
 
@@ -264,18 +253,6 @@ namespace OptimizingParallelCompiler
             ThreeOPConverter.Transform(threeOPCode, intStatements, letOPCode);
 
             rtbThreeOPCode.Clear();
-
-            //foreach (var variable in threeOPCode)
-            //{
-            //    if (!variable.StartsWith("end"))
-            //    {
-            //        rtbThreeOPCode.Text += variable + "\n";
-            //    }
-            //    else
-            //    {
-            //        rtbThreeOPCode.Text += variable;
-            //    }
-            //}
 
             rtbThreeOPCode.Lines = threeOPCode.ToArray();
 
