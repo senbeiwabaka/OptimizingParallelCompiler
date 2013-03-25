@@ -3,7 +3,6 @@ var
    int i
    int j
    int t
-   int x
    int maxnum
    int seed
    int lb
@@ -14,11 +13,11 @@ begin
    let seed = -1
    while (seed < 0)
       input seed
-      if (seed >= 0) then goto break
+      if (seed >= 0) then goto break1
       prompt "I need a non-zero number: "
       let seed = -1
    endwhile
-   label break
+   label break1
    let maxnum = 30
    let lb = 0
    let ub = maxnum - 1
@@ -31,10 +30,11 @@ begin
    rem insert sort
    for i = lb + 1 to ub
       let t = data[i]
-      for j = lb to i - 1
-         let x = i - 1 - j
-         if (data[x + lb] > t) then let data[x + lb + 1] = data[x + lb]
-      endfor
+      let j = i - 1
+      while (j >= lb)
+         if (data[j] > t) then let data[j + 1] = data[j]
+         let j = j - 1
+      endwhile
       let data[j + 1] = t
    endfor
    rem end insert sort
