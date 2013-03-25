@@ -68,6 +68,10 @@ namespace OptimizingParallelCompiler
                     {
                         IfMethod(code, ref labelCounter, s, notModified, index, ifs);
 
+                        var something = lets.Find(x => x.Index == index);
+
+                        InformationOutput.InformationPrint(something != null ? something.ToString() : "not it");
+
                         InformationOutput.InformationPrint("Line number " + code.IndexOf(notModified) + " type is if sentence " + notModified);
                     }
                     else if (s.IndexOf("goto", StringComparison.Ordinal) == 0)
@@ -109,7 +113,7 @@ namespace OptimizingParallelCompiler
             i = 0;
             foreach (var item in lets)
             {
-                code.Insert(item.Index + i, item.Statements);
+                code.Insert(item.Index + i, item.Statement);
                 ++i;
             }
 
@@ -118,7 +122,7 @@ namespace OptimizingParallelCompiler
             i = 0;
             foreach (var item in intStatements)
             {
-                code.Insert(item.Index + i, item.Statements);
+                code.Insert(item.Index + i, item.Statement);
             }
 
             code.ForEach(s =>
