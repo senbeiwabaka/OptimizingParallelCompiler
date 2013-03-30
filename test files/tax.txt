@@ -22,14 +22,21 @@ var
    int eic
    int spousedependant
 begin
-   let line1 = 0;
-   let line2 = 0;
-   let line3 = 0;
-   let line4 = 0;
-   let line5 = 0;
-   let line6 = 0;
-   let line7 = 0;
-   let line8 = 0;
+   let line1 = 0
+   let line2 = 0
+   let line3 = 0
+   let line4 = 0
+   let line5 = 0
+   let line6 = 0
+   let line7 = 0
+   let line8 = 0
+   let dependant = 0
+   let single = 0
+   let d = 0
+   let spousedependant= 0
+   let eic = 0
+   let b = 0
+   let e = 0
    prompt "Welcome to the United States 1040 federal income tax program.\n"
    prompt "(Note: this isn't the real 1040 form. If you try to submit your\n"
    prompt "taxes this way, you'll get what you deserve!\n\n"

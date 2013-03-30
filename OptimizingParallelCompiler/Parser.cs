@@ -57,7 +57,7 @@ namespace OptimizingParallelCompiler
                         sentence = "int[] " + sentence + " = new int[" + value + "];";
                         code[index] = code[index].Replace(s, sentence);
 
-                        InformationOutput.InformationPrint("Line number " + code.IndexOf(notModified) + " type is list sentence " + notModified);
+                        //InformationOutput.InformationPrint("Line number " + code.IndexOf(notModified) + " type is list sentence " + notModified);
                     }
                     else if (s.IndexOf("input", StringComparison.Ordinal) == 0)
                     {
@@ -70,9 +70,9 @@ namespace OptimizingParallelCompiler
 
                         var something = lets.Find(x => x.Index == index);
 
-                        InformationOutput.InformationPrint(something != null ? something.ToString() : "not it");
+                        //InformationOutput.InformationPrint(something != null ? something.ToString() : "not it");
 
-                        InformationOutput.InformationPrint("Line number " + code.IndexOf(notModified) + " type is if sentence " + notModified);
+                        //InformationOutput.InformationPrint("Line number " + code.IndexOf(notModified) + " type is if sentence " + notModified);
                     }
                     else if (s.IndexOf("goto", StringComparison.Ordinal) == 0)
                     {
@@ -100,11 +100,11 @@ namespace OptimizingParallelCompiler
                 {
                     if (lets[k].Index > ifs[i])
                     {
-                        InformationOutput.InformationPrint(lets[k].Index.ToString());
+                        //InformationOutput.InformationPrint(lets[k].Index.ToString());
                         lets[k].Index++;
                         //ifs.RemoveAt(i);
                         //i = 0;
-                        InformationOutput.InformationPrint(lets[k].Index.ToString());
+                        //InformationOutput.InformationPrint(lets[k].Index.ToString());
                     }
                 }
                 ++i;
@@ -152,7 +152,7 @@ namespace OptimizingParallelCompiler
                     {
                         WhileTransform(count, notModified, s, code, ref labelCounter);
 
-                        InformationOutput.InformationPrint("Line number " + index + " type is while sentence " + notModified);
+                        //InformationOutput.InformationPrint("Line number " + index + " type is while sentence " + notModified);
                     }
                     else if (s.IndexOf("endfor", StringComparison.Ordinal) == 0)
                     {
@@ -161,20 +161,20 @@ namespace OptimizingParallelCompiler
                         code[index] = listOfEndFors[listOfEndFors.Count - 1];
                         listOfEndFors.RemoveAt(listOfEndFors.Count - 1);
 
-                        InformationOutput.InformationPrint("Line number " + index + " type is endfor sentence " + notModified);
+                        //InformationOutput.InformationPrint("Line number " + index + " type is endfor sentence " + notModified);
                     }
                     else if (s.IndexOf("for", StringComparison.Ordinal) == 0)
                     {
                         ForTransform(s, code, notModified, ref labelCounter, listOfEndFors);
 
-                        InformationOutput.InformationPrint("Line number " + index + " type is for sentence " + notModified);
+                        //InformationOutput.InformationPrint("Line number " + index + " type is for sentence " + notModified);
                     }
                     else if (s.StartsWith("int") && !s.EndsWith(";"))
                     {
                         //code[index] = code[index].Replace(s, notModified.Substring(0, notModified.IndexOf("int")) + s + ";");
                         code[index] += ";";
 
-                        InformationOutput.InformationPrint("Line number " + index + " type is int sentence " + notModified);
+                        //InformationOutput.InformationPrint("Line number " + index + " type is int sentence " + notModified);
                     }
                 });
         }
@@ -276,7 +276,7 @@ namespace OptimizingParallelCompiler
                 code.Insert(index + 2, notModified.Substring(0, notModified.IndexOf("if")) + label + ":");
                 ++labelCounter;
 
-                ifs.Add(index + 2);
+                ifs.Add(index + 1);
             //}
         }
 
