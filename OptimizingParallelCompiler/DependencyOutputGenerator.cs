@@ -59,7 +59,7 @@ namespace OptimizingParallelCompiler
 
                     if (x.StartsWith("for", StringComparison.Ordinal))
                     {
-                        //code.RemoveAt(index);
+                        forLoops.Add(x);
                     }
                     
                 });
