@@ -95,22 +95,6 @@ namespace OptimizingParallelCompiler
                             //InformationOutput.InformationPrint("code statement : " + code[index]);
 
                             code[index] = original;
-
-                            //var equator = EquatorTypeAmount(begin.Substring(begin.IndexOf("(") + 1, begin.IndexOf(")") - begin.IndexOf("(") - 1));
-                            //begin = afterEqual.Substring(0, afterEqual.IndexOf("="));
-                            //afterEqual = afterEqual.Substring(afterEqual.IndexOf("=") + 1);
-                            //OneArrayTransformation(ref original, begin, ref counter, generate, letStatementCreation, index, " let");
-                            //InformationOutput.InformationPrint("original statement : " + original);
-                            //InformationOutput.InformationPrint("code statement : " + code[index]);
-                            //OneArrayTransformation(ref original, original.Substring(original.IndexOf("(") + 1, original.IndexOf(equator.Type) - original.IndexOf("(") - 1), ref counter, generate, letStatementCreation, index, "if");
-                            //InformationOutput.InformationPrint("original statement : " + original);
-                            //InformationOutput.InformationPrint("code statement : " + code[index]);
-
-                            //LetAfterEqualTransformation(ref original, ref afterEqual, ref counter, generate, letStatementCreation, index);
-                            //InformationOutput.InformationPrint("original statement : " + original);
-                            //InformationOutput.InformationPrint("code statement : " + code[index]);
-
-                            //code[index] = original;
                         }
                         //var between = afterEqual.Substring(0, afterEqual.IndexOf(")") + 1);
                         var equator = EquatorTypeAmount(afterEqual.Substring(afterEqual.IndexOf("(") + 1, afterEqual.IndexOf(")") - afterEqual.IndexOf("(") - 1));
@@ -128,40 +112,9 @@ namespace OptimizingParallelCompiler
                             between = between.Trim(' ');
                             ValueExtration(elements, between);
                             OderOfOperations(ref original, between, elements, ref counter, generate, letStatementCreation, index, "if");
-
-                            //InformationOutput.InformationPrint(original);
-
-                            
-
-                            //var statement = letStatementCreation.Find(value => value.Index == index);
-
-                            //statement!=null?(code.Insert(index,statement.Statements); letStatementCreation.RemoveAt(index)):"";
                         }
 
                         code[index] = original;
-
-                        //var ifLets = letStatementCreation.wh
-
-                        //letStatementCreation.Reverse();
-
-                        //for (int i = 0; i < letStatementCreation.Count; i++)
-                        //{
-                        //    if (letStatementCreation[i].Index == index)
-                        //    {
-                        //        code.Insert(index, letStatementCreation[i].Statement);
-                        //        letStatementCreation.RemoveAt(i);
-                        //        letStatementCreation.ForEach(k => InformationOutput.InformationPrint(k.Index.ToString()));
-                        //        letStatementCreation.ForEach(k => 
-                        //        {
-                        //            if (k.Index > index) k.Index++;
-                        //        });
-                        //        letStatementCreation.ForEach(k => InformationOutput.InformationPrint(k.Index.ToString()));
-                        //    }
-                        //}
-
-                        //letStatementCreation.Reverse();
-
-                        //InformationOutput.InformationPrint(letStatementCreation.Count.ToString());
                     }
                 });
         }
