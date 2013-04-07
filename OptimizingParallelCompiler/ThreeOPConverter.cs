@@ -7,7 +7,7 @@ namespace OptimizingParallelCompiler
 {
     internal class ThreeOPConverter
     {
-        public static void Transform(List<string> code, List<ThreeOPCreation> generate, List<ThreeOPCreation> letStatementCreation)
+        public static string[] Transform(List<string> code, List<ThreeOPCreation> generate, List<ThreeOPCreation> letStatementCreation)
         {
             var counter = 0;
 
@@ -117,6 +117,8 @@ namespace OptimizingParallelCompiler
                         code[index] = original;
                     }
                 });
+
+            return code.ToArray();
         }
 
         /// <summary>

@@ -8,7 +8,7 @@ namespace OptimizingParallelCompiler
 {
     public static class ConstantPropragation
     {
-        public static void Constants(List<string> code)
+        public static string[] Constants(List<string> code)
         {
             var labelCounter = 0;
             var listOfEndFors = new List<string>();
@@ -33,17 +33,17 @@ namespace OptimizingParallelCompiler
                     return false;
                 });
 
-            var count = code.RemoveAll(x =>
-                {
-                    x = x.Trim(' ', '\t');
+            //var count = code.RemoveAll(x =>
+            //    {
+            //        x = x.Trim(' ', '\t');
 
-                    if (x.StartsWith("int") || x.StartsWith("list"))
-                    {
-                        return true;
-                    }
+            //        if (x.StartsWith("int") || x.StartsWith("list"))
+            //        {
+            //            return true;
+            //        }
 
-                    return false;
-                });
+            //        return false;
+            //    });
 
             var sentence = string.Join(string.Empty, lets);
 
@@ -75,7 +75,7 @@ namespace OptimizingParallelCompiler
             var i = 0;
             while(i < codeVariables.Count)
             {
-                count = Regex.Matches(sentence, codeVariables[i]).Count;
+                var count = Regex.Matches(sentence, codeVariables[i]).Count;
 
                 if (count > 1 || count <= 0)
                 {
@@ -85,6 +85,8 @@ namespace OptimizingParallelCompiler
 
                 ++i;
             }
+
+            return code.ToArray();
         }
 
         private static void ForTransform(string s, List<string> code, string other, ref int labelCounter, List<string> listOfEndFors)
