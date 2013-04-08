@@ -10,75 +10,81 @@ namespace OptimizingParallelCompiler
     {
         public static string[] Generator(List<string> code)
         {
-            var forLoops = new List<string>();
-
-            var variables = new List<VariableInformation>();
-
-            var codeVariables = code.FindAll(x =>
-                {
-                    x = x.Trim(' ', '\t');
-                    if (x.StartsWith("int", StringComparison.Ordinal) || x.StartsWith("list", StringComparison.Ordinal))
-                    {
-                        return true;
-                    }
-                    return false;
-                });
-
-            //var i = 0;
-            foreach (var item in codeVariables)
+            var sentence = string.Join(string.Empty, code);
+            if (Regex.Matches(sentence, @"\bendfor\b").Count > 0)
             {
-                var index = codeVariables.IndexOf(item);
-                var s = item.Trim(' ', '\t');
-                if (s.StartsWith("list", StringComparison.Ordinal))
+                var forLoops = new List<string>();
+
+                var variables = new List<VariableInformation>();
+
+                var codeVariables = code.FindAll(x =>
+                    {
+                        x = x.Trim(' ', '\t');
+                        if (x.StartsWith("int", StringComparison.Ordinal) || x.StartsWith("list", StringComparison.Ordinal))
+                        {
+                            return true;
+                        }
+                        return false;
+                    });
+
+                //var i = 0;
+                foreach (var item in codeVariables)
                 {
-                    variables.Add(new VariableInformation { IsArray = true, Name = s.Substring(s.IndexOf(" ", StringComparison.Ordinal) + 1), Type = 1, VariablePosition = index });
+                    var index = codeVariables.IndexOf(item);
+                    var s = item.Trim(' ', '\t');
+                    if (s.StartsWith("list", StringComparison.Ordinal))
+                    {
+                        variables.Add(new VariableInformation { IsArray = true, Name = s.Substring(s.IndexOf(" ", StringComparison.Ordinal) + 1), Type = 1, VariablePosition = index });
+                    }
+                    else if (s.StartsWith("int", StringComparison.Ordinal))
+                    {
+                        variables.Add(new VariableInformation { IsArray = false, Name = s.Substring(s.IndexOf(" ", StringComparison.Ordinal) + 1), Type = 0, VariablePosition = index });
+                    }
                 }
-                else if (s.StartsWith("int", StringComparison.Ordinal))
+
+                int count = 0;
+                code.ForEach(x =>
+                    {
+                        x.Trim(' ', '\t');
+                        if (x.StartsWith("for", StringComparison.Ordinal))
+                        {
+                            ++count;
+                        }
+                    });
+
+                code.ForEach(x =>
+                    {
+                        var index = code.IndexOf(x);
+
+                        x = x.Trim(' ', '\t');
+
+                        //var count
+
+                        if (x.StartsWith("for", StringComparison.Ordinal))
+                        {
+                            //forLoops.Add(x);
+                            var end = code.FindIndex(index, s => s.Contains("endfor"));
+                            forLoops.AddRange(code.GetRange(index, end - index));
+                            code.RemoveAt(index);
+                        }
+
+                    });
+
+                forLoops.Add(Environment.NewLine);
+
+                sentence = string.Empty;
+
+                for (int i = 0; i < variables.Count; i++)
                 {
-                    variables.Add(new VariableInformation { IsArray = false, Name = s.Substring(s.IndexOf(" ", StringComparison.Ordinal) + 1), Type = 0, VariablePosition = index });
+                    sentence += variables[i].Type.ToString() + " ";
                 }
+
+                forLoops.Add(sentence);
+
+                return forLoops.ToArray();
             }
 
-            int count = 0;
-            code.ForEach(x =>
-                {
-                    x.Trim(' ', '\t');
-                    if (x.StartsWith("for", StringComparison.Ordinal))
-                    {
-                        ++count;
-                    }
-                });
-
-            code.ForEach(x =>
-                {
-                    var index = code.IndexOf(x);
-
-                    x = x.Trim(' ', '\t');
-
-                    //var count
-
-                    if (x.StartsWith("for", StringComparison.Ordinal))
-                    {
-                        //forLoops.Add(x);
-                        var end = code.FindIndex(index, s => s.Contains("endfor"));
-                        forLoops.AddRange(code.GetRange(index, end - index));
-                        code.RemoveAt(index);
-                    }
-                    
-                });
-
-            forLoops.Add(Environment.NewLine);
-
-            var sentence = string.Empty;
-
-            for (int i = 0; i < variables.Count; i++)
-            {
-                sentence += variables[i].Type.ToString() + " ";
-            }
-
-            forLoops.Add(sentence);
-
-            return forLoops.ToArray();
+            return new string[] {"No for loops"};
         }
 
         /// <summary>
