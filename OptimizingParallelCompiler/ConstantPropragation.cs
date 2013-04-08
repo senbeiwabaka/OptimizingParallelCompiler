@@ -52,7 +52,7 @@ namespace OptimizingParallelCompiler
             var lets = code.FindAll(x => 
                 {
                     x = x.Trim(' ', '\t');
-                    if (x.StartsWith("let", StringComparison.Ordinal))
+                    if (x.StartsWith("let", StringComparison.Ordinal) || x.StartsWith("input", StringComparison.Ordinal))
                     {
                         return true;
                     }
@@ -64,7 +64,10 @@ namespace OptimizingParallelCompiler
             for (var j = 0; j < lets.Count; j++)
             {
                 var s = lets[j];
-                lets[j] = lets[j].Substring(0, lets[j].IndexOf("="));
+                if (lets[j].Contains("let"))
+                {
+                    lets[j] = lets[j].Substring(0, lets[j].IndexOf("="));
+                }
             }
 
             //var count = code.RemoveAll(x =>
@@ -109,12 +112,23 @@ namespace OptimizingParallelCompiler
             var i = 0;
             while(i < codeVariables.Count)
             {
-                var count = Regex.Matches(sentence, codeVariables[i].Name).Count;
+                var pattern = @"\b" + codeVariables[i].Name;
+                var count = Regex.Matches(sentence, pattern).Count;
 
                 if (count > 1 || count <= 0)
                 {
                     codeVariables.RemoveAt(i);
                     --i;
+                }
+                else if (count == 1)
+                {
+                    var index = sentence.IndexOf(codeVariables[i].Name);
+                    var statement = sentence.Substring(index - 1 - "input".Length <= 0 ? 0 : index - 1 - "input".Length, "input".Length);
+                    if (statement == "input")
+                    {
+                        codeVariables.RemoveAt(i);
+                        --i;
+                    }
                 }
 
                 ++i;
@@ -125,12 +139,16 @@ namespace OptimizingParallelCompiler
                 InformationOutput.InformationPrint(code.IndexOf(codeVariables[i].Name).ToString() + Environment.NewLine);
                 code.ForEach(x =>
                     {
-                        if (x.Contains(codeVariables[i].Name) && x.Contains("let"))
+                        if (x.Contains("let"))
                         {
-                            InformationOutput.InformationPrint(code.IndexOf(x).ToString() + Environment.NewLine);
-                            codeVariables[i].value = code[code.IndexOf(x)].Substring(code[code.IndexOf(x)].IndexOf("=") + 2);
-                            InformationOutput.InformationPrint(codeVariables[i].value);
-                            code.Remove(x);
+                            var beforeEquals = x.Substring(0, x.IndexOf("="));
+                            if (beforeEquals.Contains(codeVariables[i].Name))
+                            {
+                                InformationOutput.InformationPrint(code.IndexOf(x).ToString() + Environment.NewLine);
+                                codeVariables[i].value = code[code.IndexOf(x)].Substring(code[code.IndexOf(x)].IndexOf("=") + 2);
+                                InformationOutput.InformationPrint(codeVariables[i].value);
+                                code.Remove(x);
+                            }
                         }
                         else if (x.Contains(codeVariables[i].Name) && x.Contains("int"))
                         {
@@ -144,7 +162,9 @@ namespace OptimizingParallelCompiler
                 code.ForEach(x =>
                     {
                         var index = code.IndexOf(x);
-                        x = x.Replace(item.Name, item.value);
+                        //x = x.Replace(item.Name, item.value);
+                        var pattern = @"\b" + item.Name + @"\b";
+                        x = Regex.Replace(x, pattern, item.value, RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace);
                         code[index] = x;
                     });
             }
