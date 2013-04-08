@@ -48,7 +48,7 @@ namespace OptimizingParallelCompiler
         /// <param name="e">The event thingy</param>
         private void convertToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var code = new List<string>(txtDeadCode.Lines);
+            var code = new List<string>(rtbThreeOPCode.Lines);
            
             Parser.Transform(code, letOPCode, intStatements);
 
@@ -244,8 +244,6 @@ namespace OptimizingParallelCompiler
         {
             intStatements.Clear();
             letOPCode.Clear();
-
-            //ThreeOPConverter.Transform(threeOPCode, intStatements, letOPCode);
 
             rtbThreeOPCode.Clear();
 
