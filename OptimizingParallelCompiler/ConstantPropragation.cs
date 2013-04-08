@@ -145,8 +145,8 @@ namespace OptimizingParallelCompiler
                             if (beforeEquals.Contains(codeVariables[i].Name))
                             {
                                 InformationOutput.InformationPrint(code.IndexOf(x).ToString() + Environment.NewLine);
-                                codeVariables[i].value = code[code.IndexOf(x)].Substring(code[code.IndexOf(x)].IndexOf("=") + 2);
-                                InformationOutput.InformationPrint(codeVariables[i].value);
+                                codeVariables[i].Value = code[code.IndexOf(x)].Substring(code[code.IndexOf(x)].IndexOf("=") + 2);
+                                InformationOutput.InformationPrint(codeVariables[i].Value);
                                 code.Remove(x);
                             }
                         }
@@ -157,6 +157,27 @@ namespace OptimizingParallelCompiler
                     });
             }
 
+            i = 0;
+            while (i <= codeVariables.Count - 1)
+            {
+                var j =  0;
+                while (j <= codeVariables.Count - 1)
+                {
+                    var s = codeVariables[j].Name;
+                    s = s.Trim(' ');
+                    if (Regex.Matches(codeVariables[i].Value, @"\b"+s+@"\b").Count > 0)
+                    {
+                        Console.Write(true);
+                        codeVariables[i].Value = Regex.Replace(codeVariables[i].Value, s, codeVariables[j].Value, RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.IgnoreCase);
+                        Console.Write(codeVariables[i].Value);
+                    }
+
+                    ++j;
+                }
+
+                ++i;
+            }
+
             foreach (var item in codeVariables)
             {
                 code.ForEach(x =>
@@ -164,7 +185,7 @@ namespace OptimizingParallelCompiler
                         var index = code.IndexOf(x);
                         //x = x.Replace(item.Name, item.value);
                         var pattern = @"\b" + item.Name + @"\b";
-                        x = Regex.Replace(x, pattern, item.value, RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace);
+                        x = Regex.Replace(x, pattern, item.Value, RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace);
                         code[index] = x;
                     });
             }
@@ -175,7 +196,7 @@ namespace OptimizingParallelCompiler
         private class Variables
         {
             public string Name { get; set; }
-            public string value { get; set; }
+            public string Value { get; set; }
         }
     }
 }
