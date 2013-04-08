@@ -59,12 +59,24 @@ namespace OptimizingParallelCompiler
 
                     if (x.StartsWith("for", StringComparison.Ordinal))
                     {
-                        forLoops.Add(x);
+                        //forLoops.Add(x);
+                        var end = code.FindIndex(index, s => s.Contains("endfor"));
+                        forLoops.AddRange(code.GetRange(index, end - index));
+                        code.RemoveAt(index);
                     }
                     
                 });
 
-            //code.RemoveAll(x => !x.Contains("for"));
+            forLoops.Add(Environment.NewLine);
+
+            var sentence = string.Empty;
+
+            for (int i = 0; i < variables.Count; i++)
+            {
+                sentence += variables[i].Type.ToString() + " ";
+            }
+
+            forLoops.Add(sentence);
 
             return forLoops.ToArray();
         }
