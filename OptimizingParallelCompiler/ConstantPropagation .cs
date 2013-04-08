@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace OptimizingParallelCompiler
 {
-    public static class ConstantPropragation
+    public static class ConstantPropagation 
     {
         public static string[] Constants(List<string> code)
         {
-            var labelCounter = 0;
-            var listOfEndFors = new List<string>();
             var codeVariables = new List<Variables>();
 
             code.ForEach(x =>
@@ -70,44 +67,12 @@ namespace OptimizingParallelCompiler
                 }
             }
 
-            //var count = code.RemoveAll(x =>
-            //    {
-            //        x = x.Trim(' ', '\t');
-
-            //        if (x.StartsWith("int") || x.StartsWith("list"))
-            //        {
-            //            return true;
-            //        }
-
-            //        return false;
-            //    });
-
             var sentence = string.Join(string.Empty, lets);
-
-            InformationOutput.InformationPrint(sentence);
 
             for (int j = 0; j < codeVariables.Count; j++)
             {
                 codeVariables[j].Name = codeVariables[j].Name.Substring(codeVariables[j].Name.LastIndexOf(" "));
             }
-
-            //code.ForEach(x =>
-            //    {
-            //        var original = x;
-            //        x.Trim(' ', '\t');
-
-            //        if (x.StartsWith("for", StringComparison.Ordinal))
-            //        {
-            //            ForTransform(x, code, original, ref labelCounter, listOfEndFors);
-            //        }
-            //        else if (x.StartsWith("endfor", StringComparison.Ordinal))
-            //        {
-            //            //var index = index;
-            //            //take the last string off the list
-            //            code[code.IndexOf(original)] = listOfEndFors[listOfEndFors.Count - 1];
-            //            listOfEndFors.RemoveAt(listOfEndFors.Count - 1);
-            //        }
-            //    });
 
             var i = 0;
             while(i < codeVariables.Count)
@@ -144,9 +109,7 @@ namespace OptimizingParallelCompiler
                             var beforeEquals = x.Substring(0, x.IndexOf("="));
                             if (beforeEquals.Contains(codeVariables[i].Name))
                             {
-                                InformationOutput.InformationPrint(code.IndexOf(x).ToString() + Environment.NewLine);
                                 codeVariables[i].Value = code[code.IndexOf(x)].Substring(code[code.IndexOf(x)].IndexOf("=") + 2);
-                                InformationOutput.InformationPrint(codeVariables[i].Value);
                                 code.Remove(x);
                             }
                         }
@@ -167,9 +130,7 @@ namespace OptimizingParallelCompiler
                     s = s.Trim(' ');
                     if (Regex.Matches(codeVariables[i].Value, @"\b"+s+@"\b").Count > 0)
                     {
-                        Console.Write(true);
                         codeVariables[i].Value = Regex.Replace(codeVariables[i].Value, s, codeVariables[j].Value, RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.IgnoreCase);
-                        Console.Write(codeVariables[i].Value);
                     }
 
                     ++j;

@@ -264,7 +264,7 @@ namespace OptimizingParallelCompiler
         private void deadCodeRemovalToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
-            txtDeadCode.Lines = ConstantPropragation.Constants(txtOneilCode.Lines.ToList());
+            txtDeadCode.Lines = ConstantPropagation.Constants(txtOneilCode.Lines.ToList());
             tabTransform.SelectTab("tbpConstantPropragation");
             oPCodeToolStripMenuItem.Enabled = true;
         }
