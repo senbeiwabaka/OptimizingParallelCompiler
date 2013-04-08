@@ -63,9 +63,6 @@ namespace OptimizingParallelCompiler
                     }
                     else if (x.StartsWith("print", StringComparison.Ordinal) && x.Contains("["))
                     {
-                        //InformationOutput.InformationPrint("original statement : " + original);
-                        //InformationOutput.InformationPrint("trimmed statement : " + x);
-
                         var array = x.Substring(0, x.IndexOf("["));
                         array = array.Substring(array.LastIndexOf(" ") + 1);
                         array += x.Substring(x.IndexOf("["), x.IndexOf("]") - x.IndexOf("[")) + "]";
@@ -73,17 +70,9 @@ namespace OptimizingParallelCompiler
                         OneArrayTransformation(ref original, array, ref counter, generate, letStatementCreation, index, "print");
 
                         code[index] = original;
-
-                        //InformationOutput.InformationPrint("original statement : " + original);
-                        //InformationOutput.InformationPrint("code statement : " + code[index]);
                     }
                     else if (x.StartsWith("if", StringComparison.Ordinal))
                     {
-                        //InformationOutput.InformationPrint("original statement : " + original);
-                        //InformationOutput.InformationPrint("trimmed statement : " + x);
-
-                        //var begin = afterEqual.Substring(0, afterEqual.IndexOf(")"));
-
                         if (x.Contains("let") || x.Contains("goto") || x.Contains("print") || x.Contains("prompt"))
                         {
                             code.Insert(index + 1, original.Substring(0, original.IndexOf("if")) + " " + x.Substring(x.IndexOf("then") + "then".Length));
@@ -91,12 +80,8 @@ namespace OptimizingParallelCompiler
                             original = original.Replace(x.Substring(x.IndexOf("then") + "then".Length), "");
                             x = x.Substring(0, x.IndexOf("then") + "then".Length);
 
-                            //InformationOutput.InformationPrint("original statement : " + original);
-                            //InformationOutput.InformationPrint("code statement : " + code[index]);
-
                             code[index] = original;
                         }
-                        //var between = afterEqual.Substring(0, afterEqual.IndexOf(")") + 1);
                         var equator = EquatorTypeAmount(afterEqual.Substring(afterEqual.IndexOf("(") + 1, afterEqual.IndexOf(")") - afterEqual.IndexOf("(") - 1));
 
                         OneArrayTransformation(ref original, original.Substring(original.IndexOf("(") + 1, original.IndexOf(equator.Type) - original.IndexOf("(") - 1), ref counter, generate, letStatementCreation, index, "if");
