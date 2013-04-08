@@ -249,7 +249,7 @@ namespace OptimizingParallelCompiler
 
             rtbThreeOPCode.Clear();
 
-            rtbThreeOPCode.Lines = ThreeOPConverter.Transform(rtbDependencyOutput.Lines.ToList(), intStatements, letOPCode);
+            rtbThreeOPCode.Lines = ThreeOPConverter.Transform(txtDeadCode.Lines.ToList(), intStatements, letOPCode);
 
             tabTransform.SelectTab("tbpThreeOPCode");
 
