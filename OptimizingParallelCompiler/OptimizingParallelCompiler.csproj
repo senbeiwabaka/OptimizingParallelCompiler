@@ -68,7 +68,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ConstantPropragation.cs" />
+    <Compile Include="ConstantPropagation .cs" />
     <Compile Include="DependencyOutputGenerator.cs" />
     <Compile Include="InformationOutput.cs" />
     <Compile Include="MainForm.cs">
