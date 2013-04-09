@@ -11,7 +11,8 @@ namespace OptimizingParallelCompiler
         public static string[] Generator(List<string> code)
         {
             var sentence = string.Join(string.Empty, code);
-            if (Regex.Matches(sentence, @"\bendfor\b").Count > 0)
+            var count = Regex.Matches(sentence, @"\bendfor\b").Count;
+            if (count > 0)
             {
                 var forLoops = new List<string>();
 
@@ -42,16 +43,6 @@ namespace OptimizingParallelCompiler
                     }
                 }
 
-                int count = 0;
-                code.ForEach(x =>
-                    {
-                        x.Trim(' ', '\t');
-                        if (x.StartsWith("for", StringComparison.Ordinal))
-                        {
-                            ++count;
-                        }
-                    });
-
                 code.ForEach(x =>
                     {
                         var index = code.IndexOf(x);
@@ -70,7 +61,16 @@ namespace OptimizingParallelCompiler
 
                     });
 
-                forLoops.Add(Environment.NewLine);
+                var lub = new List<LowerUpperBound>();
+
+                forLoops.ForEach(x =>
+                    {
+                        x = x.Trim(' ', '\t');
+
+                        InformationOutput.InformationPrint(x);
+                    });
+
+                forLoops.Add(Environment.NewLine + "Variables");
 
                 sentence = string.Empty;
 
@@ -100,6 +100,12 @@ namespace OptimizingParallelCompiler
             public int VariablePosition { get; set; }
             // is it an array
             public bool IsArray { get; set; }
+        }
+
+        private struct LowerUpperBound
+        {
+            public int LowerBound { get; set; }
+            public int UpperBound { get; set; }
         }
     }
 }
