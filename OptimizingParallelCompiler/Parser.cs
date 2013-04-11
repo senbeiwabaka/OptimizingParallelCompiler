@@ -10,7 +10,7 @@ namespace OptimizingParallelCompiler
         /// Transforms O'Neil code to C#
         /// </summary>
         /// <param name="code">Takes in a (referenced) list of type string of the code in the txtOneil textbox</param>
-        public static void Transform(List<string> code, List<ThreeOPCreation> lets, List<ThreeOPCreation> intStatements)
+        public static void Transform(List<string> code, List<ThreeOPCode> lets, List<ThreeOPCode> intStatements)
         {
             var listOfEndFors = new List<string>();
 

@@ -14,8 +14,8 @@ namespace OptimizingParallelCompiler
         private string _output = "Out.exe";
         private CompilerResults _results;
         private const string ErrorFile = "error.txt";
-        private List<ThreeOPCreation> letOPCode = new List<ThreeOPCreation>();
-        private List<ThreeOPCreation> intStatements = new List<ThreeOPCreation>();
+        private List<ThreeOPCode> letOPCode = new List<ThreeOPCode>();
+        private List<ThreeOPCode> intStatements = new List<ThreeOPCode>();
 
         public MainForm()
         {
