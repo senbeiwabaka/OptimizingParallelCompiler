@@ -13,3 +13,15 @@ Then you can turn the code into three OP
 Then you can convert the code to C#
 Then you can compile the code
 Then you can run the code
+
+****
+NOTES : 
+Automation - has a slight bug in that when it runs, anything other than 0 and 1 exit the program
+
+Jacobi - still does not run because we still have not had to implement multi-dimensional arrays and Dr. O'Neil had talked about changing it just a one dimensional array
+
+Sort Insertion - has a slight bug in, that when it runs, it does not swap variables correctly
+
+Tax - crashes the program because a couple of the variables have not been initialized
+
+All other cases worked fine
