@@ -101,7 +101,7 @@ namespace OptimizingParallelCompiler
 
             for (i = 0; i < codeVariables.Count; i++)
             {
-                InformationOutput.InformationPrint(code.IndexOf(codeVariables[i].Name).ToString() + Environment.NewLine);
+                //InformationOutput.InformationPrint(code.IndexOf(codeVariables[i].Name).ToString() + Environment.NewLine);
                 code.ForEach(x =>
                     {
                         if (x.Contains("let"))
@@ -113,7 +113,7 @@ namespace OptimizingParallelCompiler
                                 code.Remove(x);
                             }
                         }
-                        else if (x.Contains(codeVariables[i].Name) && x.Contains("int"))
+                        else if (Regex.Match(x,@"\b"+codeVariables[i].Name+@"\b").Success && Regex.Match(x,@"\bint\b").Success) //(x.Contains(codeVariables[i].Name) && x.Contains("int"))
                         {
                             code.Remove(x);
                         }
