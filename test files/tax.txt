@@ -22,20 +22,9 @@ var
    int eic
    int spousedependant
 begin
-   let line1 = 0
-   let line2 = 0
-   let line3 = 0
    let line4 = 0
    let line5 = 0
-   let line6 = 0
-   let line7 = 0
-   let line8 = 0
-   let dependant = 0
-   let single = 0
    let d = 0
-   let spousedependant= 0
-   let eic = 0
-   let b = 0
    let e = 0
    prompt "Welcome to the United States 1040 federal income tax program.\n"
    prompt "(Note: this isn't the real 1040 form. If you try to submit your\n"
@@ -48,12 +37,14 @@ begin
       if (line1 < 0) then prompt "I need a non-negative number: "
    endwhile
    prompt "Taxable interest (such as from bank accounts)? "
+   let line2 = -1
    while (line2 < 0)
       input line2
       if (line2 < 0) then prompt "I need a non-negative number: "
    endwhile
    prompt "Unemployment compensation, qualified state tuition, and Alaska\n"
    prompt "Permanent Fund dividends? "
+   let line3 = -1
    while (line3 < 0)
       input line3
       if (line3 < 0) then prompt "I need a non-negative number: "
@@ -64,6 +55,7 @@ begin
    prompt "\n"
    prompt "Enter <1> if your parents or someone else can claim you on their"
    prompt " return. \nEnter <0> otherwise: "
+   let dependant = -1
    while (dependant < 0)
       input dependant
       if (dependant < 0) then prompt "I need a non-negative number: "
@@ -73,6 +65,7 @@ begin
    let c = b
    if (c < line1 + 250) then let c = line1 + 250
    prompt "Enter <1> if you are single, <0> if you are married: "
+   let single = -1
    while (single < 0)
       input single
       if (single < 0) then prompt "I need a non-negative number: "
@@ -85,6 +78,7 @@ begin
    if (single != 0) then goto unmarried
    prompt "Enter <1> if your spouse can be claimed as a dependant, "
    prompt "enter <0> if not: "
+   let spousedependant = -1
    while (spousedependant < 0)
       input spousedependant 
       if (spousedependant < 0) then prompt "I need a non-negative number: "
@@ -96,6 +90,7 @@ begin
    goto depnz
    label depz
    prompt "Enter <1> if you are single, <0> if you are married: "
+   let single = -1
    while (single < 0)
       input single
       if (single < 0) then prompt "I need a non-negative number: "
@@ -109,12 +104,14 @@ begin
    print line6
    prompt "\n"
    prompt "Enter the amount of Federal income tax withheld: "
+   let line7 = -1
    while (line7 < 0)
       input line7
       if (line7 < 0) then prompt "I need a non-negative number: "
    endwhile
    prompt "Enter <1> if you get an earned income credit (EIC); "
    prompt "enter 0 otherwise: "
+   let eic = -1
    while (eic < 0)
       input eic
       if (eic < 0) then prompt "I need a non-negative number: "

@@ -8,10 +8,7 @@ var
    int lb
    int ub
    list[30] data
-   int temp
-   int done
 begin
-   let done = 0
    prompt "Please input a non-zero random number generator seed: "
    let seed = -1
    while (seed < 0)
@@ -35,28 +32,12 @@ begin
       let t = data[i]
       let j = i - 1
       while (j >= lb)
-	 let temp = 0
-         if (data[j] > t) then goto swap
-
-	 label cont
+         if (data[j] > t) then let data[j + 1] = data[j]
          let j = j - 1
       endwhile
-      rem let data[j + 1] = t
+      let data[j + 1] = t
    endfor
-
-   let done = 1
-
-   if (done == 1) then goto pr
-
-   label swap
-   let temp = data[j + 1]
-   let data[j + 1] = data[j]
-   let data[j] = temp
-   goto cont
-
    rem end insert sort
-
-   label pr
    prompt "results:\n"
    for i = lb to ub
       print i
