@@ -56,7 +56,7 @@ namespace OptimizingParallelCompiler
 
                             ValueExtration(elements, afterEqual);
 
-                            if (Regex.Matches(afterEqual, "[-+*/%]").Count <= 2)
+                            if (Regex.Matches(afterEqual, "[-+*/%]").Count <= 2 && elements.Count<=3)
                             {
                                 elements.Clear();
                             }
